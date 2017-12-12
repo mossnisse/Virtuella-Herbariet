@@ -1,0 +1,454 @@
+/************************** for all pages *****************************/
+
+body {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+@media print {
+    body {
+        background-color: white;
+        font-family: Georgia, Times, serif;
+        font-size: 10pt;
+    }
+}
+
+.menu1 {
+    background-color: white;
+   /* width: 90%;*/
+    margin: 0;
+}
+
+@media print {
+    .menu1 {
+        display: none;
+    }
+}
+
+.menu1 ul{
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    float: left;
+    width: 100%; /*width of menu*/
+}
+
+.menu1 ul li a{
+float: left;
+color: black; /*text color*/
+padding: 5px 11px;
+text-decoration: none;
+border-right: 6px solid white;
+/*border-left: 3px solid lightgrey;*/
+background-color: white;
+}
+
+.menu1 ul li a:hover{
+color: white !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: darkorange;
+}
+
+.menu1 ul li a{
+color: white !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: grey;
+}
+
+#start_page .menu1 .start_page a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#standard_search .menu1 .standard_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#cross_browser .menu1 .cross_browser a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+.subMenu {
+    background-color: lightgrey;
+    /*width: 50%;*/
+    padding: 10px;
+}
+
+@media print {
+    .submenu {
+        background-color: white;
+        padding: 0px;
+    }
+}
+
+h2 {
+    font-size: 250%;
+    font-family: sans-serif;
+    font-style:normal;
+    font-weight:lighter;
+    color: #404040;
+}
+h2 .first {
+    font-size: 130%;
+    font-weight:normal;
+    color: #DF6C00;
+}
+
+@media print {
+    h2 {
+        color: black;
+    }
+    h2 .first {
+        color: black;
+    }
+}
+
+.menu2 {
+    background-color: lightgray;
+    width: 100%;
+    margin: 0;
+}
+
+@media print {
+    .menu2 {
+        display: none;
+    }
+}
+
+.menu2 ul{
+    background-color: lightgray;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    float: left;
+    width: 100%; /*width of menu*/
+    /*border: 1px solid #564c66; /*dark purple border*/
+    /*border-width: 1px 0;*/
+    /*background: black url(img/menybg1.jpg) center center repeat-x;*/
+}
+
+.menu2 ul li a{
+float: left;
+color: black; /*text color*/
+padding: 5px 11px;
+text-decoration: none;
+border-right: 6px solid lightgray;
+/*border-left: 3px solid lightgrey;*/
+background-color: white;
+}
+
+.menu2 ul li a:hover{
+color: white !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: darkorange;
+}
+
+.menu2 ul li a{
+color: white !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: gray;
+}
+
+#list .menu2 .list a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
+#record .menu2 .record a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
+#map .menu2 .map a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
+#export .menu2 .export a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
+@media print {
+    .menu {
+        display: none;
+    }
+}
+
+
+
+/* a box that center the contet on the page */
+.outerBox {
+    /*margin-left: auto;
+    margin-right: auto;*/
+    margin-top: 1ex;
+    background-color: white;
+    border-style: none /*outset;*/
+}
+@media print {
+    .outerBox {
+        /*margin-left: auto;
+        margin-right: auto;*/
+        margin-top: 0pt;
+        background-color: white;
+        border-style: none;
+    }
+}
+
+.Box {
+    border: 2px solid darkorange;
+    padding: 1em;
+    margin: 1ex;
+}
+@media print {
+    .Box {
+        border: 1pt solid black;
+        padding: 3pt;
+        margin: 3pt;
+    }
+}
+
+.Box td {
+    padding: 3px;
+    vertical-align: top;
+   border: 2px solid transparent;
+} 
+@media print {
+    .Box td {
+        padding: 1pt;
+        vertical-align: top;
+    }
+}
+
+/*
+.Box tr {
+    border: 1pt solid black;
+    backgroundColor: black;
+}*/
+
+
+.curr {
+    font-weight:bold;
+    color: darkorange;
+}
+
+th {
+    text-align:left;
+}
+
+h1 {
+    margin-top: 2ex;
+    /*line-height: 0.2ex;*/
+    margin-bottom: 0ex;
+}
+
+h2 {
+    margin-top: 2ex;
+    /*line-height: 0.2ex;*/
+    margin-bottom: 0ex;
+}
+
+h3 {
+    margin-top: 2ex;
+    /*line-height: 0.2ex;*/
+    margin-bottom: 0ex;
+}
+
+/*****************************  the specimen page **************************************/
+/* the top box in the specimen page */
+#topBox {
+    border: 2px solid darkgrey;
+    padding: 10px;
+    /*margin: 1ex;*/
+    width: 90%;
+}
+@media print {  
+    #topBox {
+        border: 1pt solid black;
+        padding: 5pt;
+        margin: 3pt;
+    }
+}
+
+/* the left box in the specimen page */
+#left {
+    width: 60%;
+    /*border: 2px solid black;*/
+    position: relative;
+    float: left;
+    /*margin: 1ex;*/
+}
+@media print {
+     #left {
+        width: 48%;
+        border: none;
+        position: relative;
+        float: left;
+        margin: 3pt;
+    }
+}
+    
+/* the right box in the specimen page */
+#right {
+    width: 30%;
+    /*border: 2px solid black;*/
+    position: relative;
+    float: left;
+    /*margin: 1ex;*/
+}
+@media print {
+    #right {
+        width: 48%;
+        border: none;
+        position: relative;
+        float: left;
+        margin: 3pt;
+    }
+}
+
+/* google map in the specimen view */
+#smap {
+    width: 100%;
+    height: 370px;
+}
+
+.comment {
+    color: darkgrey;
+}
+
+.LatinSp {
+    font-style: italic;
+}
+
+.Aukt {
+    font-size: small;
+}
+
+
+.SBox {
+    border: 2px solid darkorange;
+    padding: 1em;
+    margin: 1ex;
+    width: 97%;
+}
+
+@media print {
+    .SBox {
+        border: 1pt solid black;
+        padding: 3pt;
+        margin: 3pt;
+        width: 97%;
+    }
+}
+.SBox td {
+    padding: 3px;
+    vertical-align: top;
+}
+@media print {
+    .Box td {
+        padding: 1pt;
+        vertical-align: top;
+    }
+}
+
+.clear {
+    clear:both;
+}
+
+/**************** Standard search ************************/
+
+.sortr a:link {
+     color: green; text-decoration: underline;
+}
+
+.sortr a:visited {
+    color: green; text-decoration: underline;
+}
+
+.sortra a:link {
+     color: black; text-decoration: underline;
+}
+
+.sortra a:visited {
+    color: black; text-decoration: underline;
+}
+
+.eng {
+    width: 15em;
+/*    color: green;
+    font-size: larger;*/
+}
+
+.fbox {
+    width: 18em;
+}
+/********************** Cross browser ****************************/
+
+#sysBox {
+    position: relative;
+    float: left;
+    width: 20em;
+}
+
+#spatBox {
+    position: relative;
+    float: left;
+}
+
+#rurBox {
+    padding: 1em;
+    margin: 1ex;
+}
+
+/***************************** searc result google map ****************************/
+/* google map in the search result view */
+#googleMap {
+    width: 700px;
+    height: 550px;
+}
+
+/**************** List page ************************/
+.typesign {
+    color: red;
+    font-size:65%;
+    vertical-align: super;
+    font-weight:bold;
+}
+/**************************** super search ***************************************/
+/* div box for the explanations id the super search page */
+.outsideBoxS {
+    margin: 1em;
+    max-width: 56em;
+}
+
+#superexpl {
+    width: 70%;
+}
+
+/****************autofill ***********************************/
+#zgen {
+    visibility: hidden;
+    position:absolute;
+    z-index:9;
+}
