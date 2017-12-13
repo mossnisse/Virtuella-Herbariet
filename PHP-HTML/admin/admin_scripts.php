@@ -132,11 +132,11 @@ function doreplace($con, $query, $sfileName, $file_ID) {
         inserting $sfileName in db <br />";
     ob_flush();
     flush();
-    ///$file_ID = insertFileUME($con, $uploadfile, $sfileName);
         
-    $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    try {
+    //$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    //try {
         $result = $con->query($query);
+        if(!$result) echo 'error when trying to insert: ' . $con->error. ' <br />';
         echo "<br /> query: $query <br />
             $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
         echo "
@@ -144,12 +144,11 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             ob_flush();
             flush();
             delfile ($con);
-            /*
         echo "
             <h3> 4. Changing name for geografical regions</h3>";
             ob_flush();
             flush();
-            fixGeoNames($con, $file_ID);*/
+            fixGeoNames($con, $file_ID);
         echo "
             done. Time: " .$timer->getTime() ."
             <h3> 5. Fixing relations for faster access to the db</h3>";
@@ -161,7 +160,7 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             <h3> 6. Calculating coordinates in wgs84 </h3>";
             ob_flush();
             flush();
-            CalcCoordBatch($con, $timer, $file_ID);
+            CalcCoordBatchM($con, $timer, $file_ID);
         echo "
             done. Time: " .$timer->getTime() ."
             <h3> 7. Empty cache </h3>";
@@ -170,10 +169,10 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             emptycache();
         echo "
         done. Time: " .$timer->getTime() ."<p>";
-    } catch (PDOException $e) {
+    /*} catch (PDOException $e) {
         echo 'error when trying to insert: ' . $e->getMessage();
         echo "<br /> query: $query <br /> Time:" .$timer->getTime() . "<p>";
-    }
+    }*/
 }
 
 function emptycache() {
@@ -278,7 +277,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con)." <br />
+        error when creating Genus_ID:".mysql_error($con)." <br />
         query: $query2 <br />";
         
     }
@@ -290,7 +289,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con)." <br />
+        error when creating Taxon_ID:".mysql_error($con)." <br />
         query: $query4 <br />";
         
     }
@@ -302,7 +301,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con)." <br />
+        error when creating Geo_ID:".mysql_error($con)." <br />
         query: $query6 <br />";
     }
    echo "Time: ".$timer->getTime()."<br />";
@@ -313,7 +312,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con2)." <br />
+        error when creating Sign_ID:".mysql_error($con2)." <br />
         query: $query8 <br />";
     }
     echo "Time: ".$timer->getTime()."<br />";
@@ -324,7 +323,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con2)." <br />
+        error when adding Dyntaxa_ID:".mysql_error($con2)." <br />
         query: $query10 <br />";
     }*/
   echo "
@@ -334,7 +333,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error:".mysql_error($con2)." <br />
+        error when creating specimen_ID:".mysql_error($con2)." <br />
         query: $query11 <br />";
     }
     echo "Time: ".$timer->getTime()."<br />";
