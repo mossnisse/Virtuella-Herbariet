@@ -31,14 +31,13 @@ function RT90ToWGS ($RiketsN, $RiketsO) {
     $qs = asin(sin($xp)/cosh($np));
     $WGS['Lat'] = ($qs + sin($qs)*cos($qs)*(0.00673949676 -0.00005314390556 * pow(sin($qs),2)) + 5.74891275E-7 * pow(sin($qs),4)) * 180/M_PI;
     
-    if ($x%1000 == 0  and $y%1000 == 0) {
+    if ($x%10000 == 0  and $y%10000 == 0) {
+        $WGS['Prec'] = 10000;
+    } else if ($x%1000 == 0  and $y%1000 == 0) {
         $WGS['Prec'] = 1000;
-    } else if ($x%100 == 0  and $y%100 == 0) {
-        $WGS['Prec'] = 100;
     } else {
-        $WGS['Prec'] = "";
+        $WGS['Prec'] = 100;
     }
-    
     return $WGS;
 }
 
@@ -96,11 +95,11 @@ function RUBINToRT90($RUBIN) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 5000;
+        $RT90['Prec'] = 4000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  50000; 
+        $RT90['Prec'] =  40000; 
     } else {
         return NULL;
     }
@@ -139,11 +138,11 @@ function LINREGToRT90($LINREG) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 5000;
+        $RT90['Prec'] = 4000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  50000; 
+        $RT90['Prec'] =  40000; 
     } else {
         return NULL;
     }
@@ -187,11 +186,11 @@ function RUBINf($RUBIN) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 5000;
+        $RT90['Prec'] = 4000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  50000; 
+        $RT90['Prec'] =  40000; 
     } else {
         return NULL;
     }
@@ -199,48 +198,6 @@ function RUBINf($RUBIN) {
             $d = numAlpha($d);
     return "$a$b$c$d $e$f$g$h";
 }
-
-
-/*
-function RUBINf($RUBIN){
-    function numAlpha($int) {
-        $int += ord("a");
-        return chr($int);
-    }
-    
-    $RUBIN = str_replace(' ', '', $RUBIN);
-    $RUBIN = str_replace("\xA0", '', $RUBIN);
-    $RUBIN = str_replace("\xC2", '', $RUBIN);
-    $RUBIN = str_replace("\xC2\xA0", '', $RUBIN);
-
-    if (ctype_alpha(substr($RUBIN , 1))) {
-        $a = substr($RUBIN, 0, 1);
-        $b = substr($RUBIN, 1, 1);
-        if (substr($RUBIN, 2, 1)==" ") {
-            $c = substr($RUBIN, 3, 1);
-            $d = substr($RUBIN, 4, 1);
-        } else {
-            $c = substr($RUBIN, 2, 1);
-            $d = substr($RUBIN, 3, 1);
-        }
-        
-    } else {
-        $a = substr($RUBIN, 0, 2 );
-        $b = substr($RUBIN, 2, 1);
-        if (substr($RUBIN, 3, 1)==" ") {
-            $c = substr($RUBIN, 4, 1);
-            $d = substr($RUBIN, 5, 1);
-        } else {
-            $c = substr($RUBIN, 3, 1);
-            $d = substr($RUBIN, 4, 1);
-        }
-    }
-    if (strlen($RUBIN)>3) {
-        if (ctype_digit($d))
-            $d = numAlpha($d);
-    }
-    return "$a$b$c$d";
-}*/
 
 // Konverterar RUBIN koordinater till WGS-84
 function RUBINToWGS($RUBIN) {
@@ -289,12 +246,14 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
     $Long_deg= str_replace(',', '.', $Long_deg);
     $Lat_min= str_replace(',', '.', $Lat_min);
     $Long_min= str_replace(',', '.', $Long_min);
+    // fixa prec för decimaltal
     if (isset($Long_sec) and isset($Lat_sec) and ($Lat_sec != "") and ($Long_sec != ""))
         $WGS['Prec'] = '30';
     else if (isset($Long_min) and isset($Lat_min) and ($Lat_min != "") and ($Long_min != ""))
         $WGS['Prec'] = '2000';
     else if (isset($Long_deg) and isset($Lat_deg) and ($Lat_deg != "") and ($Long_deg != ""))
         $WGS['Prec'] = '120000';
+        // Todo check decimals
     else
         $WGS['Prec'] = 'error';
 
@@ -346,7 +305,7 @@ function CalcCoord($row, $con) {
         $WGS['Source'] = "RT90-coordinates";
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
-    //elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and ($row['Lat_deg'] != "" or $row['Long_deg'] !="" or $row['Long_min'] !="" or $row['Long_min'] !="")) {  // and ($row['Lat_deg'] != 0 or $row['Long_deg'] !=0 or $row['Long_min'] !=0 or $row['Long_min'] !=0)
+
     elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="") {
         $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
@@ -365,21 +324,20 @@ function CalcCoord($row, $con) {
     
     elseif ($row['locality_ID']!= "" and $row['Long'] !="") {
         $locality_ID = $row['locality_ID'];
-        $query = "SELECT lat, `long`, locality FROM locality WHERE ID = $locality_ID";
-        $result = $con->query($query);
+        $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $locality_ID";
+        $result = $con->query($querys);
         if (!$result) {
             echo "
-            error:".mysql_error($con)." <br /> 
-            query: ".$query;
+            error when trying to select from locality tabel:".mysql_error($con)." <br /> 
+            query: ".$querys;
         } else {
             $row2 = $result->fetch();
             $WGS['Lat'] = $row2['lat'];
             $WGS['Long'] = $row2['long'];
             $WGS['Source'] = "LocalityVH";
             $WGS['Value'] = $row2['locality'];
-            $WGS['Prec'] = "";
+            $WGS['Prec'] = $row2['Coordinateprecision'];
          }
-       
     }
     
     elseif ($row['Locality']!= "" and $row['Long'] !="") {
@@ -387,7 +345,7 @@ function CalcCoord($row, $con) {
         $WGS['Long'] = $row['Long'];
         $WGS['Source'] = "Locality";
         $WGS['Value'] = $row['Locality'];
-        $WGS['Prec'] = "";
+        $WGS['Prec'] = $row['Coordinateprecision'];
     }
     elseif (isset($row['District'])) {
         if (isset($row['Longitude']) and $row['Longitude'] !="" ) {
@@ -395,7 +353,7 @@ function CalcCoord($row, $con) {
             $WGS['Long'] = $row['Longitude'];
             $WGS['Source'] = "District";
             $WGS['Value'] = $row['District'];
-            $WGS['Prec'] = "";
+            $WGS['Prec'] = $row['precision'];
         }
         else {
             $WGS['Lat'] = 0;
@@ -415,8 +373,8 @@ function CalcCoord($row, $con) {
     return $WGS;
 }
 
+/*
 function CalcCoordBatch($con, $timer, $file_ID) {
-    //$Where = "";
     //echo "file to calc koord: $file <br />";
     if ($file_ID == 0) {
         $Where = "";
@@ -424,8 +382,8 @@ function CalcCoordBatch($con, $timer, $file_ID) {
         $Where = "WHERE specimens.sFile_ID = '$file_ID'";
     }
     
-    $query = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.Long, locality.Lat, RUBIN, linereg, RiketsN, RiketsO, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude,
-                CSource, specimen_locality.locality_ID
+    $query = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.Long, locality.Lat, RUBIN, linereg, RiketsN, RiketsO, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir,
+                    district.Longitude, district.Latitude, district.precision, CSource, specimen_locality.locality_ID
                FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
                LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID $Where;";
     $result = $con->query($query);
@@ -434,8 +392,6 @@ function CalcCoordBatch($con, $timer, $file_ID) {
     echo "
         $query <br />";
     $i=0;
-    
-    
 
     while($row = $result->fetch()) {
         if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database') {
@@ -461,11 +417,10 @@ function CalcCoordBatch($con, $timer, $file_ID) {
     $t = $timer->getTime();
     echo "
         done calculating $i coordinates in ".round($t)." seccond <br />";
-}
+}*/
 
 function CalcCoordBatchM($con, $timer, $file_ID) {
-    //$Where = "";
-    //echo "file to calc koord: $file <br />";
+    echo "batchM file to calc koord: $file_ID <br />";
     $batch = 50000;
     $test = $batch;
     $counter = 0;
@@ -475,29 +430,27 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
         $Where = "WHERE specimens.sFile_ID = '$file_ID'";
     }
     
-    /*$query = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.Long, locality.Lat, RUBIN, linereg, RiketsN, RiketsO, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, CSource
-               FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province $Where";
-    */
-    $query = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, RUBIN, linereg, RiketsN, RiketsO, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, CSource, specimen_locality.locality_ID 
+    $query3 = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, locality.Coordinateprecision,
+                    RUBIN, linereg, RiketsN, RiketsO,
+                    Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, district.precision,
+                    CSource, specimen_locality.locality_ID 
             FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID
             LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
             LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID
             $Where ";
             
     While( $test == $batch) {
-        
+        echo "Batch no  $counter <br />";
         echo "
-         $query LIMIT $counter, $batch <br />";
+         $query3 LIMIT $counter, $batch <br /> <br />";
         
-        $result = $con->query($query." LIMIT $counter, $batch;");
-            echo "
-                ".mysql_error(). ' <br />';
-        //$test = mysql_num_rows($result);
+        $result = $con->query($query3." LIMIT $counter, $batch;");
+        if ($result === TRUE)
+            echo "error when selecting batch to calc coordinates".$con->error. ' <br />';
          
          $counter += $batch;
         
         $i=0;
-        
     
         $test = 0;
         while($row = $result->fetch()) {
@@ -506,11 +459,12 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
                 $cvalue = SQLf($koord['Value']);
                 $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
                 $result2 = $con->query($query2);
-                if (!$result2) {
-                   // echo "error:".mysql_error($con)." <br />";
-                   echo "error";
-                    echo "query2: ".$query2;
+                if ($result2 === TRUE) {
+                   echo "error when updating coordinate:". $con->error. "<br/>";
+                  // echo "error";
+                    echo "query2: ".$query2. "<br/>";
                 }
+                //echo "query coord: ".$query2. "<br/>";
                 if(!($i % 5000)) {
                     $t = $timer->getTime();
                     echo "
@@ -527,5 +481,4 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     echo "
         done calculating $i coordinates in ".round($t)." seccond <br />";
 }
-
 ?>
