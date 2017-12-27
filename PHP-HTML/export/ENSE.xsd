@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema version ="0.1"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.UMEENSE/" 
+           xmlns:ense="http://www.UMEENSE/" >
+    <xs:element name = "ENSExml">
+        <xs:complexType>
+        <xs:sequence>
+        <xs:element name = "Metadata">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="InstitutionCode" />
+                    <xs:element name="CollectionCode" /> 
+                    <xs:element name="BasisOfRecord" />
+                    <xs:element name="FileCreated" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+        <xs:element name = "RecordSet">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name = "Record">
+                        <xs:complexType>
+                            <xs:all>
+                                <xs:element name="Occurrence" minOccurs="1" />
+                                <xs:element name="Location" minOccurs="1" />
+                                <xs:element name="GlobalUniqueIdentifier" minOccurs="1" />
+                                <xs:element name="DateLastModified" minOccurs="1" />
+                                <xs:element name="CatalogNumber" minOccurs="1" />
+                                <xs:element name="DateCollected" minOccurs="0" />
+                                <xs:element name="Collector" minOccurs="0" />
+                                <xs:element name="CollectorNumber" minOccurs="0" />
+                                <xs:element name="IndividualCount" minOccurs="1" />
+                                <xs:element name="Remarks" minOccurs="0" />
+                                <xs:element name="Continent" minOccurs="0" />
+                                <xs:element name="Country" minOccurs="1" />
+                                <xs:element name="StateProvince" minOccurs="0" />
+                                <xs:element name="County" minOccurs="0" />
+                                <xs:element name="Parish" minOccurs="0" />
+                                <xs:element name="Locality" minOccurs="1" />
+                                <xs:element name="DecimalLatitude" minOccurs="0" />
+                                <xs:element name="DecimalLongitude" minOccurs="0" />
+                                <xs:element name="VerbatimCoordinates" minOccurs="0" />
+                                <xs:element name="VerbatimCoordinateSystem" minOccurs="0" />
+                                <xs:element name="ScientificName" minOccurs="1" />
+                                <xs:element name="Genus" minOccurs="1" />
+                                <xs:element name="SpecificEpithet" minOccurs="0" />
+                                <xs:element name="IntraspecificEpithet" minOccurs="0" />
+                                <xs:element name="InfraspecificRank" minOccurs="0" />
+                                <xs:element name="NomenclatureCode" minOccurs="1" />
+                                <xs:element name="IdentifiedBy" minOccurs="1" />
+                                <xs:element name="DateIdentified" minOccurs="1" />
+                                <xs:element name="Kingdom" minOccurs="0" />
+                                <xs:element name="Phylum" minOccurs="0" />
+                                <xs:element name="Class" minOccurs="0" />
+                                <xs:element name="Order" minOccurs="0" />
+                                <xs:element name="Family" minOccurs="0" />
+                            </xs:all>
+                        </xs:complexType>
+                    </xs:element>  
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+    </xs:complexType>
+    </xs:element>
+</xs:schema>
+

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema version ="0.1"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.UMECore/" 
+           xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
+           xmlns:dcterms="http://purl.org/dc/terms/"
+           xmlns:ucr="http://www.UMECore/" >
+    <xs:import namespace="http://rs.tdwg.org/dwc/terms/" schemaLocation="http://rs.tdwg.org/dwc/xsd/tdwg_dwcterms.xsd"/>
+    <xs:import namespace="http://purl.org/dc/terms/" schemaLocation="http://rs.tdwg.org/dwc/xsd/dublin_core.xsd"/>
+    <xs:element name = "UMECoreRecordSet">
+        <xs:complexType>
+           <xs:sequence>
+                <xs:element ref="dcterms:type" />
+                <xs:element ref="dwc:institutionCode" />
+                <xs:element ref="dwc:collectionCode" /> 
+                <xs:element ref="dwc:basisOfRecord" />
+                <xs:element ref="dwc:nomenclatureCode" />
+                <xs:element ref="ucr:UMECoreRecord" maxOccurs="unbounded" minOccurs="0" /> 
+            </xs:sequence>
+         </xs:complexType>
+    </xs:element>
+    <xs:element name = "UMECoreRecord">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="ucr:Occurrence" minOccurs="1" />
+                <xs:element ref="ucr:Location" minOccurs="1" />
+                <xs:element ref="ucr:Taxon" minOccurs="1" />
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name = "Occurrence">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="dwc:occurrenceID" minOccurs="0" />
+                <xs:element ref="dcterms:modified" minOccurs="0" />
+                <xs:element ref="dwc:catalogNumber" minOccurs="0" />
+                <xs:element ref="dcterms:eventDate" minOccurs="0" />
+                <xs:element ref="dwc:recordedBy" minOccurs="0" />
+                <xs:element ref="dwc:collectorNumber" minOccurs="0" />
+                <xs:element ref="dwc:occurenceRemarks" minOccurs="0" />
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name = "Location">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="dwc:continent" minOccurs="0" />
+                <xs:element ref="dwc:country" minOccurs="0" />
+                <xs:element ref="dwc:stateProvince" minOccurs="0" />
+                <xs:element ref="dwc:county" minOccurs="0" />
+                <xs:element ref="dwc:locality" minOccurs="0" />
+                <xs:element ref="dwc:decimallatitude" minOccurs="0" />
+                <xs:element ref="dwc:decimallongitude" minOccurs="0" />
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name = "Taxon">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="dwc:scientificName" minOccurs="0" />
+                <xs:element ref="dwc:genus" minOccurs="0" />
+                <xs:element ref="dwc:specificEpithet" minOccurs="0" />
+                <xs:element ref="dwc:intraspecificEpithet" minOccurs="0" />
+                <xs:element ref="dwc:nomenclatureCode" minOccurs="0" />
+                <xs:element ref="dwc:identifiedBy" minOccurs="0" />
+                <xs:element ref="dwc:dateIdentified" minOccurs="0" />
+                <xs:element ref="dwc:rike" minOccurs="0" />
+                <xs:element ref="dwc:phylum" minOccurs="0" />
+                <xs:element ref="dwc:class" minOccurs="0" />
+                <xs:element ref="dwc:order" minOccurs="0" />
+                <xs:element ref="dwc:family" minOccurs="0" />
+                <xs:element ref="dwc:taxonRank" minOccurs="0" />
+                
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
