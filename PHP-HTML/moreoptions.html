@@ -1,0 +1,24 @@
+<!Content-type: text/html; charset=utf-8'>
+<table class="SBox">
+    <tr> <th colspan="2"> Select Taxon (using classification) </td> <th> Välj taxon (systematisk indelning) </th> </tr>
+    <tr> <td class="eng"> Kingdom </td> <td class="fbox">
+        <select name="Kingdom" size="1" id = "Kingdom" onchange="getList('Kingdom', 'Phylum');">
+            <option value="*">*</option>
+            <option value=""></option>
+            <option value="Bacteria">Bacteria</option>
+            <option value="Fungi">Fungi</option>
+            <option value="Plantae">Plantae</option>
+            <option value="Protoctista">Protoctista</option>
+        </select> </td> <td> Rike </td> </tr>
+    <tr> <td class="eng"> Phylum (Division) </td> <td class="fbox" id="Phylumd"> <input type="text" name="Phylum" id="Phylum" value="*" size="32" onblur="getList('Phylum', 'Class');" onclick="star('Phylum')" /> </td> <td>  Stam (Division) </td> </tr>
+    <tr> <td class="eng"> Class </td> <td class="fbox" id="Classd"> <input type="text" name="Class" id="Class" value="*" size="32" onblur="getList('Class', 'Order'); getSpList('Class', 'Family');" onclick="star('Class')" /> </td> <td> Klass </td> </tr>
+    <tr> <td class="eng"> Order </td> <td class="fbox" id="Orderd"> <input type="text" name="Order" id="Order" value="*" size="32" onblur="getList('Order', 'Family'); " onclick="star('Order')"/> </td> <td>  Ordning </td> </tr>
+    <tr> <td class="eng"> Family (generates list of genera in top box) </td> <td class="fbox" id="Familyd"> <input type="text" name="Family" id="Family" value="*" size="32" onblur="getList('Family', 'Genus');" onclick="star('Family')"/> </td> <td> Familj (skapar lista på släkten i översta boxen) </td> </tr>
+</table>
+
+
+
+<table class="SBox">
+    
+    <tr> <td colspan="2"> <input type="submit" name= "search" value="Search" /> </td> <td> <a href="standard_search.html"> Clear search fields </a> </td> </tr>
+</table>
