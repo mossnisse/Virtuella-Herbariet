@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /virtuella_herbariet/
+Disallow: /collector.php
+Disallow: /cross_browser.php
+Disallow: /export.php
+Disallow: /list.php
+Disallow: /map.php
+Disallow: /record.php
