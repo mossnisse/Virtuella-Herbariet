@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="author" content="Nils Ericson" />
+        <title> Virtuella herbariet export function for lifewatch</title>
+        <link rel="shortcut icon" href="favicon.ico" />
+	</head>
+	<body>
+		<h1>lifewatch data capture</h1>
+		Funktion för hämntning av data till lifewatch<br/>
+		date - datum för att bara söka ut "filer" som är uppdaterat efter datumet. Format: YYYY-MM-DD <br/>
+		page size - max antal poster i en fil.
+		page - om inte allt får plats i en fil iterera up från 1 tills du får en tom fil.
+		Filter för export: Country = "Sweden"
+		Fil format? Character code = UTF8; brytning mellan poster= Windows style line endings \r\n; Brytning mellan fält = tab \t. <br/>
+		Fältordning:<br/>
+		InstitutionCode, CollectionNumber <br/>
+		Genus, SpeciesEpithet, SspVarForm, HybridName, Dyntaxa_ID <br/>
+		Date, collector <br/>
+		Original_name, Original_text, Notes <br/>
+		Province, District, Locality, Lat, Long, CoordinateSource, sFIle_ID <br/>
+		<form enctype="multipart/form-data" action="lifewatch.php" method="get" accept-charset=\"utf-8\">
+			<table>
+			<tr> <td> Datum: </td> <td> <input type="text" name ="datum" /> </td> </tr>
+			<tr> <td> Page size: </td> <td> <input type="text" name ="pagesize" /> </td> </tr>
+			<tr> <td> Page: </td> <td> <input type="text" name ="page" /> </td> </tr>
+			<tr> <td> <input type="submit" value="OK" /> </td> </tr>
+			</table>
+		</form>
+		Exel/xml format
+		<form enctype="multipart/form-data" action="lifewatche.php" method="get" accept-charset=\"utf-8\">
+			<table>
+			<tr> <td> Datum: </td> <td> <input type="text" name ="datum" /> </td> </tr>
+			<tr> <td> Page size: </td> <td> <input type="text" name ="pagesize" /> </td> </tr>
+			<tr> <td> Page: </td> <td> <input type="text" name ="page" /> </td> </tr>
+			<tr> <td> <input type="submit" value="OK" /> </td> </tr>
+			</table>
+		</form>
+		
+	</body>
+</html>
