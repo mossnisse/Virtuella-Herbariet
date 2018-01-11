@@ -252,6 +252,19 @@ echo "
                     position: new google.maps.LatLng($CLat,$CLong),
                     map: map
                 });";
+                if ($row['CPrec']!="") {
+							echo "
+							var circle = new google.maps.Circle({
+								strokeColor: '#FF0000',
+								strokeOpacity: 0.8,
+								strokeWeight: 2,
+								fillColor: '#FF0000',
+								fillOpacity: 0.35,
+								map: map,
+								center: new google.maps.LatLng($CLat,$CLong),
+								radius: $row[CPrec]
+							});";
+                }
             }
             echo "
             
@@ -467,18 +480,6 @@ if ($row['RiketsN'] != "")
         <tr> <td> Altitude: </td> <td> $row[Altitude_meter] m. </td> </tr>"; */
 echo "
         </table> ";
-        
-/*
-if ($instCode=="LD" and $type_status!="") {
-    $filenamesub = "http://130.235.11.36:591/Lund/Images/$AccessionNo.jpg";
-    $thumb = "http://130.235.11.36:591/Lund/Images/$AccessionNo.gif";
-    //if (@fopen($thumb, "r")) {
-        echo "
-        <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
-        </table>";
-   // }
-}*/
 
 if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
     //$directory = "http://130.235.11.36:591/Lund/Images/";
@@ -545,51 +546,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
         </table>
     ";
     
-}
-
-
-/*elseif ($row['InstitutionCode'] == "S")  {
-        $query = "SELECT URLt, URLs FROM SKryptoBilder Where accnr = '$AccessionNo'";
-        $result = $con->query($query);
-        if (!$result) {
-            echo 'Invalid query: ' . mysql_error();
-        }
-        if (($result->rowCount())>0) {
-            while ($row4 = $result->fetch()) {
-                //$row4 = mysql_fetch_array($result);
-                $URLt = $row4['URLt'];
-                $URLs = $row4['URLs'];
-                echo "
-                <table>
-                    <tr> <td> <a href=\"$URLs\" target =\"_blank\"> <img src=\"$URLt\" </a> </td></tr>
-                </table>";
-            }
-        } else {
-        
-            //echo "num image ".mysql_num_rows($result);
-            $sep = strrpos($AccessionNo,'-')+1;
-            $pref = substr($AccessionNo,0,$sep);
-            $numstr = substr($AccessionNo,$sep);
-            $num1000 = (int)($numstr/1000);
-            $num = $num1000*1000+1;
-            $sero = 6-strlen($num);
-            $seros = "";
-            if($sero==1) $seros ="0";
-            if($sero==2) $seros ="00";
-            if($sero==3) $seros ="000";
-            if($sero==4) $seros ="0000";
-            if($sero==5) $seros ="00000";
-            $subdir="$pref$seros$num";
-            $directory = "http://andor.nrm.se/kryptos/fbo/kryptobase";
-            $filenamesub = "$directory/large/$subdir/$AccessionNo.jpg";
-            $thumb = "$directory/small/$subdir/$AccessionNo.jpg";
-            echo "
-            <table>
-                <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
-            </table>";
-        }
-} */
-    
+}   
     
 echo "
     </td> </tr> </table>";
