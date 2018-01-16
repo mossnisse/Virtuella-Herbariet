@@ -24,8 +24,9 @@
         <a href="lasUpp.php">Lås upp databasen...</a> <p />
         <a href="..\edit\samlare.php">tolkade samlare</a> <br />
         <a href="..\edit\signatures.php">signaturer</a> <br />
-        <a href="..\edit\lokaler.php">lokal databasen</a> <br />
+        <a href="..\locality_search.php">lokal databasen</a> <br />
         <a href="import_localities.php">importera lokaler</a> <br />
+        <a href="lifewatch.html">exportera till lifewatch</a> <br />
         <a href="../">start page</a> <br />
     </div>
 </body>

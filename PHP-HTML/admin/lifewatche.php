@@ -10,7 +10,7 @@ $page = $_GET['page'];
 $date = $_GET['datum'];
 $offset = $pagesize*($page-1);
 
-$query = "SELECT InstitutionCode, AccessionNo, Genus, Species, SspVarForm, HybridName, Dyntaxa_ID, Year, Month, Day, collector, Original_name, Original_text, Notes, Province, District, Locality , Lat, `Long`, CSource, sFile_ID
+$query = "SELECT InstitutionCode, AccessionNo, Genus, Species, SspVarForm, HybridName, Dyntaxa_ID, Year, Month, Day, collector, Original_name, Original_text, Notes, Province, District, Locality , Lat, `Long`, CSource, CValue, CPrec, sFile_ID
 FROM specimens join sfiles ON sfiles.ID = specimens.sFile_ID where country = \"Sweden\" AND sfiles.date > \"$date\" limit $pagesize OFFSET $offset";
 //echo $query ;
 
@@ -43,6 +43,8 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">DecimalLongitude</Data></Cell>
 				
                 <Cell><Data ss:Type=\"String\">CoordinateSource</Data></Cell>
+				<Cell><Data ss:Type=\"String\">CoordinateValue</Data></Cell>
+				<Cell><Data ss:Type=\"String\">CoordinatePrecision</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Original name</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Original text</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Dyntaxa ID</Data></Cell>
@@ -86,6 +88,8 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">$row[Long]</Data></Cell>
 				
                 <Cell><Data ss:Type=\"String\">$row[CSource]</Data></Cell>
+				<Cell><Data ss:Type=\"String\">$row[CValue]</Data></Cell>
+				<Cell><Data ss:Type=\"String\">$row[CPrec]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$original_name</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$original_text</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Dyntaxa_ID]</Data></Cell>
