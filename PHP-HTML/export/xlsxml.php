@@ -11,7 +11,7 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day,
           specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
-          specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource";
+          specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource, specimens.CPrec, specimens.CValue ";
           
 $page = 1;
 $pageSize = 100000;
@@ -56,6 +56,8 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">DecimalLatitude</Data></Cell>
                 <Cell><Data ss:Type=\"String\">DecimalLongitude</Data></Cell>
                 <Cell><Data ss:Type=\"String\">CoordinateSource</Data></Cell>
+                <Cell><Data ss:Type=\"String\">CoordinateValue</Data></Cell>
+                <Cell><Data ss:Type=\"String\">CoordinatePrecision</Data></Cell>
                 <Cell><Data ss:Type=\"String\">ScientificName</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Genus</Data></Cell>
                 <Cell><Data ss:Type=\"String\">SpecificEpithet</Data></Cell>
@@ -106,6 +108,8 @@ while($row = $result->fetch())
                 <Cell><Data ss:Type=\"String\">$row[Lat]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Long]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[CSource]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$row[CValue]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$row[CPrec]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$scientificName</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Genus]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Species]</Data></Cell>
