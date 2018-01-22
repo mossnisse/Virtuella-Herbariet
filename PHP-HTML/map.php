@@ -230,7 +230,7 @@ echo "
     <div class = \"subMenu\">
         <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Map </h2>
         <h3> Specimens giving hits for : $Rubrik </h3>
-        $nrRecords records found of which ".($NrRT90 + $NrLatLong + $NrRUBIN +$NrDistrict+ $NrUPS) ." are mapped on this page.";
+        $nrRecords records found of which ".($NrDistrict + $NrLocality + $NrLocalityVH + $NrRUBIN + $NrLatLong + $NrRT90 + $NrUPS + $NrOHN + $NrLINREG) ." are mapped on this page.";
         
         //echo "nrBlipps: $nrBlipps MapPage: $MapPageSize <p>";
         if ($nrPages>1)
