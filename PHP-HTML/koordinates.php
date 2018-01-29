@@ -241,6 +241,14 @@ function DecLong($Long_deg, $Long_min, $Long_sec, $Long_dir) {
         return $Long_deg+$Long_min/60+$Long_sec/3600;
 }
 
+function get_precision($value) {
+    if (!is_numeric($value)) { return false; }
+    $decimal = $value - floor($value); //get the decimal portion of the number
+    if ($decimal == 0) { return 0; } //if it's a whole number
+    $precision = strlen($decimal) - 2; //-2 to account for "0."
+    return $precision; 
+}
+
 function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Long_min, $Long_sec, $Long_dir) {
     $Lat_deg= str_replace(',', '.', $Lat_deg);
     $Long_deg= str_replace(',', '.', $Long_deg);
@@ -248,15 +256,25 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
     $Long_min= str_replace(',', '.', $Long_min);
     // fixa prec för decimaltal
     if (isset($Long_sec) and isset($Lat_sec) and ($Lat_sec != "") and ($Long_sec != ""))
-        $WGS['Prec'] = '30';
-    else if (isset($Long_min) and isset($Lat_min) and ($Lat_min != "") and ($Long_min != ""))
-        $WGS['Prec'] = '2000';
-    else if (isset($Long_deg) and isset($Lat_deg) and ($Lat_deg != "") and ($Long_deg != ""))
-        $WGS['Prec'] = '120000';
-        // Todo check decimals
+        $WGS['Prec'] = '100';
+    else if (isset($Long_min) and isset($Lat_min) and ($Lat_min != "") and ($Long_min != "")) {
+        $lop = get_precision($Long_min);
+        $lap = get_precision($Lat_min);
+        if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
+        $prec = 2000/pow(10,$lap);
+        if ($prec<500) $prec = 500;
+        $WGS['Prec'] = $prec;
+    }
+    else if (isset($Long_deg) and isset($Lat_deg) and ($Lat_deg != "") and ($Long_deg != "")) {
+        $lop = get_precision($Long_deg);
+        $lap = get_precision($Lat_deg);
+        if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
+        $prec = 120000/pow(10,$lap);
+        if ($prec<500) $prec = 500;
+        $WGS['Prec'] = $prec;
+    }
     else
         $WGS['Prec'] = 'error';
-
     if ($Lat_dir == 'S')
         $WGS['Lat'] = -$Lat_deg-$Lat_min/60-$Lat_sec/3600;
     else
@@ -266,6 +284,41 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
         $WGS['Long'] =  -$Long_deg-$Long_min/60-$Long_sec/3600;
     else
         $WGS['Long'] =  $Long_deg+$Long_min/60+$Long_sec/3600;
+    return $WGS;
+}
+
+function DistDirectWGS84 ($WGS, $distance, $direction) {
+    // using haversine function assumes earth is spherical.
+    //echo "Distance + direction ($WGS[Lat],$WGS[Long]) Distance: $distance Direction: $direction ";
+    $lat = deg2rad($WGS["Lat"]);
+    $long = deg2rad($WGS["Long"]);
+    $drtoaz= array(
+        "N" => 0,
+        "NNE" => 22.5,
+        "NE" => 45,
+        "ENE" => 67.5,
+        "E" => 90,
+        "ESE" => 110.5,
+        "SE" => 135,
+        "SSE" => 157.5,
+        "S" => 180,
+        "SSW" => 202.5,
+        "SW" => 225,
+        "WSW" => 247.5,
+        "W" => 270,
+        "WNW" => 292.5,
+        "NW" => 315,
+        "NNW" => 337.5
+    );
+    $bearing = deg2rad($drtoaz[$direction]);
+    $earthRadius = 6371000;
+    $distFrac = $distance / $earthRadius;
+    $latitudeResult = asin(sin($lat) * cos($distFrac) + cos($lat) * sin($distFrac) * cos($bearing));
+    $a = atan2(sin($bearing) * sin($distFrac) * cos($lat), cos($distFrac) - sin($lat) * sin($latitudeResult));
+    $longitudeResult = ($long + $a);// + 3 * M_PI); //% (2 * M_PI) - M_PI;  // det blir nog fel när det går över meridianen motsatt till greenwich
+    $WGS["Lat"] = rad2deg($latitudeResult);
+    $WGS["Long"] = rad2deg( $longitudeResult);
+    //echo "result: ($WGS[Lat],$WGS[Long]) <br />";
     return $WGS;
 }
 
@@ -300,13 +353,13 @@ function CalcCoord($row, $con) {
         $WGS['Value'] = "";
         $WGS['Prec'] = "unknown";
     }
-    elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0) {
+    elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0 and $row['InstitutionCode']!="LD") {
         $WGS = RT90ToWGS($row['RiketsN'], $row['RiketsO']);
         $WGS['Source'] = "RT90-coordinates";
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
 
-    elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="") {
+    elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="" and $row['InstitutionCode']!="LD") {
         $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
         $WGS['Value'] = "Longitude: $row[Long_deg]º $row[Long_min]' $row[Long_sec]'' $row[Long_dir] Latitude: $row[Lat_deg]º $row[Lat_min]' $row[Lat_sec]'' $row[Lat_dir]";
@@ -322,8 +375,9 @@ function CalcCoord($row, $con) {
         $WGS['Value'] = $row['RUBIN'];
     }
     
-    elseif ($row['locality_ID']!= "" and $row['Long'] !="") {
+    elseif ($row['locality_ID']!= "" ) {  //and $row['Long'] !=""
         $locality_ID = $row['locality_ID'];
+        $specimen_ID =
         $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $locality_ID";
         $result = $con->query($querys);
         if (!$result) {
@@ -332,15 +386,25 @@ function CalcCoord($row, $con) {
             query: ".$querys;
         } else {
             $row2 = $result->fetch();
+            
+            
             $WGS['Lat'] = $row2['lat'];
             $WGS['Long'] = $row2['long'];
+            if ($row['distance']!='') {
+                $WGSD = DistDirectWGS84($WGS, $row['distance'], $row['direction']);
+                $WGS['Lat'] =  $WGSD['Lat'];
+                $WGS['Long'] =  $WGSD['Long'];
+                $WGS['Value'] = $row['distance']."m ".$row['direction']." " .$row2['locality'];
+            } else {
+                $WGS['Value'] = $row2['locality'];
+            }
+            
             $WGS['Source'] = "LocalityVH";
-            $WGS['Value'] = $row2['locality'];
             $WGS['Prec'] = $row2['Coordinateprecision'];
          }
     }
     
-    elseif ($row['Locality']!= "" and $row['Long'] !="") {
+    elseif ($row['Locality']!= "" and $row['Long'] !="") { 
         $WGS['Lat'] = $row['Lat'];
         $WGS['Long'] = $row['Long'];
         $WGS['Source'] = "Locality";
@@ -373,52 +437,6 @@ function CalcCoord($row, $con) {
     return $WGS;
 }
 
-/*
-function CalcCoordBatch($con, $timer, $file_ID) {
-    //echo "file to calc koord: $file <br />";
-    if ($file_ID == 0) {
-        $Where = "";
-    } else {
-        $Where = "WHERE specimens.sFile_ID = '$file_ID'";
-    }
-    
-    $query = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.Long, locality.Lat, RUBIN, linereg, RiketsN, RiketsO, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir,
-                    district.Longitude, district.Latitude, district.precision, CSource, specimen_locality.locality_ID
-               FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
-               LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID $Where;";
-    $result = $con->query($query);
-        echo "
-            ".mysql_error(). ' <br />';
-    echo "
-        $query <br />";
-    $i=0;
-
-    while($row = $result->fetch()) {
-        if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database') {
-            $koord = CalcCoord($row, $con);
-            $cvalue = SQLf($koord['Value']);
-            $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
-            $result2 = $con->query($query2);
-            if (!$result2) {
-                echo "
-                error:".mysql_error($con)." <br /> 
-                query2: ".$query2;
-            }
-            if(!($i % 5000)) {
-                $t = $timer->getTime();
-                echo "
-                    row: $i time: ".round($t)." <br />";
-                ob_flush();
-                flush();
-         }
-        $i++;
-        }
-    }
-    $t = $timer->getTime();
-    echo "
-        done calculating $i coordinates in ".round($t)." seccond <br />";
-}*/
-
 function CalcCoordBatchM($con, $timer, $file_ID) {
     echo "batchM file to calc koord: $file_ID <br />";
     $batch = 50000;
@@ -433,7 +451,7 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     $query3 = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, locality.Coordinateprecision,
                     RUBIN, linereg, RiketsN, RiketsO,
                     Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, district.precision,
-                    CSource, specimen_locality.locality_ID 
+                    CSource, specimen_locality.locality_ID, specimens.InstitutionCode, direction, distance
             FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID
             LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
             LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID
@@ -459,7 +477,7 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
                 $cvalue = SQLf($koord['Value']);
                 $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
                 $result2 = $con->query($query2);
-                if ($result2 === TRUE) {
+                if (!$result2) {
                    echo "error when updating coordinate:". $con->error. "<br/>";
                   // echo "error";
                     echo "query2: ".$query2. "<br/>";
