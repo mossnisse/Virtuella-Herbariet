@@ -30,9 +30,10 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
     echo "
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
-    $query = "SELECT sfiles.name, sfiles.ID, sfiles.date, sfiles.inst, sfiles.coll, Count(*) as records FROM specimens join sfiles on specimens.sFile_ID = sfiles.ID GROUP BY sFile_ID;";
+    $query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
     $result = $con2->query($query);
     if (!$result) {
+        echo "$query <p>";
         echo mysql_error();
     }
     while($row = $result->fetch())
@@ -42,7 +43,7 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
             <td> <input type= \"radio\" name=\"delfile_ID\" value =\"$row[ID]\"/> </td>
             <td> $row[ID] </td>
             <td> $row[name] </td>
-            <td> $row[records] </td>
+            <td> $row[nr_records] </td>
             <td> $row[inst] </td>
             <td> $row[coll] </td>
             <td> $row[date] </td>
@@ -124,6 +125,42 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
     </html>";
 }
 
+function instable($con, $sfileName, $instCode, $collCode) {
+    $query = "INSERT INTO sfiles (name, inst, coll) values ('$sfileName', '$instCode', '$collCode');";
+    $result = $con->query($query);
+    if (!$result) {
+        echo "Query: $query </P>";
+        echo mysql_error();
+        return false;
+    } else {
+        $res = $con->query("SELECT LAST_INSERT_ID()");
+        $ro = $res->fetch();
+        return $ro[0];
+    }
+}
+
+function instablenr($con, $sfileID) {
+    $query = "SELECT count(*) from specimens WHERE sFile_ID = $sfileID Group by sFile_ID";
+    $res = $con->query($query);
+    //echo "Query: $query </p>";
+    if (!$res) {
+        echo "error Query: $query </p>";
+        echo mysql_error();
+        return false;
+    } else {    
+        $ro = $res->fetch();
+        $nr = $ro[0];
+        $query = "UPDATE sfiles set nr_records = $nr WHERE ID = $sfileID";
+        $res2 = $con->query($query);
+        //echo "Query: $query </p>";
+         if (!$res2) {
+            echo "error Query: $query </p>";
+            echo mysql_error();
+            return false;
+        }
+    
+    }
+}
 
 function doreplace($con, $query, $sfileName, $file_ID) {
     $timer = new Timer();
@@ -132,13 +169,14 @@ function doreplace($con, $query, $sfileName, $file_ID) {
         inserting $sfileName in db <br />";
     ob_flush();
     flush();
-        
-    //$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    //try {
-        $result = $con->query($query);
-        if(!$result) echo 'error when trying to insert: ' . $con->error. ' <br />';
-        echo "<br /> query: $query <br />
-            $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
+    $result = $con->query($query);
+    if(!$result) {
+        echo 'error when trying to insert: ' . $con->error. ' <br />';
+        echo "<br /> query: $query <br />";
+    } else {
+        instablenr($con, $file_ID);
+        echo "<br /> query: $query <br />  $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
+       
         echo "
             <h3> 3. Deleting file </h3>";
             ob_flush();
@@ -169,10 +207,7 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             emptycache();
         echo "
         done. Time: " .$timer->getTime() ."<p>";
-    /*} catch (PDOException $e) {
-        echo 'error when trying to insert: ' . $e->getMessage();
-        echo "<br /> query: $query <br /> Time:" .$timer->getTime() . "<p>";
-    }*/
+    }
 }
 
 function emptycache() {
@@ -246,14 +281,14 @@ function fixIdLinks($con, $file_ID, $timer) {
         $query1 = "UPDATE specimens SET Genus_ID = Null;";
         $query2 = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID;";
         $query3 = "UPDATE specimens SET Taxon_ID = Null";
-        $query4 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID;";
+        $query4 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid;";
         $query5 = "UPDATE specimens SET Geo_ID = Null;";
-        $query6 = "UPDATE specimens join district using (district, province, country) SET Geo_ID = district.ID;"; // Collate binnary
+        //$query6 = "UPDATE specimens join district using (district, province, country) SET Geo_ID = district.ID;"; // Collate binnary
         $query6 = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country  SET Geo_ID = district.ID";
         $query7 = "UPDATE specimens SET Sign_ID = Null;";
         $query8 = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID;";
-        $query9 = "UPDATE specimens SET Dyntaxa_ID = Null;";
-        $query10 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Dyntaxa_ID = xnames.taxonid;";
+        //$query9 = "UPDATE specimens SET Dyntaxa_ID = Null;";
+        //$query10 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Dyntaxa_ID = xnames.taxonid;";
         $query11 ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;";
     } else {
         $query1 = "UPDATE specimens SET Genus_ID = Null WHERE sFile_ID = '$file_ID';";
@@ -265,9 +300,12 @@ function fixIdLinks($con, $file_ID, $timer) {
         $query6 = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country SET Geo_ID = district.ID WHERE sFile_ID ='$file_ID'";
         $query7 = "UPDATE specimens SET Sign_ID = Null WHERE sFile_ID = '$file_ID';";
         $query8 = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID  WHERE sFile_ID = '$file_ID';";
-        $query9 = "UPDATE specimens SET Dyntaxa_ID = Null WHERE sFile_ID = '$file_ID';";
+        //$query9 = "UPDATE specimens SET Dyntaxa_ID = Null WHERE sFile_ID = '$file_ID';";
         //$query10 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Dyntaxa_ID = xnames.taxonid WHERE sFile_ID = '$file_ID';";
         $query11 ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode and sFile_ID = '$file_ID';";
+        
+        //fix specimen_locality link with ID
+        // use something like update specimen_locality join specimens using (InstitutionCode, AccessionNo) set specimen_locality.specimen_ID = specimens.ID where sFile_ID = "627";
     }
 
     echo "
@@ -316,16 +354,6 @@ function fixIdLinks($con, $file_ID, $timer) {
         query: $query8 <br />";
     }
     echo "Time: ".$timer->getTime()."<br />";
-  /*  echo "
-        adding DyntaxaID.. <br />";
-    $result = $con->query($query10);
-    ob_flush();
-    flush();
-    if (!$result) {
-        echo "
-        error when adding Dyntaxa_ID:".mysql_error($con2)." <br />
-        query: $query10 <br />";
-    }*/
   echo "
         creating specimen ID in the locality db.. <br />";
     $result = $con->query($query11);
@@ -341,19 +369,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     done fixing id links <br />";
 }
 
-function instable($con, $sfileName, $instCode, $collCode) {
-    $query = "INSERT INTO sfiles (name, inst, coll) values ('$sfileName', '$instCode', '$collCode');";
-    $result = $con->query($query);
-    if (!$result) {
-        echo "Query: $query </P>";
-        echo mysql_error();
-        return false;
-    } else {
-        $res = $con->query("SELECT LAST_INSERT_ID()");
-        $ro = $res->fetch();
-        return $ro[0];
-    }
-}
+
 
 function filetable($con2) {
     echo "
