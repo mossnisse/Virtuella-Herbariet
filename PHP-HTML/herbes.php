@@ -93,7 +93,6 @@ function curPageURLCache() {
 }
 
 function cacheStart() {
-    
     $cachefile = curPageURLCache();
 /*    echo "
 	cache start $cachefile <p />";*/
@@ -127,30 +126,14 @@ function cacheEnd() {
 // Kopplar upp mot databasen (herbes) med en avnändre med endast SELECT rättigheter
 //   och returnerar kopplingen
 function conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass)
-{
-    
-    //$con = new PDO("mysql:host=$MySQLHost;dbname=samhall', $MySQLSUser, $MySQLSPass");
-    
+{   
     try {
-	//$con = new PDO("mysql:host=$MySQLHost;dbname=$MySQLDB", $MySQLSUser, $MySQLSPass);
 	$con = new PDO('mysql:host=localhost;dbname=samhall;charset=utf8', $MySQLSUser, $MySQLSPass);
 	return $con;
     } catch (PDOException $e) {
 	print "Error!: " . $e->getMessage() . "<br/>";
 	die();
     }
-    
-    //echo "conecting to database ($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass)";
-    /*
-    $con = mysql_connect($MySQLHost, $MySQLSUser, $MySQLSPass)
-        or die ('Unable to connect to database!'. mysql_error());
-    if (!mysql_select_db($MySQLDB, $con)) 
-    {
-        echo "Error $MySQLDB at $MySQLHost Database does not exists. <p>";
-    }
-    mysql_set_charset('utf8');
-    return $con;
-    */
 }
 
 // loggar åtkomster i av php sidorna i tabellen logg med ip adress och URL
@@ -331,7 +314,6 @@ function existsInDyntaxa($con,  $Name) {
 		$HybridName = "and HybridName = \"$Name[HybridName]\"";
 	} 
 	
-		
 	$tquery = "select count(*) from xnames where $Genus $Species $SspVarForm $HybridName";
 	$tresult = $con->query($tquery);
 	$trow = $tresult->fetch();
@@ -378,10 +360,6 @@ function dyntaxaID($con) {
 		return null;
 	}
 }
-	
-	
-
-
 
 // klipper och klistrar ihop delar av SQL SELECT query från URL vid utsökning av arter
 // i list.php, collect.php och list.php
@@ -473,7 +451,7 @@ function simpleSQLS($con, $dyntaxaID) {
             foreach ($h as $v) {
                 $SearchValue.=" +$v";
             }
-            $wherestat = ahh($wherestat, " MATCH (Original_text) AGAINST ('$SearchValue' IN BOOLEAN MODE) OR MATCH (Notes) AGAINST ('$SearchValue' IN BOOLEAN MODE)");
+            $wherestat = ahh($wherestat, " (MATCH (Original_text) AGAINST ('$SearchValue' IN BOOLEAN MODE) OR MATCH (Notes) AGAINST ('$SearchValue' IN BOOLEAN MODE))");
         } elseif ($SearchItem == "Where") {
             if ($SearchValue !="" ) {
                 $wherestat = ahh($wherestat, " MATCH(specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality, specimens.Cultivated, specimens.Original_text)
@@ -634,7 +612,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
 		$result = $con->query($query);
 		$nr = getNrRecords ($con);
 	}
-	//echo $query;
+	echo $query;
 	$svar['nr'] = $nr;
 	$svar['result'] = $result;
 	return $svar;
