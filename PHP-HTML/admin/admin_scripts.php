@@ -234,9 +234,15 @@ function delfile ($con) {
         echo "
             delete file $delfile_ID from db <br />";
         $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
+        $query2 = "update sfiles set nr_records = 0 where ID = $delfile_ID";
         //echo "$query <p>";
         $result = $con->query($query);
         if ($result) {
+            $result2 = $con->query($query2);
+            echo "$query2 <br />";
+            if (!$result2) {
+                echo "error updating sfiles table $query2 <br/>";
+            }
             echo "
             $delfile_ID deleted <p />";
             return true;
@@ -247,6 +253,8 @@ function delfile ($con) {
                 query: $query <br />";
             return false;
         }
+       
+
     } else {
         echo "no file to delete chosen <p />";
     }
