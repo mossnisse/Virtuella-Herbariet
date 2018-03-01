@@ -52,6 +52,7 @@ if (isUpdating2()) {
     setUpdating2(false);
 }
 echo "
+        <a href=\"rapport.php?FileID=$File_id\">Fel rapport och rättning</a> <br />
         <a href=\"replaceUPS.php\">back</a> <br />
         <a href=\"admin.php\">admin page</a> <br />
         <a href=\"../\">start page</a> <br />";
