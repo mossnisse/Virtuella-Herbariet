@@ -24,9 +24,10 @@ if (isset($_GET['ARecord'])) {
     $_GET['Page'] =$_GET['ARecord'];
 }
 
+/*
 if (!isset($_GET['Page'])) {
      $_GET['Page'] = 1;
-}
+}*/
 
 $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 //mysql_set_charset('utf8', $con);
@@ -47,22 +48,10 @@ if (isset($_GET['Page'])) {
         $limit = "";
     } else {
         $order2['SQL'];
-        //$wherestat = simpleSQL($con);
-        //$limit = pageSQL($page, 1);
         $whatstat = "specimens.ID, specimens.AccessionNo, specimens.InstitutionCode, CollectionCode";
         $GroupBy = '';
         $svar = wholeSQL($con, $whatstat, $page, 1, $GroupBy, $order2);
         $result = $svar['result'];
-        //$nr = $svar['nr'];
-
-        //SQL_CALC_FOUND_ROWS 
-        //$query = "SELECT specimens.ID, specimens.AccessionNo, specimens.InstitutionCode, CollectionCode $wherestat $sort $limit";
-          
-        //echo "<p>query 1: $query <p>";
-        //$result = $con->query($query);
-        //echo mysql_error($result);
-        //$nr = getNrRecords ($con);
-        //echo $nr;
         $row3 = $result->fetch();
         $ID = $row3['ID'];
         $AccessionNo = $row3['AccessionNo'];
@@ -74,13 +63,13 @@ if (isset($_GET['Page'])) {
         $limit = "";
     }
 } else {
-    $wherestat = "WHERE specimens.AccessionNo = '$AccessionNo'";
+    $wherestat = "WHERE specimens.ID = '$ID'";
+    $_GET['Page'] = 1;
+    $nr=1;
     $sort = "";
     $limit = "";
 }
 
-
-//$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
                  collector, collectornumber, `Year`, `Month`, `Day`, specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
                  Altitude_meter, RUBIN, RiketsN, RiketsO, Notes, Original_name, Original_text, Comments, Cultivated,
@@ -96,7 +85,6 @@ $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.Ssp
                  LEFT JOIN samlare ON signaturer.samlar1_ID = samlare.ID)
                  LEFT JOIN countries ON countries.english = specimens.country)
                  LEFT JOIN district ON specimens.Geo_ID = district.ID)
-                 
           $wherestat $sort $limit";
 
 //echo "<p>query 2: $query <p>";
@@ -117,7 +105,7 @@ while($row2 = $result->fetch())
     //$Scientificnames .= ", ".scn ($row2, $ID, $AccessionNo, $con);
     if ($row2["ID"] == $ID) {
         $row = $row2;
-        if ($row["SspVarForm"]!= "")
+        if ($row["SspVarForm"]!= "" and $row["SspVarForm"]!= " ")
         {
             $sspAukt = $row["Auktor"];
             $query2 = "SELECT Auktor, AccessionNo FROM specimens LEFT JOIN xnames USING (Genus, Species, HybridName) WHERE AccessionNo = '$AccessionNo' AND (xnames.SspVarForm = '' OR xnames.SspVarForm IS NULL) AND Genus = '$row[Genus]' ;";
@@ -537,14 +525,30 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
         </table>";
     }
-} elseif ($row['InstitutionCode'] == "GB"  and $type_status!="") {
-    $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$AccessionNo.jpg";
-    $thumb = "http://herbarium.bioenv.gu.se/web/images/$AccessionNo"."_small.jpg";
+} elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {
+    $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$row[Image1].jpg";
+    $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image1]_small.jpg";
     echo "
     <table>
             <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
         </table>
     ";
+     if (!$row['Image2'] == "") {
+            $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$row[Image2].jpg";
+            $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image2]_small.jpg";
+            echo "
+         <table>
+                <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            </table>";
+    }
+    if (!$row['Image3'] == "") {
+         $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$row[Image3].jpg";
+        $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image3]_small.jpg";
+        echo "
+        <table>
+            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+        </table>";
+    }
     
 }   
     
