@@ -13,7 +13,8 @@ echo "<head>
 	 <body>
 	 <H3>Släkten</H3>
 	 mellanslag eller tabb i slutet eller början av släktnamnet
-	 <table>";
+	 <table>
+		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH><Species/TH><TH>Original name</TH><TH>Country</TH></TR>";
 	 
 $query = "Select ID, AccessionNo, Genus, Species, Original_name, Country from specimens where specimens.sFile_ID =$fileID and (not trim(Genus) = Genus or not trim('\\t' from Genus) = Genus) LIMIT 1000;";
 $result = $con->query($query);
@@ -28,7 +29,7 @@ echo "
 	 <p />
 	 Släkten som saknas i Systematiktabellen eller är felstavade vid registreringen. Visar max 1000 poster
 	 <TABLE>
-		<TR><TD>Catalogue No.</TD><TD>Genus</TD><TD><Species/TD><TD>Original name</TD><TD>Country</TD></TR>";
+		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH><Species/TH><TH>Original name</TH><TH>Country</TH></TR>";
 
 $query = "Select ID, AccessionNo, Genus, Species, Original_name, Country from specimens where specimens.sFile_ID =$fileID and Genus_ID is null LIMIT 1000;";
 $result = $con->query($query);

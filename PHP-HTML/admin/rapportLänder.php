@@ -14,7 +14,7 @@ echo "<head>
 	 Länder som saknas i Landstabeller eller är felstavade vid registreringen. Osynliga tecken m.m. kan också ställa till det. Det finns inte alltid konsensus över vad ett land heter ex (Russia / Russian Federation). Och vissa geografiska regioner använder vi som länder även om de inte är det<br>Visar max 1000.<p />
 	 vi följer i stort  <a href = \"https://en.wikipedia.org/wiki/ISO_3166-1\"> ISO 3166-1 standarden </a>
 	 <Table>
-		<TR><TD>Catalogue No.</TD><TD>Continent</TD><TD>Country</TD><TD>Province</TD></TR>";
+		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>";
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, Province from specimens left join countries on specimens.country = countries.english where sFile_ID = $fileID  and countries.id is null and not specimens.Country =\"\" LIMIT 1000;";
 $result = $con->query($query);

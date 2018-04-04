@@ -13,7 +13,7 @@ echo "<head>
 	 <H3>Provinser som saknas i tabellen</H3>
 	 Visar max 1000 poster
 	 <Table>
-		<TR><TD>Catalogue No.</TD><TD>Continent</TD><TD>Country</TD><TD>Province</TD></TR>";
+		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>";
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, specimens.Province from specimens left join district on district.Country = specimens.Country and district.Province = specimens.Province
 			where sFile_ID = $fileID and district.id is null and NOT specimens.province = \"\"LIMIT 1000";;
@@ -26,10 +26,8 @@ ob_flush();
 flush();
 echo
 "<H3>Provinser som jag anser är felaktigt registrerade</H3>
-<table>";
-
-
-echo "<tr><td>NR</td><td>Species</td><td>Provins</td><td>Samlare</td><td>datum</td><td>text</td></tr>";
+<table>
+<tr><th>NR</th><th>Species</th><th>Provins</th><th>Samlare</th><th>datum</th><th>text</th></tr>";
 
 $query = "select specimens.ID, Genus, Species, SspVarForm, Year, Month, Day, specimens.AccessionNo, Province, oProvince, oDistrict, collector, Original_text from specimen_locality join specimens on specimen_locality.specimen_ID = specimens.ID
 where not oProvince =\"\" and not oProvince = specimens.province and specimens.sFile_ID = $fileID order by Genus;";

@@ -5,32 +5,34 @@ $fileID = $_GET['FileID'];
 $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 
 echo "<head>
-		<title>Rapport District</title>
+		<title>Rapport District Sverige</title>
 		<meta name=\"author\" content=\"Nils Ericson\" />
 		<link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
 	 </head>
 	 <body>
-	 <H3> District med tabb/mellanslag i början/slutet</H3>
+	 För district i Sverige andänd socknar. Det följer typ Riksantikvarieämbetsts socknar med en del undantag.
+	 <H3> District med tabb/mellanslag i början/slutet från Sverige</H3>
 	 <table>
-		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH><TH>District<TH></TR>";
-$query = "Select ID, AccessionNo, Country, Province, District from specimens where specimens.sFile_ID =$fileID and (not trim(District) = District or not trim('\\t' from District) = District) LIMIT 1000;";
+		<TR><TH>Catalogue No.</TH><TH>Province</TH><TH>District<TH></TR>";
+$query = "Select ID, AccessionNo, Province, District from specimens where specimens.sFile_ID =$fileID and specimens.Country = \"Sweden\" and (not trim(District) = District or not trim('\\t' from District) = District) LIMIT 1000;";
 
 $result = $con->query($query);
 while($row = $result->fetch()) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD><TD>$row[District]</TD></TR>";
+	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD><TD>$row[District]</TD></TR>";
 }
 
 echo 
 	 "<table>
-	 <H3>District som saknas i tabellen</H3>
+	 <H3>District som saknas i tabellen från Sverige</H3>
 	 Visar max 1000 poster
 	 <Table>
-		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH><TH>District<TH></TR>";
+		<TR><TD>Catalogue No.</TD><TD>Continent</TD><TD>Country</TD><TD>Province</TD><TD>District<TD></TR>";
 		
-$query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, specimens.Province, specimens.District from specimens where sFile_ID = $fileID and Geo_ID is null and not District = \"\" LIMIT 1000";;
+$query = "Select specimens.ID, AccessionNo, specimens.Province, specimens.District from specimens where sFile_ID = $fileID and specimens.Country = \"Sweden\" and Geo_ID is null and not District = \"\" LIMIT 1000";
+echo "<p>$query <p>";
 $result = $con->query($query);
 while($row = $result->fetch()) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD><TD>$row[District]</TD></TR>";
+	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD><TD>$row[District]</TD></TR>";
 }
 echo "</table>";
 ob_flush();

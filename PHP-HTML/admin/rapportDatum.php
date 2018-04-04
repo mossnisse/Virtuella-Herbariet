@@ -10,10 +10,10 @@ echo "<head>
 		<link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
 	 </head>
 	 <body>
-	 <H3>Uppenbart felaktiga datum</H3>
+	 <H3>Uppenbart felaktiga formaterat datum eller typ månad 13/ dag 32 och liknande</H3>
 	 Visar max 1000 poster
 	 <Table>
-		<TR><TD>Catalogue No.</TD><TD>Year</TD><TD>Month</TD><TD>Day</TD><TD>Collector<TD></TR>";
+		<TR><TH>Catalogue No.</TH><TH>Year</TH><TH>Month</TH><TH>Day</TH><TH>Collector<TH></TR>";
 
 $now = date("Y")+1;
 		
