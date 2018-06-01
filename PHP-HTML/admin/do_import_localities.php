@@ -56,10 +56,12 @@ if ($_POST['mypassword'] == "baconas")
 								$query3 = "Insert into Locality (locality, district, province, country, continent, lat, `long`, RT90N, RT90E,
 											alternative_names, lcomments, coordinate_source, createdby, created, modified, Coordinateprecision)
 											Select Locality, District, Province, Country, Continent,
-											IF (LatitudeLocality='', null, CAST(LatitudeLocality as DECIMAL(10,7))), IF (LongitudeLocality='',null,CAST(LongitudeLocality as DECIMAL(10,7))), 
+											IF (LatitudeLocality='', null, CAST(REPLACE(LatitudeLocality,',','.')  as DECIMAL(10,7))),  IF (LongitudeLocality='',null,CAST(REPLACE(LongitudeLocality,',','.')  as DECIMAL(10,7))),	
 											IF (RiketsN = '',null, CAST(RiketsN AS UNSIGNED) ),  IF (RiketsN = '',null, CAST(RiketsO AS UNSIGNED)),
 											AlternativeNames, Comments, CoordinateSource, RegisteredBy, STR_TO_DATE(Created,'%Y-%m-%d') , STR_TO_DATE(Modified,'%Y-%m-%d'), Coordinateprecision
-											from Locality_temp where ID = $row[ID]";
+											from Locality_temp where ID = $row[ID]";				
+											
+											
 								if ($con2->query($query3)) {
 									echo "Locality insterted: $row[Locality], $row[Province], $row[Country] <br/>";
 								} else {
@@ -73,9 +75,9 @@ if ($_POST['mypassword'] == "baconas")
 						
 					}
 					
-					echo "Empty temp table";
+					/*echo "Empty temp table";
 					$query = "DELETE from locality_temp";
-					$con2->query($query);
+					$con2->query($query);*/
 					
                     echo "<p> <a href=\"admin.php\"> back to admin page </a>";
                 }
