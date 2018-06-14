@@ -447,9 +447,9 @@ echo "
         <table class =\"SBox\">
             <tr> <th colspan=\"2\"> Geospatial information </th> </tr>
             <tr> <td> Continent: </td> <td> <a href=\"cross_browser.php?SpatLevel=1&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" . urlencode($row['Continent']) . "&amp;Herb=All\"> $row[Continent] </a> </td> </tr>
-            <tr> <td> Country: </td> <td> <a href=\"cross_browser.php?SpatLevel=2&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" . urlencode($row['Country']) . "&amp;Herb=All\"> $row[Country] </a> </td> </tr>
-            <tr> <td> $provinceName: </td> <td> <a href=\"cross_browser.php?SpatLevel=3&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" . urlencode($province) . "&amp;Herb=All\"> $province </a> </td> </tr>
-            <tr> <td> $districtName: </td> <td> <a href=\"cross_browser.php?SpatLevel=4&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" .urlencode($district) . "&amp;Province=" . urlencode($province) ." &amp;Herb=All\"> $district </a> </td> </tr>";
+            <tr> <td> Country: </td> <td> <a href=\"maps/country.php?Country=" . urlencode($row['Country']) . "\"> $row[Country] </a> </td> </tr>
+            <tr> <td> $provinceName: </td> <td> <a href=\"maps/province.php?Province=" . urlencode($province) . "&amp;Country=". urlencode($row['Country']) ."\"> $province </a> </td> </tr>
+            <tr> <td> $districtName: </td> <td> <a href=\"maps/district.php?District=" .urlencode($district) . "&amp;Province=" . urlencode($province) ." &amp;Country=". urlencode($row['Country']) ."\"> $district </a> </td> </tr>";
 
 if ($locality !="" )
     echo "
