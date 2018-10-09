@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="herbes.css" type="text/css" />
+    <script src="ajaj.js" type="text/javascript"> </script>
+    <meta name="author" content="Nils Ericson" />
+    <title>Sweden's Virtual Herbarium: Standard search</title>
+</head>
+<body onload="getList('Group', 'Subgroup'); getSpList('Group', 'Genus');
+            getList('Continent', 'Country'); getList('Country', 'Province'); getList('Province', 'District');
+              getList('Genus', 'Species'); getList('Species', 'SspVarForm');" id = standard_search>
+
+<div class = "menu1">
+                <ul>
+                    <li class = "start_page"> <a href="index.html"> Start page </a></li>
+                    <li class = "standard_search"> <a href="standard_search.html">Standard search</a> </li>
+                    <li class ="cross_browser"> <a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a> </li>
+                </ul>
+            </div>
+        <div class = "subMenu">
+    <h2> <span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Standard search </h2>
+    <h3> Finds a set of specimens by using one or several parameters </h3>
+    Fill in one or several fields. <br />
+    Reduce selection by starting at the top of each block, clicking on preset alternatives at each level. Or enter text directly into boxes. <br />
+    Exact match of entire text is usually needed for a hit, but in the fields “Collector”, “Original taxon” and “Original text”, words (one or several) are matched. <br />
+    Fields marked * will not be used in the search. <br />
+    <table class = "outerBox"> <tr> <td> 
+        <form method="get" action="list.php" accept-charset="utf-8">
+            
+<table class="SBox">
+    <tr> <td class="eng" >  <input type="submit" name= "search" value="Search" /> </td> <td class="fbox"> </td> <td> <a href="standard_search.html"> Clear search fields </a> </td> </tr>
+    <tr> <th colspan="2"> Select Taxon (using easy groups) </th> <th> Välj taxon (enkel indelning) </th> </tr>
+    <tr> <td class="eng" > Major group </td> <td class="fbox">
+    <select name="Group" size="1" id = "Group" onchange="getList('Group', 'Subgroup'); getSpList('Group', 'Genus');">
+            <option value="*">*</option>
+            <option value="Slime molds / Slemsvampar"> Slime molds / Slemsvampar </option>
+            <option value="Fungi except Lichens / Svampar utom Lavar">Fungi except Lichens / Svampar utom Lavar</option>
+            <option value="Lichens / Lavar">Lichens / Lavar</option>
+            <option value="Algae / Alger">Algae / Alger</option>
+            <option value="Bryophytes / Mossor">Bryophytes / Mossor</option>
+            <option value="Pteridophytes / Kärlkryptogamer"> Pteridophytes / Kärlkryptogamer </option>
+            <option value="Spermatophytes / Fröväxter">Spermatophytes / Fröväxter</option>
+            <option value=""></option>
+        </select> </td> <td> Huvudgrupp </td> </tr>
+    <tr> <td class="eng"> Subgroup </td> <td class="fbox" id="Subgroupd"> <input type="text" name="Subgroup" id="Subgroup" value="*" size="32" onblur="getList('Subgroup', 'Genus');" onclick="star('Subgroup')" /> </td> <td> Undergrupp </td> </tr>
+    <tr>
+        <td class="eng"> Genus </td>
+        <td class="fbox" id="Genusd">
+            <div id="dGenus" >
+                <input type="text" name="Genus" id="Genus" value="*" size="20" autocomplete="off" onblur="getList('Genus', 'Species'); getHybrids('Genus', 'HybridName'); hideauto();" onclick="star('Genus');" onkeyup="acomplete('Genus');" /> <br />
+                <div id="zgen">
+                    <select name="sGenus" size="5" id = "sGenus" onchange="fillin();">
+                        <option value="hej"> hej </option>
+                        <option value="hejdå"> hejdå </option>
+                    </select>
+                </div>
+            </div>
+    </td> <td> Släkte </td> </tr>
+    
+    <tr> <td class="eng"> Species </td> <td class="fbox" id="Speciesd"> <input type="text" name="Species" id="Species" value="*" size="20" onblur="getList('Species', 'SspVarForm');" onclick="star('Species')" /> </td> <td> Art </td> </tr>
+    <tr> <td class="eng"> Intraspecific taxon </td> <td class="fbox" id="SspVarFormd"> <input type="text" name="SspVarForm" id="SspVarForm" value="*" size="32" onclick="star('SspVarForm')" /> </td> <td> Inomartstaxon </td></tr>
+    <tr> <td class="eng"> Hybrid </td> <td class="fbox" id="HybridNamed"> <input type="text" name="HybridName" id="HybridName" value="*" size="32" onclick="star('HybridName')" /> </td> <td> Hybrid </td></tr>
+</table>
+<table class="SBox">
+    <tr> <th colspan="2"> Select Geographical unit </th>  <th> Välj geografisk enhet </th> </tr>
+    <tr> <td class="eng"> Continent </td> <td class="fbox">
+        <select name="Continent" size="1" id = "Continent" onchange="getList('Continent', 'Country');">
+            <option value="*">*</option>
+            <option value=""></option>
+            <option value="Africa">Africa</option>
+            <option value="Antarctica">Antarctica</option>
+            <option value="Asia">Asia</option>
+            <option value="Europe">Europe</option>
+            <option value="North America">North America</option>
+            <option value="Oceania">Oceania </option>
+            <option value="South & Central America">South & Central America</option>
+        </select> </td> <td> Världsdel </td> </tr>
+    <tr> <td class="eng"> Country </td> <td class="fbox" id="Countryd"> <input type="text" name="Country" value="*" size="32" id = "Country" onblur="prvName(); disName(); getList('Country', 'Province'); " onclick="star('Country')"/>  </td> <td> Land </td> </tr>
+    <tr> <td class="eng"> Province <span id="prvName"></span> </td> <td class="fbox" id="Provinced"> <input type="text" name="Province" value="*" size="32" id = "Province" onblur="getList('Province', 'District');" onclick="star('Province')" /> </td> <td> Provins <span id="sprvName">(landskap)</span> </td> </tr>
+    <tr> <td class="eng"> District <span id="disName"></span> </td> <td class="fbox" id="Districtd"> <input type="text" name="District" value="*" size="32" id = "District" onclick="star('District')" /> </td> <td> Distrikt <span id="sdisName">(socken)</span></td> </tr>
+</table>
+<table class="SBox">
+    <tr> <th colspan="2"> Various search fields </th> <th> Diverse sökfält </th> </tr>
+    <tr> <td class="eng"> Herbarium </td> <td class="fbox">
+        <select name="InstitutionCode" size="1" id = "institutionCode" >
+            <option value="*">*</option>
+            <option value=""></option>
+            <option value="GB">GB - Göteborg</option>
+            <option value="LD">LD - Lund</option>
+            <option value="OHN">OHN - Oskarshamn</option>
+            <option value="S">S - Stockholm</option>
+            <option value="UME">UME - Umeå</option>
+            <option value="UPS">UPS - Uppsala</option>
+        </select> </td> <td> Herbarium </td> </tr>
+    <tr> <td class="eng"> Catalogue number </td> <td class="fbox"> <input type="text" name="AccessionNo" value="*" size="32" onclick="star('AccessionNo')" /> </td> <td> Katalognummer </td> </tr>
+    <tr> <td class="eng"> Collector </td> <td class="fbox"> <input type="text" name="SmartCollector" value="*" size="32" onclick="star('SmartCollector')" /> </td> <td> Samlare </td> </tr>
+    <tr> <td class="eng"> Collector's number </td> <td class="fbox"> <input type="text" name="Collectornumber" value="*" size="32" onclick="star('Collectornumber')" /> </td> <td> Insamlarnummer </td> </tr>
+    <tr> <td class="eng"> Collection year </td> <td class="fbox"> From: <input type="text" name="YearStart" value="*" size="5" onclick="star('YearStart')"/> To: <input type="text" name="YearEnd" value="*" size="5" onclick="star('YearEnd')" /> </td> <td> Insamlingsår </td> </tr>
+    <tr> <td class="eng"> Collection date </td> <td class="fbox"> Y: <input type="text" name="Year" value="*" size="4" onclick="star('Year')"/> M: <input type="text" name="Month" value="*" size="2" onclick="star('Month')" /> D: <input type="text" name="Day" value="*" size="2" onclick="star('Day')" /> </td> <td> Insamlingsdatum </td> </tr>    
+    <tr> <td class="eng"> Original taxon  (as written on label) </td> <td class="fbox"> <input type="text" name="Original_name" value="*" size="32" onclick="star('Original_name')"/> </td> <td> Taxon i original (som på etiketten) </td> </tr>
+    <tr> <td class="eng"> Original text (locality etc. In UPS only Locality) </td> <td class="fbox"> <input type="text" name="Original_text" value="*" size="32" onclick="star('Original_text')"/> </td> <td> Originaltext (lokal kan sökas här)</td> </tr>
+     <tr> <td class="eng"> Image </td> <td class="fbox">
+    <select name="Image" size="1" id = "Image">
+            <option value="*">*</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+    </select> </td> <td> Bild </td> </tr>
+</table>
+<table class="SBox">
+    <tr> <th colspan="2"> Type specimens </th> <th> Typmaterial </th> </tr>
+    <tr> <td class="eng"> Type status </td> <td class="fbox">
+    <select name="Type_status" value="*" size="1" id = "Type_status">
+        <option value="*">*</option>
+        <option value="All"> All </option>
+        <option value="Epitype"> Epitype </option>
+        <option value="Holotype"> Holotype </option>
+        <option value="Isolectotype"> Isolectotype </option>
+        <option value="Isoneotype"> Isoneotype</option>
+        <option value="Isotype"> Isotype </option>
+        <option value="Lectotype"> Lectotype </option>
+        <option value="Neotype"> Neotype </option>
+        <option value="Paratype"> Paratype </option>
+        <option value="Possible type"> Possible type </option>
+        <option value="Syntype"> Syntype </option>
+        <option value="Type"> Type </option>
+        <option value="Type fragment"> Type fragment </option>
+    </select> </td> <td> Typstatus </td> </tr>
+   <tr> <td class="eng"> Type of </td> <td class="fbox"> <input type="text" name="Basionym" value="*" size="32" onclick="star('Basionym')" /> </td> <td> Typens originalnamn </td> </tr>
+    
+</table>
+
+<table class="SBox">
+    <tr> <th colspan="2"> Swedish search fields </th> <th> Svenska sökfält </th> </tr>
+    <tr> <td class="eng"> Swedish name of taxon <br /> </td> <td class="fbox"> <input type="text" name="Svenskt_namn" value="*" size="32" onclick="star('Svenskt_namn')" /> </td> <td> Svenskt växtnamn </td> </tr>
+    <tr> <td class="eng"> Län </td> <td class="fbox" id="Land">
+    <select name="Lan" value="*" size="1" id = "Lan" onchange="getList('Lan', 'Kommun');">
+        <option value="*">*</option>
+        <option value="Skåne län"> Skåne län </option>
+        <option value="Blekinge län"> Blekinge län </option>
+        <option value="Kronobergs län"> Kronobergs län </option>
+        <option value="Gotlands län"> Gotlands län </option>
+        <option value="Kalmar län"> Kalmar län </option>
+        <option value="Jönköpings län"> Jönköpings län </option>
+        <option value="Hallands län"> Hallands län </option>
+        <option value="Västra Götalands län"> Västra Götalands län </option>
+        <option value="Östergötlands län"> Östergötlands län </option>
+        <option value="Örebro län"> Örebro län </option>
+        <option value="Södermanlands län"> Södermanlands län </option>
+        <option value="Stockholms län"> Stockholms län </option>
+        <option value="Värmlands län"> Värmlands län </option>
+        <option value="Västmanlands län"> Västmanlands län </option>
+        <option value="Uppsala län"> Uppsala län </option>
+        <option value="Dalarnas län"> Dalarnas län </option>
+        <option value="Gävleborgs län"> Gävleborgs län </option>
+        <option value="Västernorrlands län"> Västernorrlands län </option>
+        <option value="Jämtlands län"> Jämtlands län </option>
+        <option value="Västerbottens län"> Västerbottens län </option>
+        <option value="Norrbottens län"> Norrbottens län </option>
+    </select> </td> <td> Län</td> </tr>
+    <tr> <td class="eng"> Kommun </td> <td class="fbox" id="Kommund"> <input type="text" name="Kommun" value="*" size="32" id = "Kommun" onclick="star('Kommun')" /> </td> <td> Kommun </td> </tr>
+    <tr> <td colspan="2"> <input type="submit" name= "search" value="Search" /> </td> <td> <a href="standard_search.html"> Clear search fields </a> </td> </tr>
+</table>
+
+<div id="moreOptions">
+
+</div>
+</form>
+
+<form action="" method="get" style="text-align: left">
+    <input id = "opbutton" type="button" name="button" value="show extended search" onClick="moreoptions()" />
+</form>
+  
+    </td> </tr> </table>
+</div>
+</body>
+</html>
