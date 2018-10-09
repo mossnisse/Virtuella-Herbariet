@@ -11,7 +11,7 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day,
           specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
-          specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource, specimens.CPrec, specimens.CValue ";
+          specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource, specimens.CPrec, specimens.CValue, specimens.Type_status, specimens.TAuctor, specimens.Basionym ";
           
 $page = 1;
 $pageSize = 100000;
@@ -68,6 +68,9 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">Original name</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Original text</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Dyntaxa ID</Data></Cell>
+                <Cell><Data ss:Type=\"String\">Type status</Data></Cell>
+                <Cell><Data ss:Type=\"String\">Basionym</Data></Cell>
+                <Cell><Data ss:Type=\"String\">Type Auctor</Data></Cell>
             </Row>";
 
 while($row = $result->fetch())
@@ -120,6 +123,9 @@ while($row = $result->fetch())
                 <Cell><Data ss:Type=\"String\">$original_name</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$original_text</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Dyntaxa_ID]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$row[Type_status]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$row[Basionym]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$row[TAuctor]</Data></Cell>
             </Row>";
 }
 
