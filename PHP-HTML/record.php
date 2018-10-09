@@ -376,9 +376,8 @@ echo "
 if ($type_status!="") {
     echo "
         <table class =\"SBox\">
-            <tr> <th> $type_status </th> </tr>
-            <tr> <td> Basionym:  </td> <td> $basionym </td> </tr>
-            <tr> <td> Auctor:  </td> <td> $tauctor </td> </tr>
+            <tr> <th> Type status </th> </tr>
+            <tr> <td> $type_status of $basionym $tauctor </td> </tr>
         </table>";
 }
         
