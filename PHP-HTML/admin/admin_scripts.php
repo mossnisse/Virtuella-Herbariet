@@ -158,7 +158,6 @@ function instablenr($con, $sfileID) {
             echo mysql_error();
             return false;
         }
-    
     }
 }
 
@@ -169,11 +168,14 @@ function doreplace($con, $query, $sfileName, $file_ID) {
         inserting $sfileName in db <br />";
     ob_flush();
     flush();
-    $result = $con->query($query);
-    if(!$result) {
-        echo 'error when trying to insert: ' . $con->error. ' <br />';
-        echo "<br /> query: $query <br />";
-    } else {
+    $stmt = $con->prepare($query);
+    $stmt->execute();
+    //$result = $con->query($query);
+    $stmt = $con->query('SHOW WARNINGS');
+    echo "Warnings<br/>";
+    var_dump($stmt->fetchAll());
+    echo "<p/>";
+    if($stmt->errorCode() == 0) {
         instablenr($con, $file_ID);
         echo "<br /> query: $query <br />  $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
        
@@ -207,6 +209,11 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             emptycache();
         echo "
         done. Time: " .$timer->getTime() ."<p>";
+    } else {
+        echo 'error when trying to insert file:';
+        $errors = $stmt->errorInfo();
+        echo($errors[2]).'<br />';
+        echo "<br /> query: $query <br />";
     }
 }
 
