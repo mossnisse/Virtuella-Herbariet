@@ -26,9 +26,9 @@ DROP TABLE IF EXISTS `fix_uk_prov`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `fix_uk_prov` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `SProvince` varchar(45) DEFAULT NULL,
-  `Province` enum('England','Isle of Man','Wales','Scotland','Northern Ireland') DEFAULT NULL,
-  `District` varchar(45) DEFAULT NULL,
+  `SProvince` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
+  `Province` enum('England','Isle of Man','Wales','Scotland','Northern Ireland') CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
+  `District` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-12-08 13:38:32
+-- Dump completed on 2019-01-16 12:48:00

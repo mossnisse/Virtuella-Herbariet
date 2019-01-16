@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `countries`;
 CREATE TABLE `countries` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `english` varchar(45) DEFAULT NULL,
-  `swedish` varchar(45) DEFAULT NULL,
+  `swedish` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
   `native` varchar(45) DEFAULT NULL,
   `provinceName` varchar(45) DEFAULT NULL,
   `wgs84N` double DEFAULT NULL,
@@ -70,4 +70,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-06-13 14:57:40
+-- Dump completed on 2019-01-16 12:47:59

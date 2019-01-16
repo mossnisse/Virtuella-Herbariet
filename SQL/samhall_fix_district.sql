@@ -26,10 +26,10 @@ DROP TABLE IF EXISTS `fix_district`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `fix_district` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `SProvince` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `SDistrict` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `Province` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `District` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `SProvince` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
+  `SDistrict` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
+  `Province` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
+  `District` varchar(45) CHARACTER SET utf8 COLLATE utf8_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2025 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-06-01 11:11:46
+-- Dump completed on 2019-01-16 12:47:59
