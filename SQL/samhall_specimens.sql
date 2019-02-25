@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `specimens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `specimens` (
-  `AccessionNo` varchar(16) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `AccessionNo` varchar(16) DEFAULT NULL,
   `Day` char(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `Month` char(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `Year` char(4) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
@@ -68,13 +68,13 @@ CREATE TABLE `specimens` (
   `Geo_ID` int(10) unsigned DEFAULT NULL,
   `Genus_ID` int(10) unsigned DEFAULT NULL,
   `uDate` int(10) unsigned DEFAULT NULL,
-  `InstitutionCode` enum('LD','UME','GB','UPS','OHN','S','') DEFAULT NULL,
+  `InstitutionCode` enum('LD','UME','GB','UPS','OHN','S','') CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `CollectionCode` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `LastModified` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `prevDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `LasModifiedFM` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `CPrec` varchar(45) DEFAULT NULL,
-  `Type_status` enum('','Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?') DEFAULT NULL,
+  `Type_status` enum('','Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material') DEFAULT NULL,
   `TAuctor` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `Basionym` varchar(64) DEFAULT NULL,
   `linereg` varchar(45) DEFAULT NULL,
@@ -98,10 +98,12 @@ CREATE TABLE `specimens` (
   KEY `Sign_ID` (`Sign_ID`),
   KEY `Geo_ID` (`Geo_ID`),
   KEY `dyntaxa_id` (`Dyntaxa_ID`),
+  KEY `TypeStatus` (`Type_status`),
   FULLTEXT KEY `oName` (`Original_name`),
   FULLTEXT KEY `Basionym` (`Basionym`),
-  FULLTEXT KEY `oText` (`Original_text`,`Notes`)
-) ENGINE=MyISAM AUTO_INCREMENT=64193936 DEFAULT CHARSET=utf8;
+  FULLTEXT KEY `oText` (`Original_text`,`Notes`),
+  FULLTEXT KEY `Collector` (`collector`)
+) ENGINE=MyISAM AUTO_INCREMENT=65725993 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -113,4 +115,4 @@ CREATE TABLE `specimens` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-16 12:48:34
+-- Dump completed on 2019-02-25 11:54:47
