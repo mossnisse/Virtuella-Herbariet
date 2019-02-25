@@ -181,12 +181,12 @@ function logg($MySQLHost, $MySQLLUser, $MySQLLPass)
 	or $user_agent == 'nrsbot/6'
 	or $user_agent == 'yacybot (freeworld-global; amd64 Linux 3.2.0-4-amd64; java 1.6.0_27; Europe/de) http://yacy.net/bot.html'
 	or $user_agent == 'German Wikipedia Broken Weblinks Bot; contact: gifti@tools.wmflabs.org'
+	or $user_agent == 'Mozilla/5.0 (compatible; SemrushBot/1.1~bl; +http://www.semrush.com/bot.html)'
 	)
     {
 	
     } else {
     
-	
 	try {
 	    $con2 = new PDO('mysql:host=localhost;dbname=samhall', 'logger', 'simpleton');
 	    $ip=$_SERVER['REMOTE_ADDR'];
@@ -502,7 +502,7 @@ function simpleSQLS($con, $dyntaxaID) {
             $wherestat = ahh($wherestat, " district.`Län` = '$SearchValue' ");
 			$Geo = true;
         } elseif ($SearchItem == "Type_status" and $SearchValue == "All") {
-            $wherestat = ahh($wherestat, " Type_status != '' ");
+            $wherestat = ahh($wherestat, " Type_status IN('Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material') ");
 		} elseif ($SearchItem == "Basionym") {
             $h = explode(" ",$SearchValue);
             $SearchValue="";
@@ -544,7 +544,7 @@ function simpleSQLS($con, $dyntaxaID) {
 			$wherestat = ahh($wherestat, " $wherestattemp ");
 		} else {
             if ($SearchValue != "") {
-               $wherestat = ahh($wherestat, " specimens.`$SearchItem` = '$SearchValue' COLLATE utf8_swedish_ci ") ;
+               $wherestat = ahh($wherestat, " specimens.`$SearchItem` = '$SearchValue' ") ;  //COLLATE utf8_swedish_ci 
             } else
             {
                 $wherestat = ahh($wherestat, " (specimens.`$SearchItem` = '' OR specimens.`$SearchItem` IS NULL) " );
@@ -612,7 +612,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
 		$result = $con->query($query);
 		$nr = getNrRecords ($con);
 	}
-	echo $query;
+	//echo $query;
 	$svar['nr'] = $nr;
 	$svar['result'] = $result;
 	return $svar;
