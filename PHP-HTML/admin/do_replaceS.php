@@ -38,15 +38,18 @@ if (isUpdating2()) {
         
         $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings' IGNORE 1 LINES 
         (`AccessionNo`, `Genus`, @Species,  SspVarForm, Basionym, Type_status, collector, Collectornumber,
-        `Exsiccata`, `Exs_no`, `Year`, `Month`, `Day`, @continent, country, province, district, `Original_text`, habitat,
+        `Exsiccata`, `Exs_no`, @Year, @Month, @Day, @continent, country, province, district, `Original_text`, habitat,
         `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `RUBIN`, RiketsN, RiketsO, @AltMin, @AltMax, comments, image1, image2, image3, image4)
-        SET `sFile_ID` = '$File_id',
-        institutionCode = '$instCode',
-        CollectionCode = '$collCode',
-        Altitude_meter = SAlt(@AltMin, @AltMax),
-        continent = SContinent(@continent, @country),
-		Species = SSpecies(@Species),
-		HybridName = SHybridName(@Species)";
+			SET `sFile_ID` = '$File_id',
+			institutionCode = '$instCode',
+			CollectionCode = '$collCode',
+			Altitude_meter = SAlt(@AltMin, @AltMax),
+			continent = SContinent(@continent, @country),
+			Species = SSpecies(@Species),
+			HybridName = SHybridName(@Species),
+			Year = ToInt(@Year),
+			Month = ToInt(@Month),
+            Day = ToInt(@Day);";
 
 		//echo $query;
 

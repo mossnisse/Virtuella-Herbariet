@@ -43,17 +43,20 @@ if (isUpdating2()) {
 
        
          $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings' 
-        (`AccessionNo`, `Day`, `Month`, `Year`, Genus, @Taxon, collector, Collectornumber, @annan_ett, @continent, Country, province, district, @olokal, `Exsiccata`, `Exs_no`, @Rubin1, @Rubin2,
+        (`AccessionNo`, @Day, @Month, @Year, Genus, @Taxon, collector, Collectornumber, @annan_ett, @continent, Country, province, district, @olokal, `Exsiccata`, `Exs_no`, @Rubin1, @Rubin2,
             RiketsN, RiketsO, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, LasModifiedFM, Basionym ,Type_status, habitat)
-        SET `sFile_ID` = '$File_id',
-        institutionCode = '$instCode',
-        CollectionCode = '$collCode',
-        Species = Species2(@Taxon),
-        SspVarForm = Ssp(@Taxon),
-        HybridName = '',
-        continent = SContinent(@continent, @country),
-        Original_text = CONCAT(@annan_ett,\"\\n\" ,@olokal),
-        Rubin = CONCAT(@Rubin1, \" \", @Rubin2);";
+            SET `sFile_ID` = '$File_id',
+            institutionCode = '$instCode',
+            CollectionCode = '$collCode',
+            Species = Species2(@Taxon),
+            SspVarForm = Ssp(@Taxon),
+            HybridName = '',
+            continent = SContinent(@continent, @country),
+            Original_text = CONCAT(@annan_ett,\"\\n\" ,@olokal),
+            Rubin = CONCAT(@Rubin1, \" \", @Rubin2),
+            Year = ToInt(@Year),
+            Month = ToInt(@Month),
+            Day = ToInt(@Day);";
         
         doreplace($con,$query, $sfileName, $File_id);
     }

@@ -37,8 +37,8 @@ if (isUpdating2()) {
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
        $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$line_endings'
-        (`AccessionNo`, @Day, @Month, @Year, `Genus`, @Species, @irang, @iepi, collector, Collectornumber, notes, continent, country, province, district, original_text,
-        habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, @dumy, Type_status, Basionym) 
+        (`AccessionNo`, @Day, @Month, @Year, @Genus, @Species, @irang, @iepi, @HTaxa, collector, Collectornumber, notes, continent, country, province, district, original_text,
+        habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, LasModifiedFM, Type_status, Basionym) 
         SET `sFile_ID` = '$File_id', institutionCode = 'UPS', collectionCode = '',
             SspVarForm = concat(@irang, ' ', @iepi),
             CSource = CSource(@Lat, @Long),
@@ -46,14 +46,15 @@ if (isUpdating2()) {
             `Lat` = ToNum(@Lat),
             HybridName = UPSHybrid(@Species),
             Species = UPSSpecies(@Species),
+			Genus = UPSGenus(@Genus,@HTaxa),
             Year = ToInt(@Year),
             Month = ToInt(@Month),
             Day = ToInt(@Day);";
-
         doreplace($con,$query, $sfileName, $File_id);
     }
     setUpdating2(false);
 }
+
 echo "
         <a href=\"rapport.php?FileID=$File_id\">Fel rapport och rättning</a> <br />
         <a href=\"replaceUPS.php\">back</a> <br />

@@ -37,12 +37,15 @@ if (isUpdating2()) {
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
         $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings'
-            (`AccessionNo`, `Day`, `Month`, `Year`, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
+            (`AccessionNo`, @Day, @Month, @Year, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
             `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
             `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`, `RiketsN`,
             `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `LastModified`,
             `linereg`, `Type_status`, `Basionym`, `TAuctor`, `image1`, `image2`, `image3`)
-            SET `sFile_ID` = '$File_id', institutionCode = '$instCode', collectionCode = '$collCode'";
+            SET `sFile_ID` = '$File_id', institutionCode = '$instCode', collectionCode = '$collCode',
+            Year = ToInt(@Year),
+            Month = ToInt(@Month),
+            Day = ToInt(@Day);";
 
         doreplace($con,$query, $sfileName, $File_id);
     }

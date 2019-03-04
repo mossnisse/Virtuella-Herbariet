@@ -144,7 +144,7 @@ function instablenr($con, $sfileID) {
     $res = $con->query($query);
     //echo "Query: $query </p>";
     if (!$res) {
-        echo "error Query: $query </p>";
+        echo "instablenr error Query: $query </p>";
         echo mysql_error();
         return false;
     } else {    
@@ -171,9 +171,10 @@ function doreplace($con, $query, $sfileName, $file_ID) {
     $stmt = $con->prepare($query);
     $stmt->execute();
     //$result = $con->query($query);
-    $stmt = $con->query('SHOW WARNINGS');
-    echo "Warnings<br/>";
-    var_dump($stmt->fetchAll());
+    //$stmt = $con->query('SHOW WARNINGS');
+    //echo "Warnings<br/>";
+    //var_dump($stmt->fetchAll());
+    warningFormat($con,$sfileName);
     echo "<p/>";
     if($stmt->errorCode() == 0) {
         instablenr($con, $file_ID);
@@ -365,7 +366,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error when creating Sign_ID:".mysql_error($con2)." <br />
+        error when creating Sign_ID:".mysql_error($con)." <br />
         query: $query8 <br />";
     }
     echo "Time: ".$timer->getTime()."<br />";
@@ -376,7 +377,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     flush();
     if (!$result) {
         echo "
-        error when creating specimen_ID:".mysql_error($con2)." <br />
+        error when creating specimen_ID:".mysql_error($con)." <br />
         query: $query11 <br />";
     }
     echo "Time: ".$timer->getTime()."<br />";
@@ -465,6 +466,23 @@ function upploadfile($backpage) {
             return false;
         }
     }
+}
+
+function warningFormat($con, $sfileName) {
+    $stmt = $con->query('SHOW WARNINGS');
+    $errors = $stmt->fetchAll();
+    echo "Warnings <br/>
+        <Table>
+        <tr><th>Level</th><th>Message</th></tr>";
+    foreach ($errors as $w) {
+        echo "<tr><td>$w[Level]</td><td>$w[Message]</td></tr>";
+    }
+    echo "</Table>";
+    $myfile = fopen("C:/inetpub/wwwroot/uploadlogs/$sfileName.txt", "w") or die("Unable to open file!");
+    foreach ($errors as $w) {
+        fwrite($myfile, "$w[Level]: $w[Message]\r\n");
+    }
+    fclose($myfile);    
 }
 
 /*

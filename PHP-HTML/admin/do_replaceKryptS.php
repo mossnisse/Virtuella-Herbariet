@@ -53,7 +53,7 @@ if (isUpdating2()) {
        
          $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings' IGNORE 1 LINES 
         (`AccessionNo`, @Taxon, Basionym, Type_status, collector, Collectornumber,
-        `Exsiccata`, `Exs_no`, `Year`, `Month`, `Day`, @continent, country, province, district, `Original_text`, habitat,
+        `Exsiccata`, `Exs_no`, @Year, @Month, @Day, @continent, country, province, district, `Original_text`, habitat,
         `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, comments)
         SET `sFile_ID` = '$File_id',
         institutionCode = '$instCode',
@@ -62,8 +62,10 @@ if (isUpdating2()) {
         Species = Species2(@Taxon),
         SspVarForm = Ssp(@Taxon),
         HybridName = '',
-        continent = SContinent(@continent, @country)";
-
+        continent = SContinent(@continent, @country),
+        Year = ToInt(@Year),
+        Month = ToInt(@Month),
+        Day = ToInt(@Day);";
         
         doreplace($con,$query, $sfileName, $File_id);
     }
