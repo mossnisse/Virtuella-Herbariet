@@ -26,9 +26,9 @@ DROP TABLE IF EXISTS `specimens`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `specimens` (
   `AccessionNo` varchar(16) DEFAULT NULL,
-  `Day` char(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `Month` char(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `Year` char(4) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `Day` tinyint(4) DEFAULT NULL,
+  `Month` tinyint(4) DEFAULT NULL,
+  `Year` smallint(6) DEFAULT NULL,
   `Genus` varchar(32) DEFAULT NULL,
   `Species` varchar(42) DEFAULT NULL,
   `SspVarForm` varchar(42) DEFAULT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE `specimens` (
   FULLTEXT KEY `Basionym` (`Basionym`),
   FULLTEXT KEY `oText` (`Original_text`,`Notes`),
   FULLTEXT KEY `Collector` (`collector`)
-) ENGINE=MyISAM AUTO_INCREMENT=65725993 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=65931676 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -115,4 +115,4 @@ CREATE TABLE `specimens` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-02-25 11:54:47
+-- Dump completed on 2019-03-04 11:21:12
