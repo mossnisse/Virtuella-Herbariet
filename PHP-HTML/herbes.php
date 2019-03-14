@@ -451,7 +451,7 @@ function simpleSQLS($con, $dyntaxaID) {
             foreach ($h as $v) {
                 $SearchValue.=" +$v";
             }
-            $wherestat = ahh($wherestat, " (MATCH (Original_text) AGAINST ('$SearchValue' IN BOOLEAN MODE) OR MATCH (Notes) AGAINST ('$SearchValue' IN BOOLEAN MODE))");
+            $wherestat = ahh($wherestat, " MATCH (Original_text, Notes) AGAINST ('$SearchValue' IN BOOLEAN MODE)");
         } elseif ($SearchItem == "Where") {
             if ($SearchValue !="" ) {
                 $wherestat = ahh($wherestat, " MATCH(specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality, specimens.Cultivated, specimens.Original_text)
@@ -612,7 +612,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
 		$result = $con->query($query);
 		$nr = getNrRecords ($con);
 	}
-	//echo $query;
+	echo $query;
 	$svar['nr'] = $nr;
 	$svar['result'] = $result;
 	return $svar;
