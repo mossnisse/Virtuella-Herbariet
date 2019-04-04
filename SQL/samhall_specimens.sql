@@ -74,7 +74,7 @@ CREATE TABLE `specimens` (
   `prevDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `LasModifiedFM` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `CPrec` varchar(45) DEFAULT NULL,
-  `Type_status` enum('','Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material') DEFAULT NULL,
+  `Type_status` enum('','Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material','conserved type') DEFAULT NULL,
   `TAuctor` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `Basionym` varchar(64) DEFAULT NULL,
   `linereg` varchar(45) DEFAULT NULL,
@@ -101,9 +101,9 @@ CREATE TABLE `specimens` (
   KEY `TypeStatus` (`Type_status`),
   FULLTEXT KEY `oName` (`Original_name`),
   FULLTEXT KEY `Basionym` (`Basionym`),
-  FULLTEXT KEY `oText` (`Original_text`,`Notes`),
-  FULLTEXT KEY `Collector` (`collector`)
-) ENGINE=MyISAM AUTO_INCREMENT=65931676 DEFAULT CHARSET=utf8;
+  FULLTEXT KEY `Collector` (`collector`),
+  FULLTEXT KEY `oText` (`Original_text`,`Notes`)
+) ENGINE=MyISAM AUTO_INCREMENT=71006436 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -115,4 +115,4 @@ CREATE TABLE `specimens` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-04 11:21:12
+-- Dump completed on 2019-04-04 11:58:35
