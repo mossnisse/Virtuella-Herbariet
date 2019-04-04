@@ -502,7 +502,7 @@ function simpleSQLS($con, $dyntaxaID) {
             $wherestat = ahh($wherestat, " district.`Län` = '$SearchValue' ");
 			$Geo = true;
         } elseif ($SearchItem == "Type_status" and $SearchValue == "All") {
-            $wherestat = ahh($wherestat, " Type_status IN('Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material') ");
+            $wherestat = ahh($wherestat, " Type_status IN('Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material','conserved type') ");
 		} elseif ($SearchItem == "Basionym") {
             $h = explode(" ",$SearchValue);
             $SearchValue="";
@@ -612,7 +612,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
 		$result = $con->query($query);
 		$nr = getNrRecords ($con);
 	}
-	echo $query;
+	//echo $query;
 	$svar['nr'] = $nr;
 	$svar['result'] = $result;
 	return $svar;
