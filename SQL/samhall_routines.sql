@@ -436,6 +436,7 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `PDay`(datum varchar(90)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
+    DECLARE CONTINUE HANDLER FOR 1265 return null;
     IF (LOCATE("-",datum,7) > 1) THEN
         return SUBSTRING_INDEX(datum,'-',-1);
     ELSE
@@ -457,11 +458,16 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `PMonth`(datum varchar(12)) RETURNS int(11)
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `PMonth`(datum varchar(12)) RETURNS varchar(11) CHARSET utf8
     DETERMINISTIC
 BEGIN
+    DECLARE CONTINUE HANDLER FOR 1265 return null;
     IF (INSTR(datum,"-") > 0) THEN
-        return SUBSTRING_INDEX (SUBSTRING_INDEX(datum,'-',2),'-',-1);
+        IF (SUBSTRING_INDEX (SUBSTRING_INDEX(datum,'-',2),'-',-1)>0) THEN
+            return SUBSTRING_INDEX (SUBSTRING_INDEX(datum,'-',2),'-',-1);
+        ELSE
+            return null;
+        END IF;
     ELSE
         return NULL;
     END IF;
@@ -530,7 +536,12 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `PYear`(datum varchar(90)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
-    return SUBSTRING_INDEX(datum,'-',1);
+    DECLARE CONTINUE HANDLER FOR 1265 return null;
+    IF (SUBSTRING_INDEX(datum,'-',1) > 0) THEN
+        return SUBSTRING_INDEX(datum,'-',1);
+    ELSE
+        return null;
+    END IF;
  END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -993,4 +1004,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-04 11:58:37
+-- Dump completed on 2019-06-10 10:48:57
