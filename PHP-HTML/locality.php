@@ -22,14 +22,14 @@
 				$mod_date = substr ($row['modified'],0,10 );
 				echo "<tr><td>Locality: </td><td> $row[locality]</td></tr>";
 				echo "<tr><td>Alternative names: </td> <td> $row[alternative_names]</td></tr>";
-				echo "<tr><td>Country: </td><td>$row[country]</td></tr>";
-				echo "<tr><td>Province: </td><td>$row[province]</td></tr>";
-				echo "<tr><td>District: </td><td>$row[district]</td></tr>";
+				echo "<tr><td>Country: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/country.php?Country=$row[country]\"> $row[country] </a></td></tr>";
+				echo "<tr><td>Province: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/province.php?Province=$row[province]&Country=$row[country]\"> $row[province] </a></td></tr>";
+				echo "<tr><td>District: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/district.php?District=$row[district]&Province=$row[province]&Country=$row[country]\">$row[district]</a>    </td></tr>";
 				echo "<tr><td>WGS84: </td><td>$row[lat], $row[long]</td></tr>";
 				echo "<tr><td>RT90: </td><td>$row[RT90N], $row[RT90E]</td></tr>";
 				echo "<tr><td>Source: </td> <td> $row[coordinate_source] </td></tr>";
 				echo "<tr><td>Comments: </td><td>$row[lcomments]</td></tr>";
-				echo "<tr><td>Size/Precision: </td><td>$row[Coordinateprecision]</td></tr>";
+				echo "<tr><td>Size/Precision: </td><td>$row[Coordinateprecision] m</td></tr>";
 				echo "<tr><td>Created: </td><td>$create_date $row[createdby]</td></tr>";
 				echo "<tr><td>Modified: </td><td>$mod_date $row[modifiedby]</td></tr>";
 				echo "<tr><td><a href=\"list.php?Country=$row[country]&Province=$row[province]&District=$row[district]&Locality=$row[locality]\">Specimens</a> </td><td> OBS more specimens can come from the same place that is not registered with the locality name</td></tr>" ;

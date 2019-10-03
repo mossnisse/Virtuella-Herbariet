@@ -17,6 +17,7 @@
 				<tr> <td> <input type="submit" name= "search" value="Search" /> </td ></tr>
 			</table>
 		</td> </tr> </table>
+		You can use * as one or more unkown characters.
 		</form>
 		<form method="get" action="download_locality.php" accept-charset="utf-8">
 				Download the locality db  in Excel xml spreadsheet file format <input type="submit" name= "dowload locality db" value="Download" />
