@@ -42,6 +42,57 @@ function RT90ToWGS ($RiketsN, $RiketsO) {
 }
 
 
+Function Sweref99TMToWGS($north, $east) {
+    //echo "Sweref99Tm$north, $east";
+    $degToRad = M_PI/180;
+    $radToDeg = 180/M_PI;
+	$a_roof = 6367449.145771048;
+	$delta1 = 8.37732168164144E-4;
+	$delta2 = 5.905869626082731E-8;
+	$delta3 = 1.6734889049883464E-10;
+	$delta4 = 2.1677378055967573E-13;
+	$Astar = 0.006739496761943626;
+	$Bstar = -5.314390558188795E-5;
+	$Cstar = 5.748912755111949E-7;
+	$Dstar = -6.820452542788346E-9;
+    $lambda_zero = 0.26179938779914946;
+	        
+        // Convert.
+	$xi = ($north ) / (0.9996 * $a_roof);
+	$eta = ($east - 500000) / (0.9996 * $a_roof);
+	$xi_prim = $xi -
+	                $delta1 * sin(2.0 * $xi) * cosh(2.0 * $eta) -
+	                $delta2 * sin(4.0 * $xi) * cosh(4.0 * $eta) -
+	                $delta3 * sin(6.0 * $xi) * cosh(6.0 * $eta) -
+	                $delta4 * sin(8.0 * $xi) * cosh(8.0 * $eta);
+	$eta_prim = $eta -
+	                $delta1 * cos(2.0 * $xi) * sinh(2.0 * $eta) -
+	                $delta2 * cos(4.0 * $xi) * sinh(4.0 * $eta) -
+	                $delta3 * cos(6.0 * $xi) * sinh(6.0 * $eta) -
+	                $delta4 * cos(8.0 * $xi) * sinh(8.0 * $eta);
+	$phi_star = asin(sin($xi_prim) / cosh($eta_prim));
+	$delta_lambda = atan(sinh($eta_prim) / cos($xi_prim));
+	$lon_radian = $lambda_zero + $delta_lambda;
+	$lat_radian = $phi_star + sin($phi_star) * cos($phi_star) *
+	                ($Astar +
+	                $Bstar * pow(sin($phi_star), 2) +
+	                $Cstar * pow(sin($phi_star), 4) +
+	                $Dstar * pow(sin($phi_star), 6));
+	        //return new Coordinates($lat_radian*$radToDeg, $lon_radian*$radToDeg);
+     $WGS['Long'] = $lon_radian*$radToDeg; 
+     $WGS['Lat'] = $lat_radian*$radToDeg;
+     //echo "wgs $WGS[Lat], $WGS[Long]";
+      if ($north%10000 == 0  and $east%10000 == 0) {
+        $WGS['Prec'] = 10000;
+    } else if ($north%1000 == 0  and $east%1000 == 0) {
+        $WGS['Prec'] = 1000;
+    } else {
+        $WGS['Prec'] = 100;
+    }
+        
+    return $WGS;
+}
+
 // Konverterar RUBIN koordinater till RT-90
     
 function alphaNum3($char) {
@@ -353,13 +404,20 @@ function CalcCoord($row, $con) {
         $WGS['Value'] = "";
         $WGS['Prec'] = "unknown";
     }
-    elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0 and $row['InstitutionCode']!="LD") {
+    
+    if (isset($row['Sweref99TMN']) and isset($row['Sweref99TME']) and $row['Sweref99TMN']!=0 and $row['Sweref99TME']!=0 ) {
+		$WGS = Sweref99TMToWGS($row['Sweref99TMN'], $row['Sweref99TME']);
+        $WGS['Source'] = "Sweref99TM-coordinates";
+        $WGS['Value'] = "$row[Sweref99TMN]N, $row[Sweref99TME]E";
+    }
+    
+    elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0 ) {
         $WGS = RT90ToWGS($row['RiketsN'], $row['RiketsO']);
         $WGS['Source'] = "RT90-coordinates";
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
 
-    elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="" and $row['InstitutionCode']!="LD") {
+    elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="" ) {
         $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
         $WGS['Value'] = "Longitude: $row[Long_deg]º $row[Long_min]' $row[Long_sec]'' $row[Long_dir] Latitude: $row[Lat_deg]º $row[Lat_min]' $row[Lat_sec]'' $row[Lat_dir]";
@@ -369,7 +427,7 @@ function CalcCoord($row, $con) {
         $WGS['Source'] = "LINEREG";
         $WGS['Value'] = $row['linereg'];
     }
-    elseif ($row['RUBIN']!="") {
+    elseif ($row['RUBIN']!="" and $row['RUBIN']!=" ") {
         $WGS = RUBINToWGS($row['RUBIN']);
         $WGS['Source'] = "RUBIN";
         $WGS['Value'] = $row['RUBIN'];
@@ -449,7 +507,7 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     }
     
     $query3 = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, locality.Coordinateprecision,
-                    RUBIN, linereg, RiketsN, RiketsO,
+                    RUBIN, linereg, RiketsN, RiketsO, Sweref99TMN, Sweref99TME,
                     Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, district.precision,
                     CSource, specimen_locality.locality_ID, specimens.InstitutionCode, direction, distance
             FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID

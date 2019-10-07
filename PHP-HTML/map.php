@@ -68,6 +68,7 @@ $NrDistrict =0 ;
 $NrLatLong = 0;
 $NrUPS = 0;
 $NrOHN =0;
+$NrSweref =0;
 
 $numIcons = 7;
 
@@ -135,6 +136,11 @@ if (isset($_GET['OrderBy'])) $OrderByAdr = "&OrderBy=$_GET[OrderBy]"; else  $Ord
                 case "RT90-coordinates":
                     $nrOfSpecimens+=$Nr;
                     $NrRT90+=$Nr;
+                    $i++;
+                    break;
+                case "Sweref99TM-coordinates":
+                    $nrOfSpecimens+=$Nr;
+                    $NrSweref+=$Nr;
                     $i++;
                     break;
                 case "UPS Database":
@@ -273,6 +279,7 @@ echo "
             <b> Sources for locations of map symbols </b> <br />
             Lack coordinates and are not mapped: <a href=\"list.php?$adr&amp;CSource=None\">$NrNone</a> <br />
             RT90 2.5 gon V (only Sweden). Coordinate given with accuracy varying from 10 m to 1 km: <a href=\"list.php?$adr&amp;CSource=RT90-coordinates\">$NrRT90</a> records <br />
+            Sweref99TM (only Sweden). Coordinate given with accuracy varying from 10 m to 1 km: <a href=\"list.php?$adr&amp;CSource=Sweref99TM-coordinates\">$NrSweref</a> records <br />
             Latitude / Longitude. Accuracy varying: <a href=\"list.php?$adr&amp;CSource=Latitude+/+Longitude\">$NrLatLong</a> records <br />
             RUBIN (only Sweden). Located at centre of RT90 grid square, size usually 5×5 km: <a href=\"list.php?$adr&amp;CSource=RUBIN\">$NrRUBIN</a> records <br />
             LINREG (only Sweden). Located at centre of RT90 grid square, size usually 100×100 m: <a href=\"list.php?$adr&amp;CSource=LINREG\">$NrLINREG</a> records <br />
