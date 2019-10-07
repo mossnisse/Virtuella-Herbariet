@@ -61,7 +61,7 @@ CREATE TABLE `specimens` (
   `long_dir` varchar(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `Long` double DEFAULT NULL,
   `Lat` double DEFAULT NULL,
-  `CSource` enum('None','Latitude / Longitude','District','RUBIN','RT90-coordinates','UPS Database','OHN Database','Locality','LINEREG','LocalityVH','') DEFAULT NULL,
+  `CSource` enum('None','Latitude / Longitude','District','RUBIN','RT90-coordinates','UPS Database','OHN Database','Locality','LINEREG','LocalityVH','Sweref99TM-coordinates','') DEFAULT NULL,
   `CValue` varchar(128) DEFAULT NULL,
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Taxon_ID` int(10) unsigned DEFAULT NULL,
@@ -86,6 +86,9 @@ CREATE TABLE `specimens` (
   `image3` varchar(90) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `image4` varchar(90) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `Dyntaxa_ID` int(11) DEFAULT NULL,
+  `Sweref99TMN` int(11) DEFAULT NULL,
+  `Sweref99TME` int(11) DEFAULT NULL,
+  `UTM` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `Genus` (`Genus`),
   KEY `Species` (`Species`),
@@ -103,7 +106,7 @@ CREATE TABLE `specimens` (
   FULLTEXT KEY `Basionym` (`Basionym`),
   FULLTEXT KEY `Collector` (`collector`),
   FULLTEXT KEY `oText` (`Original_text`,`Notes`)
-) ENGINE=MyISAM AUTO_INCREMENT=71006436 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=80445719 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -115,4 +118,4 @@ CREATE TABLE `specimens` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-04 11:58:35
+-- Dump completed on 2019-10-07 16:32:32
