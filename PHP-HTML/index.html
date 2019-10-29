@@ -3,12 +3,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="stylesheet" href="herbes.css" type="text/css" />
+		<script src="stats.js" type="text/javascript"> </script>
         <meta name="author" content="Nils Ericson" />
 	<meta name="keywords" content="Virtuella herbariet">
         <title> Sweden's Virtual Herbarium </title>
         <link rel="shortcut icon" href="favicon.ico" />
     </head>
-    <body  id = "start_page">
+    <body id = "start_page" onload="fillStats();">
         <div class = "menu1">
                 <ul>
                     <li class = "start_page"> <a href="index.html"> Start page </a></li>
@@ -20,14 +21,14 @@
             <h2> <span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium </h2>
             <table class = "outerBox"> <tr> <td>
                 <div class = "Box">
-                    <b> This is a joint search page for Sweden's six largest herbaria. 4,2 million specimens and 100,000 images can be searched from</b><p />
+                    <b> This is a joint search page for Sweden's six largest herbaria. <span id="tot">??</span> million specimens and <span id="images">100,000</span> images can be searched from</b><p />
                     <table>
-                    <tr> <td>Göteborg <a href = "http://bioenv.gu.se/forskning/forskningsresurser/herbarium">GB</a> - Herbarium GB</td><td>(14% of the collection)</td> </tr>
-                    <tr> <td>Lund <a href = "http://www.biomus.lu.se/en/botanical-collections">LD</a> - Botaniska museet</td><td>(41% of the collection)</td> </tr>
-                    <tr> <td>Oskarshamn <a href = "http://www.bimon.se/sida4/sida4_1.php?select=meny4_1">OHN</a> - Biologiska museet</td><td>(99% of the collection)</td> </tr>
-                    <tr> <td>Stockholm <a href = "http://www.nrm.se/forskningochsamlingar/samlingar.179.html">S</a> - Naturhistoriska riksmuseet </td><td> (38% of the collection)</td> </tr>
-                    <tr> <td>Umeå <a href = "https://www.umu.se/institutionen-for-ekologi-miljo-och-geovetenskap/forskning/herbarium-ume/">UME</a> - Herbarium UME</td><td>(33% of the collection)</td> </tr>
-                    <tr> <td>Uppsala <a href = "http://www.evolutionsmuseet.uu.se/databaser/index.html">UPS</a> - Evolutionsmuseet Botanik</td><td>(24% of the collection)</td> </tr>
+                    <tr> <td>Göteborg <a href = "http://bioenv.gu.se/forskning/forskningsresurser/herbarium">GB</a> - Herbarium GB</td><td>(<span id="GB">??</span>% of the collection)</td> </tr>
+                    <tr> <td>Lund <a href = "http://www.biomus.lu.se/en/botanical-collections">LD</a> - Botaniska museet</td><td>(<span id="LD">??</span>% of the collection)</td> </tr>
+                    <tr> <td>Oskarshamn <a href = "http://www.bimon.se/sida4/sida4_1.php?select=meny4_1">OHN</a> - Biologiska museet</td><td>(<span id="OHN">??</span>% of the collection)</td> </tr>
+                    <tr> <td>Stockholm <a href = "http://www.nrm.se/forskningochsamlingar/samlingar.179.html">S</a> - Naturhistoriska riksmuseet </td><td> (<span id="S">??</span>% of the collection)</td> </tr>
+                    <tr> <td>Umeå <a href = "https://www.umu.se/institutionen-for-ekologi-miljo-och-geovetenskap/forskning/herbarium-ume/">UME</a> - Herbarium UME</td><td>(<span id="UME">??</span>% of the collection)</td> </tr>
+                    <tr> <td>Uppsala <a href = "http://www.evolutionsmuseet.uu.se/databaser/index.html">UPS</a> - Evolutionsmuseet Botanik</td><td>(<span id="UPS">??</span>% of the collection)</td> </tr>
                     </table>
                     
                     <h3> Search alternatives </h3>
