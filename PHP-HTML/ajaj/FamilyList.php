@@ -1,8 +1,7 @@
 <?php
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
 header('Content-type: text/html; charset=utf-8');
 include("../herbes.php");
+if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
 
 $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 $what = "Family";
@@ -15,8 +14,6 @@ $query = "SELECT DISTINCT $whatDown FROM xgenera WHERE `$what` = '$value' Collat
 $result = $con->query($query);
 
 if($result ) {
-    if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
-
     echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
           <option value=\"*\">*</option>";
 

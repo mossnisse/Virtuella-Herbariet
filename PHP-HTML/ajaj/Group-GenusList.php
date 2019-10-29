@@ -1,7 +1,8 @@
 <?php
 header('Content-type: text/html; charset=utf-8');
 include("../herbes.php");
-
+if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
+    
 $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 $what = "Group";
 $whatDown = "Genus";
@@ -18,7 +19,6 @@ $query = "SELECT DISTINCT Genus FROM xgenera WHERE $wquery ORDER BY Genus";
 //echo "$query <p>";
 $result = $con->query($query);
 if($result ) {
-    if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
     echo "<select name=\"Genus\" size=\"1\" id = \"$whatDown\" onchange=\"getList('Genus', 'Species');\" onclick=\"star('Genus')\">
           <option value=\"*\">*</option>";
 
