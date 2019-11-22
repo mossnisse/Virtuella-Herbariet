@@ -44,21 +44,20 @@ function getList(what, whatDown)
     var k = document.getElementById(what).value;
     //alert ('what: '+what+ ', what down: ' + whatDown + ', k: '+k);
     if (k=="*") {
-    
-    //alert(what + " " + whatDown + " " + document.getElementById(what).getAttribute("type"));  <input type="text" name="Province" value="*" size="32" id = "Province" onblur="getList('Province', 'District');" onclick="star('Province')" />
-	if (document.getElementById(whatDown).getAttribute("type") != "text") {
-	    document.getElementById(whatDown+"d").innerHTML = "<input type=\"text\" name=\""+whatDown+"\" id=\""+whatDown+"\" value=\"*\" size=\"32\" onblur=\"getList('" + whatDown+ "', '"+down(whatDown)+"');\" onclick=\"star('" + whatDown+ "')\" />";
-	    getList(whatDown,down(whatDown));
+		//alert(what + " " + whatDown + " " + document.getElementById(what).getAttribute("type"));  <input type="text" name="Province" value="*" size="32" id = "Province" onblur="getList('Province', 'District');" onclick="star('Province')" />
+		if (document.getElementById(whatDown).getAttribute("type") != "text") {
+			document.getElementById(whatDown+"d").innerHTML = "<input type=\"text\" name=\""+whatDown+"\" id=\""+whatDown+"\" value=\"*\" size=\"32\" onblur=\"getList('" + whatDown+ "', '"+down(whatDown)+"');\" onclick=\"star('" + whatDown+ "')\" />";
+			getList(whatDown,down(whatDown));
+		}
 	}
-    }
     else
     {
         var url = "ajaj/"+what+"List.php?"+encodeURIComponent(what)+"="+encodeURIComponent(k);
-	ajax(url, function(response) {
-	    document.getElementById(whatDown+"d").innerHTML = response;
-	});
+		ajax(url, function(response) {
+			document.getElementById(whatDown+"d").innerHTML = response;
+		});
 	
-	if (what == 'Genus')  {
+		if (what == 'Genus')  {
 	    var url = "ajaj/Genus-HybridNameList.php?"+encodeURIComponent(what)+"="+encodeURIComponent(k);
 	    ajax(url, function(response) {
 		document.getElementById('HybridNamed').innerHTML = response;
@@ -70,83 +69,94 @@ function getList(what, whatDown)
 function prvName() {
     //alert("annoy");
     var country = document.getElementById("Country").value;
-    //alert(country);
-    var xmlhttp;
-	if (window.XMLHttpRequest)
-	{
-	    // code for IE7+, Firefox, Chrome, Opera, Safari
-	    xmlhttp=new XMLHttpRequest();
-	}
-	else if (window.ActiveXObject)
-	{
-	    // code for IE6, IE5
-	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	if(country =="*") {
+		//alert(country);
+		document.getElementById("prvName").innerHTML = "";
+		document.getElementById("sprvName").innerHTML = "(landskap)";
 	}
 	else
 	{
-	    alert("Your browser does not support XMLHTTP!");
-	}
-	xmlhttp.onreadystatechange=function()
-	{
-	    if(xmlhttp.readyState==4)
-	    {
-		    var pn = xmlhttp.responseText;
-		    //alert(pn);
-		    if (pn!= undefined) {
-			document.getElementById("prvName").innerHTML = pn;
-			document.getElementById("sprvName").innerHTML = pn;
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{
+			// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else if (window.ActiveXObject)
+		{
+			// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		else
+		{
+			alert("Your browser does not support XMLHTTP!");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if(xmlhttp.readyState==4)
+			{
+				var pn = xmlhttp.responseText;
+				//alert(pn);
+				if (pn!== undefined) {
+				document.getElementById("prvName").innerHTML = pn;
+				document.getElementById("sprvName").innerHTML = pn;
 		    } else {
-			document.getElementById("prvName").innerHTML = '';
-			document.getElementById("sprvName").innerHTML = '';
+				document.getElementById("prvName").innerHTML = '';
+				document.getElementById("sprvName").innerHTML = '';
 		    }
-		    
-		    
 	    }
+		};
+		var url = "ajaj/provinceName.php?country="+country;
+		xmlhttp.open("GET", url ,true);
+		xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
+		xmlhttp.send(null);
 	}
-        var url = "ajaj/provinceName.php?country="+country;
-	xmlhttp.open("GET", url ,true);
-	xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
-	xmlhttp.send(null);
 }
 
 function disName() {
     //alert("annoy");
     var country = document.getElementById("Country").value;
-    //alert(country);
-    var xmlhttp;
-	if (window.XMLHttpRequest)
-	{
-	    // code for IE7+, Firefox, Chrome, Opera, Safari
-	    xmlhttp=new XMLHttpRequest();
-	}
-	else if (window.ActiveXObject)
-	{
-	    // code for IE6, IE5
-	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	else
-	{
-	    alert("Your browser does not support XMLHTTP!");
-	}
-	xmlhttp.onreadystatechange=function()
-	{
-	    if(xmlhttp.readyState==4)
-	    {
-		    var dn = xmlhttp.responseText;
-		    //alert(pn);
-		    if (dn!= undefined) {
-			document.getElementById("disName").innerHTML = dn;
-			document.getElementById("sdisName").innerHTML = dn;
-		    } else {
-			document.getElementById("disName").innerHTML = '';
-			document.getElementById("sdisName").innerHTML = '';	
-		    }
-	    }
-	}
+	if(country =="*"){
+		//alert(country);
+		document.getElementById("disName").innerHTML = "";
+		document.getElementById("sdisName").innerHTML = "(socken)";
+	} else {
+		//alert(country);
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{
+			// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else if (window.ActiveXObject)
+		{
+			// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		else
+		{
+			alert("Your browser does not support XMLHTTP!");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if(xmlhttp.readyState==4)
+			{
+				var dn = xmlhttp.responseText;
+				//alert(pn);
+				if (dn!== undefined) {
+					document.getElementById("disName").innerHTML = dn;
+					document.getElementById("sdisName").innerHTML = dn;
+				} else {
+					document.getElementById("disName").innerHTML = '';
+					document.getElementById("sdisName").innerHTML = '';	
+				}
+			}
+		}
         var url = "ajaj/districtName.php?country="+country;
-	xmlhttp.open("GET", url ,true);
-	xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
-	xmlhttp.send(null);
+		xmlhttp.open("GET", url ,true);
+		xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
+		xmlhttp.send(null);
+	}
 }
 
 function getSpList(what, whatDown)
@@ -237,46 +247,32 @@ function down(what) {
     switch (what){
 	case "Continent": 
 	    return "Country";
-            break;
 	case "Country": 
 	    return "Province";
-	    break;
 	case "Province": 
 	    return "District";
-	    break;
 	case "District": 
 	    return "Stop";
-	    break;
 	case "Kingdom": 
 	    return "Phylum";
-	    break;
 	case "Phylum": 
 	    return "Class";
-	    break;
 	case "Class": 
 	    return "Order";
-	    break;
 	case "Order": 
 	    return "Family";
-	    break;
 	case "Family": 
 	    return "Genus";
-	    break;
 	case "Genus": 
 	    return "Species";
-	    break;
 	case "Species": 
 	    return "SspVarForm";
-	    break;
 	case "SspVarForm": 
 	    return "Stop";
-	    break;
 	case "Group":
 	    return "Subgroup";
-	    break
 	case "Subgroup":
 	    return "Genus";
-	    break
     }
 }
 

@@ -25,7 +25,7 @@ if($result ) {
     if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 } else {
      echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
-            <option value=\"*\">Sorry Database error. Write content in boxes without the list and send a mejl so I can fix it</option>
+            <option value=\"*\">*</option>
             </select>";
 }
 ?>
