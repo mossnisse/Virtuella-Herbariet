@@ -71,21 +71,23 @@ if (isset($_GET['Page'])) {
 }
 
 $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
-                 collector, collectornumber, `Year`, `Month`, `Day`, specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
+                 collector, collectornumber, specimens.`Year`, `Month`, `Day`, specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
                  Altitude_meter, RUBIN, RiketsN, RiketsO, Notes, Original_name, Original_text, Comments, Cultivated,
                  Exsiccata, Exs_no, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, habitat,
                  xgenera.Kingdom, xgenera.Phylum, xgenera.Class, xgenera.`Order`, xgenera.Family, Syns,
                  Svenskt_namn, Taxontyp, Auktor, xgenera.`Group`, xgenera.Subgroup, `Lat`, `Long`, CSource, CPrec,
                  CValue, samlare.Fornamn, samlare.Efternamn, samlare.ID AS samlar_ID, countries.provinceName, countries.districtName, specimens.InstitutionCode, CollectionCode,
                  specimens.Type_status, specimens.TAuctor, specimens.Basionym, specimens.Image1, specimens.Image2, specimens.Image3, specimens.Image4, xnames.Taxonid
-          FROM (((((specimens
+          FROM ((((((specimens
                  LEFT JOIN xnames ON specimens.Taxon_ID = xnames.ID )
-                 LEFT JOIN xgenera ON specimens.Genus_ID = xgenera.ID
+                 LEFT JOIN xgenera ON specimens.Genus_ID = xgenera.ID)
                  LEFT JOIN signaturer ON specimens.sign_ID = signaturer.ID)
                  LEFT JOIN samlare ON signaturer.samlar1_ID = samlare.ID)
                  LEFT JOIN countries ON countries.english = specimens.country)
                  LEFT JOIN district ON specimens.Geo_ID = district.ID)
+                 
           $wherestat $sort $limit";
+
 
 //echo "<p>query 2: $query <p>";
  
@@ -134,17 +136,7 @@ while($row2 = $result->fetch())
     }
 }
 
-// -------------------revisions--------------------------------
-/*$revisions ="";
-$revQuery = "select * from revisions where specimenID =$row[ID]";
-$revResult = mysql_query($revQuery, $con);
-if (!$revResult) {
-        echo mysql_error();
-}
-while($revRow = mysql_fetch_array($revResult))
-{
-    $revisions .= $revRow['revNo']. '. '.$revRow['originalText'].'<br />';
-}*/
+
 
 $province = $row['Province'];
 $district = $row['District'];
@@ -303,16 +295,20 @@ echo "
     }*/
 
 
+    if ($instCode=="S") {
+            $link = "<a href=\"http://herbarium.nrm.se/specimens/$AccessionNo\">$AccessionNo</a>";
+    } else {
+        $link = $AccessionNo;
+    }
+
 echo "
-    
-    
-    
     <table id=\"left\"> <tr> <td>
     <table class =\"SBox\">
         <tr> <th colspan=\"2\"> $currName </th> </tr>
         
-        <tr> <td> Herbarium: $row[InstitutionCode] </td> <td> Catalogue number: $AccessionNo </td> </tr>
+        <tr> <td> Herbarium: $row[InstitutionCode] </td> <td> Catalogue number: $link </td> </tr>
         ";
+        
         if ($row['Group']=='Bryophytes / Mossor')
                 echo "<tr> <td colspan=\"2\"> $row[Subgroup] </td> </tr>";
             else
@@ -340,8 +336,17 @@ echo "
             if ($row['habitat'] != "")
     echo "
         <tr> <td> Habitat: </td> <td> $row[habitat]  </td> </tr>";
+        if ($row['Month']<10 and $row['Month']>0)
+            $m = "0$row[Month]";
+        else
+            $m = "$row[Month]";
+        if ($row['Day']<10 and $row['Day']>0)
+            $d = "0$row[Day]";
+        else
+            $d = "$row[Day]";
+        
 echo"
-            <tr> <td> Collection date: </td> <td> $row[Year]-$row[Month]-$row[Day] </td> </tr>";
+            <tr> <td> Collection date: </td> <td> $row[Year]-$m-$d </td> </tr>";
             //if ($row['InstitutionCode'] != 'GB') {
                 echo "<tr> <td> Collector on label: </td> <td> $sign";
                 
@@ -380,6 +385,46 @@ if ($type_status!="") {
             <tr> <td> $type_status of $basionym $tauctor </td> </tr>
         </table>";
 }
+ 
+  
+if ($instCode=="S") {
+    $revQuery = "SELECT revisions.revNo, revisions.species, revisions.determinator, revisions.revYear FROM revisions WHERE InstitutionCode = \"S\" and AccessionNo = \"$AccessionNo\"";
+    //echo "query: $revQuery<p>";
+    $revResult = $con->query($revQuery);
+    echo "<table class =\"SBox\">
+            <tr> <th> Revisions </th> </tr>";
+            
+    while ($revRow = $revResult->fetch())
+   // while($revRow = mysql_fetch_array($revResult))
+    {
+        echo "<tr> <td> $revRow[revNo]. $revRow[species]. </td> <td> $revRow[determinator]. $revRow[revYear]</td></tr>";
+    }
+    echo "</table>";
+}
+   
+  /* 
+if($row['revNo']!=null) {
+    echo "
+        <table class =\"SBox\">
+            <tr> <th> Revisions </th> </tr>
+            <tr>
+                <td> $row[revNo]. $row[species]. </td>
+                <td> $row[determinator]. $row[revYear]</td>
+            </tr>
+        </table>";
+}*/
+  
+// -------------------revisions--------------------------------
+/*$revisions ="";
+$revQuery = "select * from revisions where specimenID =$row[ID]";
+$revResult = mysql_query($revQuery, $con);
+if (!$revResult) {
+        echo mysql_error();
+}
+while($revRow = mysql_fetch_array($revResult))
+{
+    $revisions .= $revRow['revNo']. '. '.$revRow['originalText'].'<br />';
+}*/
         
 if ($comments!="")
     echo "
@@ -494,35 +539,38 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
         </table>";
     }
 } elseif ($row['InstitutionCode'] == "S" and !$row['Image1'] == "")  {
-    $filenamesub = $row["Image1"];
-    $thumb = str_replace ( "large" , "small" , $filenamesub );
+    //http://herbarium.nrm.se/img/fbo/small/S-C-001001/S-C-1124.jpg
+    //$thumbdirectory = ""; //"http://herbarium.nrm.se/img/fbo/small/";
+    //$largedirectory = "";
+    $filename = $row["Image1"];
+    $thumb = str_replace("large","small", $filename);
     echo "
         <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td> <a href=\" $filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
         </table>";
-    if (!$row['Image2'] == "") {
-            $filenamesub =$row['Image2'];
-            $thumb = str_replace ( "large" , "small" , $filenamesub );
+    $filename = $row["Image2"];
+    if (!$filename == "") {
+            $thumb = str_replace("large","small", $filename);
             echo "
          <table>
-                <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
             </table>";
     }
-    if (!$row['Image3'] == "") {
-        $filenamesub = ['Image3'];
-        $thumb = str_replace ( "large" , "small" , $filenamesub );
-        echo "
-        <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
-        </table>";
+   $filename = $row["Image3"];
+    if (!$filename == "") {
+            $thumb = str_replace("large","small", $filename);
+            echo "
+         <table>
+                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            </table>";
     }
-    if (!$row['Image4'] == "") {
-        $filenamesub = ['Image4'];
-        $thumb = str_replace ( "large" , "small" , $filenamesub );
-        echo "
-        <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
-        </table>";
+    $filename = $row["Image4"];
+    if (!$filename == "") {
+            $thumb = str_replace("large","small", $filename);
+            echo "
+         <table>
+                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            </table>";
     }
 } elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {
     $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$row[Image1].jpg";
