@@ -112,6 +112,160 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `DGenus` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DGenus`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    return SUBSTRING_INDEX(name,' ',1);
+ END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `DHybridName` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DHybridName`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    /* to fix specific hybrid names with varieties triple hybrids?) */
+    Declare spn int(11);
+    set spn = length(name)-length(replace(name,' ','')); /* Number of spaces in name */
+    if (spn<3) then                             /* Genus and species names */
+        return '';
+    else
+        if (spn>2) and (name like "% x %") then  /* Hybrids */
+            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name */
+                return '';
+            else
+                return Substring(name, instr(name,' ')+1);  /* normal hybrid name */
+            end if;
+        else
+           return '';
+        end if;
+    end if;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `DSpecies` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DSpecies`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    /* to fix handle cultivar names specific hybrid names with varieties triple hybrids?) */
+    Declare str varchar(90);
+    Declare spn int(11);
+    set spn = length(name)-length(replace(name,' ',''));  /* number of spaces in name*/
+    if (spn=0) then
+        return '';                                        /* Genus names of higher taxa without spaces*/
+    elseif (spn=1) then
+        if SUBSTRING_INDEX(name,' ',-1) = "s.str." or SUBSTRING_INDEX(name,' ',-1) = "s.lat." then
+            return '';                              /* Genus names of higher taxa with s.lat/s.str*/
+        else
+            return SUBSTRING_INDEX(name,' ',-1);    /* Normal species names */
+        end if;
+    else
+        if (spn>2) and (name like "% x %") then
+            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name */
+                return SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);
+            else
+                return '';                  /* Hybrids */
+            end if;
+        else
+            set str = SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);
+            if (str = "subg." or str ="x" or str = "sect." or str = "subgen." or str = "trib." or str = "subsect." or str = "ser.") then /* subg. etc between Genus and the epithet */
+                return SUBSTRING_INDEX(name,' ',-2);
+            elseif SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.str."    /* stuff behind the species epithet that should be in the species field*/
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s." 
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.lat." 
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "agg."
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.s."
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.l."
+                then
+                    return Substring(name, instr(name,' ')+1);
+            elseif (str = "s.") then   /* Genus with s. lat. / s. str. with space*/
+                return '';
+            else
+                return str;
+            end if;
+        end if;
+    end if;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `DSspVarForm` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DSspVarForm`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    /* to fix handle cultivar names specific hybrid names with varieties triple hybrids?) */
+    Declare vstr varchar(90);
+    Declare spn int(11);
+    set spn = length(name)-length(replace(name,' ','')); /* Number of spaces in name */
+    if (spn<3) then                             /* Genus and species names */
+        return '';
+    else
+        if (spn>2) and (name like "% x %") then  /* Hybrids */
+            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name */
+                return "hybrid name";/*SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);*/
+            else
+                return '';
+            end if;
+        else
+            if SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s."  /* Species with s. slat. or s. str. with space*/
+            then
+                return '';
+            else
+                Set vstr = Substring(name, instr(name,' ')+1);
+                return Substring(vstr, instr(vstr,' ')+1);     /* normal var / form /subsp names */
+            end if;
+        end if;
+    end if;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `e` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -660,6 +814,42 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `ScientificName` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `ScientificName`(Genus varchar(32),Species varchar(32), SspVarForm varchar(42), HybridName varchar(64)) RETURNS varchar(90) CHARSET utf8
+    DETERMINISTIC
+BEGIN
+    if ((Species = '' or Species is null))
+        then 
+            if (HybridName ='' or HybridName is null) 
+            then
+                return Genus;
+            else
+                return Concat(Genus, ' ', HybridName);
+            end if;
+            
+        else 
+            if(SspVarForm = '' or SspVarForm is null)
+            then
+                return Concat(Genus,' ' ,Species);
+            else
+                return Concat(Genus,' ',Species,' ',SspVarForm);
+            end if;
+    end if;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `SContinent` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1031,4 +1221,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-10-07 16:32:37
+-- Dump completed on 2019-12-10 11:29:24
