@@ -125,7 +125,13 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DGenus`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
     DETERMINISTIC
 BEGIN
-    return SUBSTRING_INDEX(name,' ',1);
+    if (Substring(name, instr(name,' ')+1) = "s. lat." or Substring(name, instr(name,' ')+1) = "s.lat." 
+        or Substring(name, instr(name,' ')+1) = "s. str." or Substring(name, instr(name,' ')+1) = "s.str."
+        or Substring(name, instr(name,' ')+1) = "indet.") then              /* Genus with s. lat. */
+        return name;
+    else
+        return SUBSTRING_INDEX(name,' ',1);
+    end if;
  END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -180,28 +186,31 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DSpecies`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
     DETERMINISTIC
 BEGIN
-    /* to fix handle cultivar names specific hybrid names with varieties triple hybrids?) */
     Declare str varchar(90);
     Declare spn int(11);
     set spn = length(name)-length(replace(name,' ',''));  /* number of spaces in name*/
     if (spn=0) then
         return '';                                        /* Genus names of higher taxa without spaces*/
+    elseif (MID(name, instr(name, ' ')+1,1)='\'' or MID(name, instr(name, ' ')+1,1)='´') then      /* Cultivars utan artepitet */
+        return Substring(name, instr(name,' ')+1); 
     elseif (spn=1) then
-        if SUBSTRING_INDEX(name,' ',-1) = "s.str." or SUBSTRING_INDEX(name,' ',-1) = "s.lat." then
+        if SUBSTRING_INDEX(name,' ',-1) = "s.str." or SUBSTRING_INDEX(name,' ',-1) = "s.lat." or SUBSTRING_INDEX(name,' ',-1) = "indet." then
             return '';                              /* Genus names of higher taxa with s.lat/s.str*/
         else
             return SUBSTRING_INDEX(name,' ',-1);    /* Normal species names */
         end if;
     else
         if (spn>2) and (name like "% x %") then
-            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name */
+            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name? */
                 return SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);
+            elseif SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1) ="x" then  /* specific hybrid name with var */
+                return Concat("x ",SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1));
             else
                 return '';                  /* Hybrids */
             end if;
         else
             set str = SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);
-            if (str = "subg." or str ="x" or str = "sect." or str = "subgen." or str = "trib." or str = "subsect." or str = "ser.") then /* subg. etc between Genus and the epithet */
+            if (str = "subg." or str ="x" or str = "sect." or str = "subgen." or str = "trib." or str = "subsect." or str = "ser." or str = "subdiv.") then /* subg. etc between Genus and the epithet */
                 return SUBSTRING_INDEX(name,' ',-2);
             elseif SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.str."    /* stuff behind the species epithet that should be in the species field*/
                     or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s." 
@@ -209,6 +218,7 @@ BEGIN
                     or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "agg."
                     or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.s."
                     or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "s.l."
+                    or SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',3),' ',-1) = "coll."
                 then
                     return Substring(name, instr(name,' ')+1);
             elseif (str = "s.") then   /* Genus with s. lat. / s. str. with space*/
@@ -237,16 +247,30 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`%`*/ /*!50003 FUNCTION `DSspVarForm`(name varchar(90)) RETURNS varchar(90) CHARSET utf8
     DETERMINISTIC
 BEGIN
-    /* to fix handle cultivar names specific hybrid names with varieties triple hybrids?) */
     Declare vstr varchar(90);
     Declare spn int(11);
     set spn = length(name)-length(replace(name,' ','')); /* Number of spaces in name */
-    if (spn<3) then                             /* Genus and species names */
+    if (spn<2) then                             /* Genus and species names */
+        return '';
+    elseif ((name like "%\'%" or name like "%´%") and not name like "% x %" ) then  /* cultivar namn */
+        if (MID(name, instr(name, ' ')+1,1)='\'' or MID(name, instr(name, ' ')+1,1)='´') then  /* cultivar utan artepitet */
+            return '';
+        else                            /* cultivar med artepitet */
+            set vstr = SUBSTRING(name,instr(name,' ')+1);
+            return SUBSTRING(vstr,instr(vstr,' ')+1);  
+        end if;
+    elseif (spn<3) then
         return '';
     else
         if (spn>2) and (name like "% x %") then  /* Hybrids */
-            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Hybrids with specific name */
-                return "hybrid name";/*SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1);*/
+            if (SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',4),' ',-1)="x") then  /* Subspecies with hybrid name */
+                Set vstr = Substring(name, instr(name,' ')+1);
+                return Substring(vstr, instr(vstr,' ')+1);
+            elseif SUBSTRING_INDEX(SUBSTRING_INDEX(name,' ',2),' ',-1)= 'x' and spn >3 then  /* specific hybrid name with variety*/
+                 Set vstr = Substring(name, instr(name,' ')+1);
+                Set vstr = Substring(vstr, instr(vstr,' ')+1);
+                return Substring(vstr, instr(vstr,' ')+1);
+                return "hybrid name";
             else
                 return '';
             end if;
@@ -1221,4 +1245,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-10 11:29:24
+-- Dump completed on 2019-12-17 10:59:57
