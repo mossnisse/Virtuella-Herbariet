@@ -434,6 +434,7 @@ if ($comments!="")
         </table>";
 
 $CText = $row['CSource'];
+$CValue = $row['CValue'];
 if ($row['CSource'] != "None") {
     if ($row['CSource']=="RUBIN") {
         if ($row['CPrec']==5000)
@@ -442,18 +443,23 @@ if ($row['CSource'] != "None") {
             $CText="centre of 1x1 km grid square in which the specimen was collected. The square is marked on the map.";
         if ($row['CPrec']==100)
             $CText="centre of 100x100 m grid square in which the specimen was collected. The square is marked on the map.";
+            
     }
     elseif($row['CSource']=="Latitude / Longitude") $CText="coordinate given as Latitude/longitude";
     elseif($row['CSource']=="RT90-coordinates") $CText="coordinate given in RT90 2.5 gon V";
-    elseif($row['CSource']=="Locality") $CText="Locality";
+    elseif($row['CSource']=="Locality") {
+        $CText="Locality";
+        $CValue = "<a href=\"/locality.php?Country=$row[Country]&Province=$row[Province]&District=$row[District]&Locality=$row[Locality]\">$CValue</a>";
+    }
     elseif($row['CSource']=="District") $CText="District (Centroid coordinate)";
+    
     echo "
         <table class =\"SBox\">
             <tr> <td>
                 <div id=\"smap\" > Loading... </div>
                 <noscript> <b> JavaScript must be enabled in order for you to use this Map. </b> </noscript>
             </td> </tr>
-            <tr> <td> Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $row[CValue] Precision: $row[CPrec]m </td> </tr>
+            <tr> <td> Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m </td> </tr>
         </table>";
 }
        

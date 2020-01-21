@@ -12,9 +12,22 @@
 			try {
 				include("herbes.php");
 				$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-				$stmt = $con->prepare("SELECT * FROM Locality WHERE ID = :id");
-				$stmt->bindParam(':id', $ID);
-				$ID = $_GET['ID'];
+				$stmt = "";
+				if (isset($_GET['ID'])) {
+					$stmt = $con->prepare("SELECT * FROM Locality WHERE ID = :id");
+					$stmt->bindParam(':id', $ID);
+					$ID = $_GET['ID'];
+				} else {
+					$stmt = $con->prepare("SELECT * FROM Locality WHERE Country = :Country and Province = :Province and District = :District and Locality = :Locality");
+					$stmt->bindParam(':Country', $Country);
+					$stmt->bindParam(':Province', $Province);
+					$stmt->bindParam(':District', $District);
+					$stmt->bindParam(':Locality', $Locality);
+					$Country = $_GET['Country'];
+					$Province = $_GET['Province'];
+					$District = $_GET['District'];
+					$Locality = $_GET['Locality'];
+				}
 				$stmt->execute();
 				$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
 				$row = $stmt->fetch();
@@ -27,6 +40,7 @@
 				echo "<tr><td>District: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/district.php?District=$row[district]&Province=$row[province]&Country=$row[country]\">$row[district]</a>    </td></tr>";
 				echo "<tr><td>WGS84: </td><td>$row[lat], $row[long]</td></tr>";
 				echo "<tr><td>RT90: </td><td>$row[RT90N], $row[RT90E]</td></tr>";
+				echo "<tr><td>Sweref99TM: </td><td>$row[SWTMN], $row[SWTME]</td></tr>";
 				echo "<tr><td>Source: </td> <td> $row[coordinate_source] </td></tr>";
 				echo "<tr><td>Comments: </td><td>$row[lcomments]</td></tr>";
 				echo "<tr><td>Size/Precision: </td><td>$row[Coordinateprecision] m</td></tr>";
