@@ -10,7 +10,7 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = 1;
+$page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
@@ -60,49 +60,47 @@ while($row = $result->fetch())
     else
         $Locality = xmlf($row['Locality']);
         
-    
         
     echo  "
         <ucr:UMECoreRecord>
             <ucr:Occurrence>
                 <dwc:occurrenceID>UME:$row[AccessionNo]</dwc:occurrenceID>
                 <dcterms:modified xsi:nil=\"true\"/>
-                <dwc:catalogNumber> $row[AccessionNo] </dwc:catalogNumber> ";
+                <dwc:catalogNumber>$row[AccessionNo]</dwc:catalogNumber>";
     if ($saml!="") echo "
-                <dwc:recordedBy>".xmlf($saml)." </dwc:recordedBy> ";
+                <dwc:recordedBy>".xmlf($saml)."</dwc:recordedBy>";
     echo "
-                <dwc:collectorNumber> $row[collectornumber] </dwc:collectorNumber> ";
+                <dwc:collectorNumber>$row[collectornumber]</dwc:collectorNumber>";
     if ($row['Year']!="") echo "
-                <dcterms:eventDate> $row[Year]-$row[Month]-$row[Day] </dcterms:eventDate>";
+                <dcterms:eventDate>$row[Year]-$row[Month]-$row[Day]</dcterms:eventDate>";
     echo "
                 <dwc:occurenceRemarks>".xmlf($row['Comments'])."</dwc:occurenceRemarks>
             </ucr:Occurrence>
             <ucr:Location> ";
     if ($row['Continent']!="") echo "
-                <dwc:continent>".xmlf($row['Continent']). "</dwc:continent>";
+                <dwc:continent>".xmlf($row['Continent'])."</dwc:continent>";
     echo "
-                <dwc:country> $country </dwc:country>";
+                <dwc:country>$country</dwc:country>";
     if ($row['Province']!="") echo "
-                <dwc:stateProvince> $row[Province] </dwc:stateProvince>";
+                <dwc:stateProvince>$row[Province]</dwc:stateProvince>";
     if ($row['District']!="") echo "        
-                <dwc:county> $row[District] </dwc:county>";
+                <dwc:county>$row[District]</dwc:county>";
     echo "
-                <dwc:locality> $Locality </dwc:locality> ";
+                <dwc:locality>$Locality</dwc:locality> ";
                 
     if (!($row['Lat'] == 0 and $row['Long'] ==0))
     echo "
-                <dwc:decimalLatitude> $row[Lat] </dwc:decimalLatitude>
-                <dwc:decimalLongitude> $row[Long] </dwc:decimalLongitude>";
+                <dwc:decimalLatitude>$row[Lat]</dwc:decimalLatitude>
+                <dwc:decimalLongitude>$row[Long]</dwc:decimalLongitude>";
     echo "
             </ucr:Location>
             <ucr:Taxon>
                 <dwc:scientificName>".scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"])."</dwc:scientificName>
-                <dwc:genus> $row[Genus] </dwc:genus>
-                <dwc:specificEpithet> $row[Species] </dwc:specificEpithet>
-                <dwc:intraspecificEpithet> $row[SspVarForm] </dwc:intraspecificEpithet> 
+                <dwc:genus>$row[Genus]</dwc:genus>
+                <dwc:specificEpithet>$row[Species]</dwc:specificEpithet>
+                <dwc:intraspecificEpithet>$row[SspVarForm]</dwc:intraspecificEpithet> 
                 <dwc:identifiedBy xsi:nil=\"true\"/>
                 <dwc:dateIdentified xsi:nil=\"true\"/>
- 
             </ucr:Taxon>
         </ucr:UMECoreRecord> ";
 }

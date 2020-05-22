@@ -12,7 +12,7 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = 1;
+$page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";

@@ -11,7 +11,7 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
           specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = 1;
+$page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";

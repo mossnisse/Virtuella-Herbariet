@@ -12,7 +12,7 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = 1;
+$page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
@@ -23,8 +23,7 @@ $svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
 $result = $svar['result'];
 $nr = $svar['nr'];
 
-echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\tNotes\tComments\tContinent\tCountry\tProvince\tDistrict\tLocality\tWGS84N
-\tWGS84S\tScientificName\tGenus\tSpecificEpithet\tIntraspecificEpithet\tRT90-N\tRT90-E\tRUBIN\tOriginalName\tOriginalText\r\n";
+echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\tNotes\tComments\tContinent\tCountry\tProvince\tDistrict\tLocality\tWGS84N\tWGS84S\tScientificName\tGenus\tSpecificEpithet\tIntraspecificEpithet\tRT90-N\tRT90-E\tRUBIN\tOriginalName\tOriginalText\r\n";
 
 while($row = $result->fetch())
 {
@@ -40,7 +39,7 @@ while($row = $result->fetch())
         
     $scientificName = scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]);
     
-    echo  "$row[institutionCode]\t$row[AccessionNo]\t$row[Collector]\t$row[collectornumber]\t$DateCollected\t$row[Notes]\t$row[Comments]\t$row[Continent]\t$row[Country]\t$row[Province]\t$row[District]\t$row[Locality]\t$row[Lat]\t$row[Long]\t$scientificName\t$row[Genus]\t$row[Species]\t$row[SspVarForm]\t$row[RiketsN]\t$row[RiketsO]\t$row[RUBIN]\t$row[Original_name]\t$row[Original_text]\r\n";
+    echo  "$row[institutionCode]\t$row[AccessionNo]\t$row[Collector]\t$row[collectornumber]\t$DateCollected\t\"$row[Notes]\"\t\"$row[Comments]\"\t$row[Continent]\t$row[Country]\t$row[Province]\t$row[District]\t$row[Locality]\t$row[Lat]\t$row[Long]\t$scientificName\t$row[Genus]\t$row[Species]\t$row[SspVarForm]\t$row[RiketsN]\t$row[RiketsO]\t$row[RUBIN]\t\"$row[Original_name]\"\t\"$row[Original_text]\"\r\n";
 }
 
 if ($Logg == 'On')

@@ -13,7 +13,7 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
           specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource, specimens.CPrec, specimens.CValue, specimens.Type_status, specimens.TAuctor, specimens.Basionym ";
           
-$page = 1;
+$page = $_GET['Page'];
 $pageSize = 100000;
 
 $GroupBy = "";
