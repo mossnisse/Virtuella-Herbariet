@@ -20,6 +20,8 @@ $order = orderBy();
 $OrderAdr = $order['Adr'];
 $nr = $_GET['nrRecords'];
 $Rubrik = getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$pages = ceil($nr/100000);
+
 
 if (isset($_GET['ARecord'])) {
     $ARecord = $_GET['ARecord'];
@@ -46,12 +48,32 @@ echo "
         </div>
         <table class = \"outerBox\"> <tr> <td>
     The export functions are still under development and may not work properly. Caracter encoding is UTF-8. The file will contain max 100000 posts even if the search gives more.
-    <table class = \"Box\"> <tr> <td>
-        <a href =\"export/dwcxml.php?$adr\"> export result set as xml (Darwin Core) </a> <br />
-        <a href =\"export/ENSExml.php?$adr\"> export result set as xml (ENSE) </a> <br />
-        <a href =\"export/CSV.php?$adr\"> export result set as simple CSV (tab separeted text in utf8, first row collumn names) </a> <br />
-        <a href =\"export/xlsxml.php?$adr\"> export result set as xml (Excel xml spreadsheet file) </a> <br />
-        <a href =\"export/artp.php?$adr\"> export result set as Artportalen excellmall (Excel xml spreadsheet file) </a> <br />
+    <table class = \"Box\"> <tr> <td>";
+    echo "Export result set as xml (Darwin Core) (";
+    for ($p=1; $p<$pages+1; $p++) {
+        echo "<a href =\"export/dwcxml.php?$adr&amp;Page=$p\">page$p</a>, ";
+    }
+    echo ")<br />
+    Export result set as xml (ENSE) (";
+    for ($p=1; $p<$pages+1; $p++) {
+        echo "<a href =\"export/ENSExml.php?$adr&amp;Page=$p\">page$p</a>, ";
+    }
+    echo ")<br /> 
+    Export result set as simple CSV (tab separeted text in utf8, first row collumn names) (";
+    for ($p=1; $p<$pages+1; $p++) {
+        echo "<a href =\"export/CSV.php?$adr&amp;Page=$p\">page$p</a>, ";
+    }
+    echo ") <br />
+    Export result set as xml (Excel xml spreadsheet file) (";
+    for ($p=1; $p<$pages+1; $p++) {
+        echo "<a href =\"export/xlsxml.php?$adr&amp;Page=$p\">page$p</a>, ";
+    }
+    echo ") <br />
+    Export result set as Artportalen excellmall (Excel xml spreadsheet file) (";
+    for ($p=1; $p<$pages+1; $p++) {
+        echo "<a href =\"export/artp.php?$adr&amp;Page=$p\">page$p</a>, ";
+    }
+    echo"
     </td> </tr> </table>";
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);
