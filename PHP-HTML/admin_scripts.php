@@ -250,7 +250,7 @@ function delfile($con, $delfile_ID, $sfileName) {
         $delfile_ID = $delfileIDA[0];
         echo "updal del id: $delfile_ID";
     } 
-    elseif ($delfile_ID!=-1) {
+     if ($delfile_ID!=-1) {
         echo "
             delete file $delfile_ID from db <br />";
         $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
@@ -403,7 +403,7 @@ function filetable($con2) {
     echo "
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
-    $query = "SELECT sfiles.name, sfiles.ID, sfiles.date, sfiles.inst, sfiles.coll, Count(*) as records FROM specimens join sfiles on specimens.sFile_ID = sfiles.ID GROUP BY sFile_ID;";
+    $query = "SELECT sfiles.name, sfiles.ID, sfiles.date, sfiles.inst, sfiles.coll, sfiles.nr_records as records FROM specimens join sfiles on specimens.sFile_ID = sfiles.ID GROUP BY sFile_ID;";
     $result = $con2->query($query);
     if (!$result) {
         echo mysql_error();
