@@ -20,7 +20,7 @@
 include("../herbes.php");
 	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 	$value = $_GET['Country'];
-	$query = "select maxX, maxY, minX, minY, code, code3 from countries where english=\"$value\"";
+	$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english=\"$value\"";
 	$result = $con->query($query);
 	$row = $result->fetch();
 	
@@ -34,8 +34,16 @@ echo "
 	<div class = \"subMenu\">
 		<h1><a href=\"\..\cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$value&Herb=All\">$value</a></h1>
 		<table>
-		<tr><td>alpha-2 code</td><td>$row[code]</td></tr>
-		<tr><td>alpha-3 code</td><td>$row[code3]</td></tr>
+		<tr><td>Alternative names</td><td>$row[syn]</td></tr>
+		<tr><td>Native name</td><td>$row[native]</td></tr>
+		<tr><td>Swedish name</td><td>$row[swedish]</td></tr>
+		<tr><td>Alpha-2 code</td><td>$row[code]</td></tr>
+		<tr><td>Alpha-3 code</td><td>$row[code3]</td></tr>
+		<tr><td>Provins division name</td><td>$row[provinceName]</td></tr>
+		<tr><td>District divison name</td><td>$row[districtName]</td></tr>
+		<tr><td>Comments</td><td>";
+		echo str_replace("\n","<br>",$row['comments']);
+		echo "</td></tr>
 		</table>
 		<div id=\"map\"></div>
 	Provinces
