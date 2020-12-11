@@ -163,9 +163,10 @@ function instablenr($con, $sfileID) {
 
 function doreplace($con, $query, $sfileName, $file_ID) {
     $timer = new Timer();
+   
     echo "
         <h3> 2. Inserting file in db</h3>
-        inserting $sfileName in db <br />";
+        inserting $sfileName ID: $file_ID in db <br />";
     ob_flush();
     flush();
     $stmt = $con->prepare($query);
@@ -179,12 +180,12 @@ function doreplace($con, $query, $sfileName, $file_ID) {
     if($stmt->errorCode() == 0) {
         instablenr($con, $file_ID);
         echo "<br /> query: $query <br />  $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
-       
         echo "
             <h3> 3. Deleting file </h3>";
             ob_flush();
             flush();
-            delfile ($con);
+            $delfile_ID = $_POST['delfile_ID'];
+            delfile($con, $delfile_ID, $sfileName);
         echo "
             <h3> 4. Changing name for geografical regions</h3>";
             ob_flush();
@@ -236,9 +237,20 @@ function emptycache() {
     closedir($mydir);
 }
 
-function delfile ($con) {
-    $delfile_ID = $_POST['delfile_ID'];
-    if ($delfile_ID!=-1) {
+function delfile($con, $delfile_ID, $sfileName) {
+    echo "delfile ID: $delfile_ID <br>";
+    if ($delfile_ID == -2) {
+        $delIDQuery = "SELECT ID FROM sfiles where name = \"$sfileName\" and not nr_records =0;";
+        $IDresult = $con->query($delIDQuery);
+        if (!$IDresult) {
+            $delfile_ID = -1;
+            echo "no old file with that name not deleting old records";
+        }
+        $delfileIDA = $IDresult->fetch();
+        $delfile_ID = $delfileIDA[0];
+        echo "updal del id: $delfile_ID";
+    } 
+     if ($delfile_ID!=-1) {
         echo "
             delete file $delfile_ID from db <br />";
         $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
@@ -391,7 +403,7 @@ function filetable($con2) {
     echo "
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
-    $query = "SELECT sfiles.name, sfiles.ID, sfiles.date, sfiles.inst, sfiles.coll, Count(*) as records FROM specimens join sfiles on specimens.sFile_ID = sfiles.ID GROUP BY sFile_ID;";
+    $query = "SELECT sfiles.name, sfiles.ID, sfiles.date, sfiles.inst, sfiles.coll, sfiles.nr_records as records FROM specimens join sfiles on specimens.sFile_ID = sfiles.ID GROUP BY sFile_ID;";
     $result = $con2->query($query);
     if (!$result) {
         echo mysql_error();
@@ -470,19 +482,24 @@ function upploadfile($backpage) {
 
 function warningFormat($con, $sfileName) {
     $stmt = $con->query('SHOW WARNINGS');
-    $errors = $stmt->fetchAll();
-    echo "Warnings <br/>
-        <Table>
-        <tr><th>Level</th><th>Message</th></tr>";
-    foreach ($errors as $w) {
-        echo "<tr><td>$w[Level]</td><td>$w[Message]</td></tr>";
+    //echo "stmt" + $stmt;
+    if ($stmt) { 
+        $errors = $stmt->fetchAll();
+        echo "Warnings <br/>
+            <Table>
+            <tr><th>Level</th><th>Message</th></tr>";
+        foreach ($errors as $w) {
+            echo "<tr><td>$w[Level]</td><td>$w[Message]</td></tr>";
+        }
+        echo "</Table>";
+        $myfile = fopen("C:/inetpub/wwwroot/uploadlogs/$sfileName.txt", "w") or die("Unable to open file!");
+        foreach ($errors as $w) {
+            fwrite($myfile, "$w[Level]: $w[Message]\r\n");
+        }
+        fclose($myfile);
+    } else {
+        echo "no warnings?";
     }
-    echo "</Table>";
-    $myfile = fopen("C:/inetpub/wwwroot/uploadlogs/$sfileName.txt", "w") or die("Unable to open file!");
-    foreach ($errors as $w) {
-        fwrite($myfile, "$w[Level]: $w[Message]\r\n");
-    }
-    fclose($myfile);    
 }
 
 /*
