@@ -72,7 +72,7 @@ if (isset($_GET['Page'])) {
 
 $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
                  collector, collectornumber, specimens.`Year`, `Month`, `Day`, specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
-                 Altitude_meter, RUBIN, RiketsN, RiketsO, Notes, Original_name, Original_text, Comments, Cultivated,
+                 Altitude_meter, RUBIN, RiketsN, RiketsO, Notes, Original_name, Original_text, specimens.Comments, Cultivated,
                  Exsiccata, Exs_no, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, habitat,
                  xgenera.Kingdom, xgenera.Phylum, xgenera.Class, xgenera.`Order`, xgenera.Family, Syns,
                  Svenskt_namn, Taxontyp, Auktor, xgenera.`Group`, xgenera.Subgroup, `Lat`, `Long`, CSource, CPrec,

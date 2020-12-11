@@ -106,6 +106,10 @@ if (isset($_GET['OrderBy'])) $OrderByAdr = "&OrderBy=$_GET[OrderBy]"; else  $Ord
             if ($Nr == 1) $pl = "Specimen";
                 else $pl = "Specimens";
             $blipps[$i]['Link'] = "<a href=\"list.php?$adr&Long=$row[Long]&Lat=$row[Lat]\" target= \"_blank\"> $Nr $pl </a>";
+            $substr = substr($row['CSource'],0,8);
+            if ( $substr == "District") {
+                $row['CSource'] ="District";
+            }
             switch($row['CSource'])
             {
                 case "District":

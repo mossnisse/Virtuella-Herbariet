@@ -473,7 +473,12 @@ function CalcCoord($row, $con) {
         if (isset($row['Longitude']) and $row['Longitude'] !="" ) {
             $WGS['Lat'] = $row['Latitude'];
             $WGS['Long'] = $row['Longitude'];
-            $WGS['Source'] = "District";
+			if (isset($row['typeNative']) and $row['typeNative']!="") {
+				$WGS['Source'] = "District($row[typeNative])";
+			} else {
+				$WGS['Source'] = "District";
+			}
+            
             $WGS['Value'] = $row['District'];
             $WGS['Prec'] = $row['precision'];
         }
@@ -509,8 +514,9 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     $query3 = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, locality.Coordinateprecision,
                     RUBIN, linereg, RiketsN, RiketsO, Sweref99TMN, Sweref99TME,
                     Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, district.precision,
-                    CSource, specimen_locality.locality_ID, specimens.InstitutionCode, direction, distance
-            FROM specimens LEFT JOIN district ON specimens.Geo_ID=district.ID
+                    CSource, specimen_locality.locality_ID, specimens.InstitutionCode, direction, distance, district.typeNative
+            FROM specimens
+			LEFT JOIN district ON specimens.Geo_ID=district.ID
             LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
             LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID
             $Where ";

@@ -94,14 +94,11 @@ function curPageURLCache() {
 
 function cacheStart() {
     $cachefile = curPageURLCache();
-/*    echo "
-	cache start $cachefile <p />";*/
     if (file_exists($cachefile)) {
-	// the page has been cached from an earlier request
-	// output the contents of the cache file
-	include($cachefile); 
-	// exit the script, so that the rest isnt executed
-	exit;
+		// the page has been cached from an earlier request output the contents of the cache file
+		include($cachefile); 
+		// exit the script, so that the rest isnt executed
+		exit;
     }
     ob_start();   // start the buffer
 }
@@ -517,6 +514,8 @@ function simpleSQLS($con, $dyntaxaID) {
 			} elseif ($SearchValue == "No") {
 				$wherestat = ahh($wherestat, " (Image == '' or Image is NULL)");
 			}
+		} elseif ($SearchItem == "CSource" and $SearchValue == "District") {
+			$wherestat = ahh($wherestat, "CSource Like 'District%' ");
 		} elseif($SearchItem == "Taxonlist") {
 			$TaxonList = explode("\n", $SearchValue );
 			/*$wherestattemp = " (";
@@ -612,7 +611,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
 		$result = $con->query($query);
 		$nr = getNrRecords ($con);
 	}
-	//echo $query;
+	//echo "query:$query";
 	$svar['nr'] = $nr;
 	$svar['result'] = $result;
 	return $svar;
