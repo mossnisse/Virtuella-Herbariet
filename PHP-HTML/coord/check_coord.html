@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="../herbes.css" type="text/css" />
+        <meta name="author" content="Nils Ericson" />
+        <title> Virtuella herbariet Check coordinate</title>
+        <link rel="shortcut icon" href="favicon.ico" />
+		<script src="coords.js" type="text/javascript"> </script>	
+    </head>
+    <body  id = "start_page">
+		<h1>Check coordinate</h1>
+		Coordinate: <input type="text" id="coord" name="Coord" value = "7193939, 1704521"/> <input id="check" type="button" value="Check" onclick="checkC();" /> <br/>
+		<div id="output">
+			<table>
+				<tr><td>Interpreted as:</td><td></td></tr>
+				<tr><td>WGS84</td><td></td></tr>
+				<tr><td>WGS84 DMSD</td><td></td></tr>
+				<tr><td>Sweref99TM</td><td></td></tr>
+				<tr><td>RT90:</td><td></td></tr>
+				<tr><td>RUBIN</td><td></td></tr>
+				<tr><td>Country</td><td></td></tr>
+				<tr><td>Province</td><td></td></tr>
+				<tr><td>District</td><td></td></tr>
+				<tr><td>Nearest locality</td><td></td></tr>
+			</table>
+		</div>
+	</body>
+</html>
