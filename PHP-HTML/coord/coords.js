@@ -1,5 +1,4 @@
 function checkC() {
-	var output = document.getElementById("output");
 	var coord = document.getElementById("coord").value;
 	coord = coord.trim();
 	var sys = "unknown";
@@ -9,6 +8,7 @@ function checkC() {
 	var Sweref99TM = "";
 	var RUBIN = "";
 	//checking parsing coordinates with easting and northing
+	coord = coord.replaceAll("\t",",");
 	var nrComma = countC(coord,",");
 	var nrSpaces= countC(coord," ");
 	var c1 ="";
@@ -141,18 +141,15 @@ function checkC() {
 			}
 		//}
 		var WGSDMS = WGS84toDMS(WGS84);
-	output.innerHTML = `<table>
-				<tr><td>Interpreted as:</td><td>`+sys + `: ` + interpreted+`</td></tr>
-				<tr><td>WGS84</td><td>`+WGS84+`</td></tr>
-				<tr><td>WGS84 DMS</td><td>`+WGSDMS+`</td></tr>
-				<tr><td>Sweref99TM</td><td>`+Sweref99TM+`</td></tr>
-				<tr><td>RT90:</td><td>`+RT90+`</td></tr>
-				<tr><td>RUBIN</td><td>`+RUBIN+`</td></tr>
-				<tr><td>Country</td><td>`+`</td></tr>
-				<tr><td>Province</td><td>`+`</td></tr>
-				<tr><td>District</td><td>`+`</td></tr>
-				<tr><td>Nearest locality</td><td>`+`</td></tr>
-			</table>`;
+		document.getElementById("interpred").innerHTML = sys + `: ` + interpreted;
+		document.getElementById("WGS84").innerHTML = WGS84[0]+", "+WGS84[1];
+		document.getElementById("WGS84DMS").innerHTML = WGSDMS;
+		document.getElementById("Sweref99TM").innerHTML = Sweref99TM[0]+", "+Sweref99TM[1];
+		document.getElementById("RT90").innerHTML = RT90[0]+", "+RT90[0];
+		document.getElementById("RUBIN").innerHTML = RUBIN;
+		getDistrict(WGS84);
+		getProvince(WGS84);
+		getCountry(WGS84);
 }
 	
 
@@ -410,3 +407,58 @@ function WGS84toDMS(WGS84) {
 	var DMS = NDeg+"&deg; "+NMin+"&prime; "+NSec+"&Prime; "+NDir+", "+EDeg+"&deg; "+EMin+"&prime; "+ESec+"&Prime; "+EDir; 
 	return DMS;
 }
+
+function ajax(url, doit)
+{
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	{
+	    xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{
+	    alert("Your browser does not support XMLHTTP!");
+	}
+	xmlhttp.onreadystatechange=function()
+	{
+	    if(xmlhttp.readyState==4)
+	    {
+            doit(xmlhttp.responseText);
+	    }
+	};
+	xmlhttp.open("GET", url ,true);
+	xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
+	xmlhttp.send(null);
+}
+
+function getDistrict(WGS84) {
+	document.getElementById("District").innerHTML = "Wait...";
+	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	ajax(url, function(json) {
+		json = json.substring(1,json.length); // remove BOM mark
+		var distr = JSON.parse(json);
+		document.getElementById("District").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/district.php?ID="+distr.ID+"\">"+distr.name+" "+distr.typeNative+"/"+distr.typeEng+"</a>";
+	});
+}
+
+function getProvince(WGS84) {
+	document.getElementById("Province").innerHTML = "Wait...";
+	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	ajax(url, function(json) {
+		json = json.substring(1,json.length); // remove BOM mark
+		var prov = JSON.parse(json);
+		document.getElementById("Province").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/province.php?ID="+prov.ID+"\">"+prov.name+" "+prov.typeNative+"/"+prov.typeEng+"</a>";
+	});
+}
+
+function getCountry(WGS84) {
+	document.getElementById("Country").innerHTML = "Wait...";
+	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	ajax(url, function(json) {
+		json = json.substring(1,json.length); // remove BOM mark
+		var count = JSON.parse(json);
+		document.getElementById("Country").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/country.php?ID="+count.ID+"\">"+count.name+"</a>";
+	});
+}
+
+//http://herbarium.emg.umu.se/maps/district.php?District=Norsj%C3%B6&Province=V%C3%A4sterbotten&Country=Sweden
