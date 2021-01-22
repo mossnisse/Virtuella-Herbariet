@@ -15,24 +15,29 @@
     </style>
 	</head>
 <?php
-	
-	
 include("../herbes.php");
 	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-	$value = $_GET['Country'];
-	$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english=\"$value\"";
-	$result = $con->query($query);
-	$row = $result->fetch();
+	$count = "";
+	if (isset($_GET['ID'])) {
+		$ID = $_GET['ID'];
+		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments FROM countries where ID = \"$ID\";";
+		$result = $con->query($query);
+		$row = $result->fetch();
+		$country = $row['english'];
+	} else {
+		$country = $_GET['Country'];
+		$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english=\"$country\"";
+		$result = $con->query($query);
+		$row = $result->fetch();
+	}
 	
-	$query = "select Province from Provinces where country=\"$value\"";
+	$query = "select Province from Provinces where country=\"$country\"";
 	$result2 = $con->query($query);
-	
-	
-	
+
 echo "
 	<body id= \"country\">
 	<div class = \"subMenu\">
-		<h1><a href=\"\..\cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$value&Herb=All\">$value</a></h1>
+		<h1><a href=\"\..\cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$country&Herb=All\">$country</a></h1>
 		<table>
 		<tr><td>Alternative names</td><td>$row[syn]</td></tr>
 		<tr><td>Native name</td><td>$row[native]</td></tr>
@@ -50,7 +55,7 @@ echo "
 	<table>";
 	while ($row2 = $result2->fetch()) {
 		
-		echo "<tr><td><a href=\"province.php?Country=$value&Province=$row2[Province]\">$row2[Province]</a></td></tr>";
+		echo "<tr><td><a href=\"province.php?Country=$country&Province=$row2[Province]\">$row2[Province]</a></td></tr>";
 	}
 	
 	echo "
@@ -78,7 +83,7 @@ echo "
 				map.data.addGeoJson(obj);
 			}
 		};
-		xmlhttp.open(\"GET\", 'gjcountry.php?country=$value' ,true);
+		xmlhttp.open(\"GET\", 'gjcountry.php?country=$country' ,true);
 		xmlhttp.send(null);
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"

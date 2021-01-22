@@ -15,13 +15,24 @@
 <?php
 	include("../herbes.php");
 	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-	$count = $_GET['Country'];
-	$prov = $_GET['Province'];
-	$query = "select maxX, maxY, minX, minY, code, type_eng, type_native, alt_names from provinces where country=\"$count\" and province = \"$prov\"";
-	$result = $con->query($query);
-	//echo $query;
-	$row = $result->fetch();
-	
+	$prov = "";
+	$count = "";
+	if (isset($_GET['ID'])) {
+		$ID = $_GET['ID'];
+		$query = "SELECT Province, Country, maxX, maxY, minX, minY, code, type_eng, type_native, alt_names FROM provinces where ID = \"$ID\";";
+		$result = $con->query($query);
+		$row = $result->fetch();
+		$prov = $row['Province'];
+		$count = $row['Country'];
+	} else {
+		$count = $_GET['Country'];
+		$prov = $_GET['Province'];
+		$query = "select maxX, maxY, minX, minY, code, type_eng, type_native, alt_names from provinces where country=\"$count\" and province = \"$prov\"";
+		$result = $con->query($query);
+		//echo $query;
+		$row = $result->fetch();
+	}
+
 	$query = "select District from District where country=\"$count\" and province=\"$prov\"";
 	$result2 = $con->query($query);
 
