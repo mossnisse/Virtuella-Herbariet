@@ -1,6 +1,7 @@
 <?php
 function linesIntersect($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4) {
 	// Return false if either of the lines have zero length
+	//echo "L1 = x1:$x1 y1:$y1 x2: $x2 y2:$y2 L2= x3:$x3 y3:$y3 x4:$x4 y4:$y4<br>\n";
 	if ($x1 == $x2 && $y1 == $y2 ||
 	    $x3 == $x4 && $y3 == $y4){
 	    return false;

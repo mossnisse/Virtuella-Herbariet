@@ -5,17 +5,33 @@
         <link rel="stylesheet" href="../herbes.css" type="text/css" />
         <meta name="author" content="Nils Ericson" />
         <title> Virtuella herbariet Check coordinate</title>
-        <link rel="shortcut icon" href="favicon.ico" />
-		<script src="coords.js" type="text/javascript"> </script>	
+        <link rel="shortcut icon" href="../favicon.ico" />
+		<script src="coords.js" type="text/javascript"> </script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU"> </script>
+		<style>
+			#map { height: 70%; }
+			html, body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
     </head>
     <body  id = "start_page">
 		<h1>Check coordinate</h1>
-		Coordinate: <input type="text" id="coord" name="Coord" value = "7193939, 1704521"/> <input id="check" type="button" value="Check" onclick="checkC();" /> <br/>
+		Coordinate: <input type="text" id="coord" name="Coord" value = ""/> <input id="check" type="button" value="Check" onclick="checkC();" /> <br/>
+		<script> // fix so that enter in input box trigger checkC()
+			document.getElementById("coord").addEventListener("keyup", function(event) {
+				event.preventDefault();
+				if (event.keyCode === 13) checkC();
+			});
+			document.getElementById("coord").focus();
+		</script>
 		<div id="output">
 			<table>
 				<tr><td>Interpreted as:</td><td id = "interpred"></td></tr>
 				<tr><td>WGS84</td><td id = "WGS84"></td></tr>
-				<tr><td>WGS84 DMSD</td><td id = "WGS84DMS"></td></tr>
+				<tr><td>WGS84 DMS</td><td id = "WGS84DMS"></td></tr>
 				<tr><td>Sweref99TM</td><td id = "Sweref99TM"></td></tr>
 				<tr><td>RT90:</td><td id = "RT90"></td></tr>
 				<tr><td>RUBIN</td><td id = "RUBIN"></td></tr>
@@ -25,5 +41,12 @@
 				<tr><td>Nearest locality</td><td id = "locality"></td></tr>
 			</table>
 		</div>
+		<! -- <input id="getLocation" type="button" value="get your location" onclick="getLocation();" />
+		<input id="showCoordinate" type="button" value="show coordinate" disabled onclick="showCoordf();" />
+		<input id="showDistrict" type="button" value="show district" disabled onclick="showDistrictf();" />
+		<input id="showProvince" type="button" value="show province" disabled onclick="showProvincef();" />
+		<input id="showCountry" type="button" value="show country" disabled onclick="showCountryf();" />
+		<input id="showRUBIN" type="button" value="show RUBIN" disabled onclick="showRUBINf();" />
+		<div id="map"></div>
 	</body>
 </html>
