@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+			integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+			crossorigin=""/>
+		<script type="text/javascript" src="coord-transform.js"> </script>
+		<script type="text/javascript" src="date-time.js"> </script>
+		<script type="text/javascript" defer src="gpx.js"> </script>
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+			integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+			crossorigin=""></script>
+	</head>
+	<body>
+		open GPX file with waypoints from a GPS <br />
+		<table>
+			<tr><td>GPX file:</td><td><input type="file" id="gpx-file" accept=".gpx" /> GPX file with waypoints</td><td><pre id ="nrWaypoints"></pre></td></tr>
+			<tr><td>Collector:</td><td><input type="text" id="collector"/></td></tr>
+			<tr><td>Prefered coordinate system</td><td>
+				<select name="coordSystem" id="coordSystem">
+					<option value="WGS84">WGS84</option>
+					<option value="Sweref99TM">Sweref99TM</option>
+					<option value="RT90">RT90</option>
+					<option value="RUBIN">RUBIN 100m</option>
+				</select>
+			</td></tr>
+			<tr><td>Timezone:</td><td>
+				<select name="timeZone" id="timeZone"/>
+					<option value="Europe/Paris">Europe/Paris</option>
+					<option value="Europe/Andorra">Europe/Andorra</option>
+					<option value="Asia/Dubai">Asia/Dubai</option>
+					<option value="Asia/Kabul">Asia/Kabul</option>
+					<option value="Europe/Tirane">Europe/Tirane</option>
+					<option value="Asia/Yerevan">Asia/Yerevan</option>
+					<option value="Antarctica/Casey">Antarctica/Casey</option>
+					<option value="Antarctica/Davis">Antarctica/Davis</option>
+					<option value="Antarctica/DumontDUrvill">Antarctica/DumontDUrvill</option>
+					<option value="Antarctica/Mawson">Antarctica/Mawson</option>
+					<option value="Antarctica/Palmer">Antarctica/Palmer</option>
+				</select>
+			</td></tr>
+			<tr><td>Settings:</td><td><input type="file" id="settings-file"/ accept=".json"> .json codelist for species names</td></tr>
+		</table>
+		<button id="labelsz" disabled onclick="tryLabels()">Labels</button>
+		<button id="artpz" disabled onclick="artp()">Artportalen mall</button>
+		<button id="showMap" disabled onclick="showMap()">Show map</button>
+
+		<pre id="artp"></pre> <br />
+		<pre id="labels"></pre> <br />
+		
+		<div id="mapid" style="height: 800px;"></div>
+		<button onclick="mapLocalities()">Show Localities in map</button> <br />
+		<script>
+
+			
+		</script>
+		<a href="example-settings.json">example settings file</a> 
+	</body>
+</html>

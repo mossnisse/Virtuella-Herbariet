@@ -1,0 +1,36 @@
+{
+	"label-template": "Flora Suecica\n<name>\n<province>.<district>.\n<distance>m <direction> <locality>\n<coordsystem>: <north>N, <east>E\n\nleg. <collector> <date>\n\n",
+	"collector": "Sven Svensson",
+	"coordSystem": "Sweref99TM",
+	"timeZone": "",
+	"species-codes": {
+		"rticka": "Fomitopsis rosea",
+		"sthack": "Större hackspett",
+		"pse cinc": "Pseudobryum cinclidioides"
+	},
+	"localities": [{
+			"name": "Ålidhem",
+			"lat": 63.8106,
+			"lon": 20.3144,
+			"max-dist": 2000
+		},
+		{
+			"name": "Carlshem",
+			"lat": 63.8012,
+			"lon": 20.3204,
+			"max-dist": 2000
+		},
+		{
+			"name": "Grössjön",
+			"lat": 63.7845,
+			"lon": 20.3548,
+			"max-dist": 2000
+		},
+		{
+			"name": "Nydalsjön",
+			"lat": 63.8218,
+			"lon": 20.3485,
+			"max-dist": 3000
+		}
+	]
+}

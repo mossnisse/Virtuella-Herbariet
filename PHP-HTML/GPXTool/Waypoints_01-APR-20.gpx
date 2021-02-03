@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" 
+	xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" 
+	xmlns:wptx1="http://www.garmin.com/xmlschemas/WaypointExtension/v1" 
+	xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" 
+	creator="eTrex 10" 
+	version="1.1" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">
+	<metadata><link href="http://www.garmin.com"><text>Garmin International</text></link><time>2020-04-01T06:52:31Z</time></metadata>
+	<wpt lat="65.791844" lon="20.323596">
+		<ele>27.479061</ele>
+		<time>2020-04-01T06:52:31Z</time>
+		<name>854</name>
+		<sym>Ski Resort</sym>
+	</wpt>
+	<wpt lat="63.791131" lon="20.331802">
+		<ele>53.133003</ele>
+		<time>2020-04-01T07:08:04Z</time>
+		<name>rticka</name>
+		<sym>Ski Resort</sym>
+	</wpt>
+	<wpt lat="63.787646" lon="20.338863"><ele>42.769878</ele><time>2020-04-01T07:34:02Z</time><name>856</name><sym>Ski Resort</sym></wpt><wpt lat="63.785962" lon="20.338861"><ele>30.871677</ele><time>2020-04-01T07:43:42Z</time><name>857</name><sym>Ski Resort</sym></wpt><wpt lat="63.784604" lon="20.337096"><ele>37.268036</ele><time>2020-04-01T07:50:06Z</time><name>858</name><sym>Ski Resort</sym></wpt><wpt lat="63.784558" lon="20.340861"><ele>34.890541</ele><time>2020-04-01T08:03:46Z</time><name>859</name><sym>Ski Resort</sym></wpt><wpt lat="63.784260" lon="20.342494"><ele>35.038631</ele><time>2020-04-01T08:09:58Z</time><name>860</name><sym>Ski Resort</sym></wpt><wpt lat="63.783576" lon="20.342612"><ele>36.158424</ele><time>2020-04-01T08:13:36Z</time><name>861</name><sym>Ski Resort</sym></wpt><wpt lat="63.783322" lon="20.348296"><ele>31.547129</ele><time>2020-04-01T08:35:30Z</time><name>862</name><sym>Ski Resort</sym></wpt>
+</gpx>
