@@ -146,11 +146,11 @@ function RUBINToRT90($RUBIN) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 4000;
+        $RT90['Prec'] = 5000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  40000; 
+        $RT90['Prec'] =  50000; 
     } else {
         return NULL;
     }
@@ -189,11 +189,11 @@ function LINREGToRT90($LINREG) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 4000;
+        $RT90['Prec'] = 5000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  40000; 
+        $RT90['Prec'] = 50000; 
     } else {
         return NULL;
     }
@@ -237,11 +237,11 @@ function RUBINf($RUBIN) {
     } else if (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
-        $RT90['Prec'] = 4000;
+        $RT90['Prec'] = 5000;
     } else if (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
-        $RT90['Prec'] =  40000; 
+        $RT90['Prec'] = 50000; 
     } else {
         return NULL;
     }
@@ -380,12 +380,27 @@ function RubinCorners($RUBIN) {
     $RT90Nmax = $mRT90['N']+$mRT90['Prec']/2;
     $RT90Emin = $mRT90['E']-$mRT90['Prec']/2;
     $RT90Emax = $mRT90['E']+$mRT90['Prec']/2;
+	$NE = RT90ToWGS ($RT90Nmax, $RT90Emax);
+	$NW = RT90ToWGS ($RT90Nmax, $RT90Emin);
+	$SE = RT90ToWGS ($RT90Nmin, $RT90Emax);
+	$SW = RT90ToWGS ($RT90Nmin, $RT90Emin);
+	
+	$WGSsq['NELat'] = $NE['Lat'];
+	$WGSsq['NELong'] = $NE['Long'];
+	$WGSsq['NWLat'] = $NW['Lat'];
+	$WGSsq['NWLong'] = $NW['Long'];
+	$WGSsq['SELat'] = $SE['Lat'];
+	$WGSsq['SELong'] = $SE['Long'];
+	$WGSsq['SWLat'] = $SW['Lat'];
+	$WGSsq['SWLong'] = $SW['Long'];
+	
+	/*
     $WGSmax = RT90ToWGS ($RT90Nmax, $RT90Emax);
     $WGSmin = RT90ToWGS ($RT90Nmin, $RT90Emin);
     $WGSsq['LatMax'] = $WGSmax['Lat'];
     $WGSsq['LongMax'] = $WGSmax['Long'];
     $WGSsq['LatMin'] = $WGSmin['Lat'];
-    $WGSsq['LongMin'] = $WGSmin['Long'];
+    $WGSsq['LongMin'] = $WGSmin['Long'];*/
     return $WGSsq;
 }
 

@@ -77,7 +77,7 @@ $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.Ssp
                  xgenera.Kingdom, xgenera.Phylum, xgenera.Class, xgenera.`Order`, xgenera.Family, Syns,
                  Svenskt_namn, Taxontyp, Auktor, xgenera.`Group`, xgenera.Subgroup, `Lat`, `Long`, CSource, CPrec,
                  CValue, samlare.Fornamn, samlare.Efternamn, samlare.ID AS samlar_ID, countries.provinceName, countries.districtName, specimens.InstitutionCode, CollectionCode,
-                 specimens.Type_status, specimens.TAuctor, specimens.Basionym, specimens.Image1, specimens.Image2, specimens.Image3, specimens.Image4, xnames.Taxonid
+                 specimens.Type_status, specimens.TAuctor, specimens.Basionym, specimens.Image1, specimens.Image2, specimens.Image3, specimens.Image4, xnames.Taxonid, Matrix
           FROM ((((((specimens
                  LEFT JOIN xnames ON specimens.Taxon_ID = xnames.ID )
                  LEFT JOIN xgenera ON specimens.Genus_ID = xgenera.ID)
@@ -197,10 +197,8 @@ echo "
             };
             var map=new google.maps.Map(document.getElementById(\"smap\"),mapProp);";
             if ($CSource == 'RUBIN') {
-                $R = 6371000;
-                $RS = $R * cos($CLat*2*M_PI/360);
-                $dLat = ($row['CPrec']/2)/$R *360 /(2*M_PI);
-                $dLong = ($row['CPrec']/2)/$RS *360 /(2*M_PI);
+                $RCornders = RubinCorners($rubin);
+              
                 echo "
                 var marker=new google.maps.Marker({
                     position: new google.maps.LatLng($CLat,$CLong),
@@ -208,11 +206,11 @@ echo "
                 });
                 
                 var RUBINC = [
-                new google.maps.LatLng($CLat + $dLat, $CLong - $dLong),
-                new google.maps.LatLng($CLat + $dLat , $CLong + $dLong),
-                new google.maps.LatLng($CLat - $dLat, $CLong + $dLong),
-                new google.maps.LatLng($CLat - $dLat , $CLong - $dLong),
-                new google.maps.LatLng($CLat + $dLat, $CLong - $dLong)
+                new google.maps.LatLng($RCornders[NELat], $RCornders[NELong]),
+                new google.maps.LatLng($RCornders[NWLat], $RCornders[NWLong]),
+                new google.maps.LatLng($RCornders[SWLat], $RCornders[SWLong]),
+                new google.maps.LatLng($RCornders[SELat], $RCornders[SELong]),
+                new google.maps.LatLng($RCornders[NELat], $RCornders[NELong])
                 ];
                 
                 RUBINSq = new google.maps.Polygon({
@@ -374,6 +372,9 @@ if ($notes != "")
 /*if ($revisions != "")
     echo "
             <tr> <td> Revisions: </td> <td> $revisions </td> </tr>";*/
+if ($row['Matrix']!= "")
+    echo "
+            <tr> <td> Matrix: </td> <td> $row[Matrix] </td> </tr>";
 
 echo "
         </table>";
