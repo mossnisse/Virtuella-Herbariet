@@ -18,6 +18,9 @@ if ($_POST['mypassword'] == "baconas")
     $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
     echo "<p> $query <p>";
     $result = $con->query($query);
+    $query2 = "update sfiles set nr_records = 0 where ID = '$delfile_ID';";
+    echo "<p> $query2 <p>";
+    $result = $con->query($query2);
     //echo $result;
     echo "<p> records deleted from file $delfile_ID <p>";
     echo "
