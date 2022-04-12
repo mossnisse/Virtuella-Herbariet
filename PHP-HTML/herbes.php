@@ -280,7 +280,11 @@ function CSVf($str) {
 
 // fixar specialtecken till SLQ strängar och så att det inte går att göra injections
 function SQLf($text) {
-    return str_replace ( "'" , "\'" , $text );
+	if ($text == null) {
+		return null;
+	} else {
+		return str_replace ( "'" , "\'" , $text );
+	}
 }
 
 // kollar om term som inte är söktermer
