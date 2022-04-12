@@ -47,7 +47,9 @@ echo "
 		<tr><td>Provins division name</td><td>$row[provinceName]</td></tr>
 		<tr><td>District divison name</td><td>$row[districtName]</td></tr>
 		<tr><td>Comments</td><td>";
-		echo str_replace("\n","<br>",$row['comments']);
+		if ($row['comments']!=null) {
+			echo str_replace("\n","<br>",$row['comments']);
+		}
 		echo "</td></tr>
 		</table>
 		<div id=\"map\"></div>

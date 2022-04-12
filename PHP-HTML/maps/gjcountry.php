@@ -2,8 +2,8 @@
 header("Content-Type: application/json; charset=UTF-8");
 include("../herbes.php");
 $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-if (array_key_exists('Country', $_GET)) {
-   $value = SQLf($_GET['Country']);
+if (array_key_exists('country', $_GET)) {
+   $value = SQLf($_GET['country']);
    $query = "SELECT geojson FROM countries where english = \"$value\";";
 } else {
    $id = SQLf($_GET['ID']);
