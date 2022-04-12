@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Code Written By Nils Ericson 2009-11-21
 // funtions that are used on varios pages
 ini_set('display_errors', 1);
@@ -221,15 +221,24 @@ function logg($MySQLHost, $MySQLLUser, $MySQLLPass)
 // Sätter färg på sånt som är markerat som kommentarer i databasen
 function CComments($text)
 {
-    $text = str_replace ( "]" , "]</span>" , $text );
-    return str_replace ( "[" , "<span class = \"comment\">[" , $text );
+	if ($text == null) {
+		return null;
+	} else {
+		$text = str_replace ( "]" , "]</span>" , $text );
+		return str_replace ( "[" , "<span class = \"comment\">[" , $text );
+	}
+    
 }
 
 function breaks($text)
 {
-    $text = str_replace ( "\n" , "\n <br />" , $text );
-    $text = str_replace ( "\v" , "\n <br />" , $text );
-    return $text;
+	if ($text == null) {
+		return null;
+	} else {
+		$text = str_replace ( "\n" , "\n <br />" , $text );
+		$text = str_replace ( "\v" , "\n <br />" , $text );
+		return $text;
+	}
 }
 
 // formaterar datum
@@ -254,28 +263,36 @@ function scientificName ($Genus, $Species, $SspVarForm, $HybridName) {
 }
 
 // fixar specialtecken till xml strängar
-function xmlf($str) { 
-    $xml_entities = array ( 
-        "&" => "&amp;",     #ampersand
-        "<" => "&lt;",
-        ">" => "&gt",
-        '"' => "&quot;",
-        "'" => "&#39;",
-        "\v" => "\n"
-    );
-    foreach ($xml_entities as $key => $value) { 
-        $str = str_replace($key, $value, $str); 
-    } 
-    return $str; 
+function xmlf($str) {
+	if ($str == null) {
+		return null;
+	} else {
+		$xml_entities = array ( 
+			"&" => "&amp;",     #ampersand
+			"<" => "&lt;",
+			">" => "&gt",
+			'"' => "&quot;",
+			"'" => "&#39;",
+			"\v" => "\n"
+		);
+		foreach ($xml_entities as $key => $value) { 
+			$str = str_replace($key, $value, $str); 
+		} 
+		return $str;
+	}
 }
 
 function CSVf($str) {
-	$str = str_replace("\\","\\\\",$str);
-	$str = str_replace("\n\r","\\n",$str);
-	$str = str_replace("\n","\\n",$str);
-	$str = str_replace("\r","\\n",$str);
-	//$str = str_replace(",","\\,",$str);
-	return $str;
+	if ($str == null) {
+		return null;
+	} else {
+		$str = str_replace("\\","\\\\",$str);
+		$str = str_replace("\n\r","\\n",$str);
+		$str = str_replace("\n","\\n",$str);
+		$str = str_replace("\r","\\n",$str);
+		//$str = str_replace(",","\\,",$str);
+		return $str;
+	}
 }
 
 // fixar specialtecken till SLQ strängar och så att det inte går att göra injections
