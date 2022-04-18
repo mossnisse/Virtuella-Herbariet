@@ -111,6 +111,9 @@ function numAlpha($num) {
 }
 
 function RUBINToRT90($RUBIN) {
+	if ($RUBIN == null) {
+		return NULL;
+	} else {
     $RUBIN = str_replace(' ', '', $RUBIN);
     $RUBIN = str_replace("\xA0", '', $RUBIN);
     $RUBIN = str_replace("\xC2", '', $RUBIN);
@@ -155,6 +158,7 @@ function RUBINToRT90($RUBIN) {
         return NULL;
     }
     return $RT90;
+	} 
 }
 
 function LINREGToRT90($LINREG) {
@@ -202,6 +206,9 @@ function LINREGToRT90($LINREG) {
 
 // formaterar rubin koder
 function RUBINf($RUBIN) {
+	if ($RUBIN == null) {
+		return null;
+	} else {
     $RUBIN = str_replace(' ', '', $RUBIN);
     $RUBIN = str_replace("\xA0", '', $RUBIN);
     $RUBIN = str_replace("\xC2", '', $RUBIN);
@@ -248,6 +255,7 @@ function RUBINf($RUBIN) {
     if (ctype_digit($d))
             $d = numAlpha($d);
     return "$a$b$c$d $e$f$g$h";
+	}
 }
 
 // Konverterar RUBIN koordinater till WGS-84
@@ -301,10 +309,26 @@ function get_precision($value) {
 }
 
 function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Long_min, $Long_sec, $Long_dir) {
-    $Lat_deg= str_replace(',', '.', $Lat_deg);
-    $Long_deg= str_replace(',', '.', $Long_deg);
-    $Lat_min= str_replace(',', '.', $Lat_min);
-    $Long_min= str_replace(',', '.', $Long_min);
+	if ($Lat_deg == null) {
+		return null;
+	} else {
+		 $Lat_deg= str_replace(',', '.', $Lat_deg);
+	}
+	if ($Long_deg == null) {
+		return null;
+	} else {
+		$Long_deg= str_replace(',', '.', $Long_deg);
+	}
+    if ($Lat_min == null){
+		return null;
+	} else {
+		$Lat_min= str_replace(',', '.', $Lat_min);
+	}
+    if ($Long_min == null) {
+		return null;
+	} else {
+		$Long_min= str_replace(',', '.', $Long_min);
+	}
     // fixa prec för decimaltal
     if (isset($Long_sec) and isset($Lat_sec) and ($Lat_sec != "") and ($Long_sec != ""))
         $WGS['Prec'] = '100';
