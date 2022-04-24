@@ -128,6 +128,7 @@ function WGS84toSweref99TM(WGS84) {
 }
 
 function RUBINtoRT90(interpreted) {
+	//console.log("RUBINtRT90: "+interpreted);
 	var n1,e1,n2,e2,n3,e3 = 0;
 	if (interpreted.length==3) {
 		// 50x50 km
@@ -227,6 +228,21 @@ function WGS84toDMS(WGS84) {
 	if (east<0) {EDir = "W"; EDeg = - EDeg;} else {EDir = "E";}
 	var DMS = NDeg+"&deg; "+NMin+"&prime; "+NSec+"&Prime; "+NDir+", "+EDeg+"&deg; "+EMin+"&prime; "+ESec+"&Prime; "+EDir; 
 	return DMS;
+}
+
+function WGS84toDM(WGS84) {
+	const north = WGS84[0];
+	const east = WGS84[1];
+	var NDeg = Math.floor(north);
+	var EDeg = Math.floor(east);
+	var NMin = Math.round((north-NDeg)*60*100)/100;
+	var EMin = Math.round((east-EDeg)*60*100)/100;
+	var NDir = "";
+	var EDir = "";
+	if (north<0) {NDir = "S"; NDeg = -NDeg;} else {NDir = "N";}
+	if (east<0) {EDir = "W"; EDeg = - EDeg;} else {EDir = "E";}
+	var DM = NDeg+"&deg; "+NMin+"&prime; "+NDir+", "+EDeg+"&deg; "+EMin+"&prime; "+EDir; 
+	return DM;
 }
 
 function UTMNumToAlpha(num) {

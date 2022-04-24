@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="/herbes.css" type="text/css" />
+        <meta name="author" content="Nils Ericson" />
+        <title> Virtuella herbariet Check many coordinates</title>
+        <link rel="shortcut icon" href="http://herbarium.emg.umu.se/favicon.ico" />
+		<script src="coord-transform.js" type="text/javascript"> </script>
+		<script src="conv_coords.js" type="text/javascript"> </script>
+	<body id="start_page">
+		<h1>Check many coordinates</h1>
+		<a href = "check_coord.html">convert/check one coordinates at a time</a><br />
+		<textarea cols = "40" rows="10" id="coordinates" name="coordinates" value=""> </textarea>
+		<br /> Output: 
+		<select name="ouptput1" id="ouptput1">
+			<option value="Country">Country</option> 
+			<option value="Province">Province</option> 
+			<option value="District" selected>District</option>
+			<option value="Locality">Nearest locality</option>
+			<option value="WGS84">WGS84</option>
+			<option value="Sweref99TM">Sweref99TM</option>
+			<option value="RT90">RT90</option>
+			<option value="RUBIN">RUBIN</option>
+			<option value="UTM">UTM(gridzone,WGS84)</option>
+			<option value="MGRS">MGRS</option>
+			<option value="DMS">WGS84 DMS</option>
+			<option value="DM">WGS84 DM</option>
+			<option value="interpreted">Interpreted as</option>
+		</select>
+		<input id="convert" type="button" value="Convert" onclick="convertC();" /> <br />
+		<table id="output_table">
+		</table>
+	</body>
+</html>

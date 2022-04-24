@@ -192,6 +192,8 @@ function checkC() {
 			document.getElementById("WGS84").innerHTML = WGS84[0].toPrecision(8)+", "+WGS84[1].toPrecision(8);
 			var WGSDMS = WGS84toDMS(WGS84);
 			document.getElementById("WGS84DMS").innerHTML = WGSDMS;
+			var WGSDM = WGS84toDM(WGS84);
+			document.getElementById("WGS84DM").innerHTML = WGSDM;
 			if (Sweref99TM != "outside defined area") {
 				document.getElementById("Sweref99TM").innerHTML = Sweref99TM[0]+", "+Sweref99TM[1];
 			} else {
@@ -262,7 +264,8 @@ function getDistrict(WGS84) {
 	document.getElementById("District").innerHTML = "Wait...";
 	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		json = json.substring(1,json.length); // remove BOM mark
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
 		var distr = JSON.parse(json);
 		if (distr.name != "outside borders") {
 			document.getElementById("District").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/district.php?ID="+distr.ID+"\">"+distr.name+"</a> "+distr.typeNative+"/"+distr.typeEng;
@@ -278,7 +281,8 @@ function getProvince(WGS84) {
 	document.getElementById("Province").innerHTML = "Wait...";
 	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		json = json.substring(1,json.length); // remove BOM mark
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
 		var prov = JSON.parse(json);
 		if (prov.name != "outside borders") {
 			document.getElementById("Province").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/province.php?ID="+prov.ID+"\">"+prov.name+"</a> "+prov.typeNative+"/"+prov.typeEng;
@@ -294,7 +298,8 @@ function getCountry(WGS84) {
 	document.getElementById("Country").innerHTML = "Wait...";
 	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		json = json.substring(1,json.length); // remove BOM mark
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
 		var count = JSON.parse(json);
 		if(count.name != "outside borders") {
 			document.getElementById("Country").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/country.php?ID="+count.ID+"\">"+count.name+"</a>";
@@ -310,7 +315,8 @@ function getLocality(WGS84) {
 	document.getElementById("locality").innerHTML = "Wait...";
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
 	ajax(url, function(json) {
-		json = json.substring(1,json.length); // remove BOM mark
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
 		var loc = JSON.parse(json);
 		if(loc.name !== "") {
 			document.getElementById("locality").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a> "+loc.distance+"m "+loc.direction;

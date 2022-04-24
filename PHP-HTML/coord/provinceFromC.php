@@ -12,8 +12,8 @@ $nrHits =0;
 while($row = $result->fetch()) {
 	$name = $row['province'];
 	//echo "Name: ".$name."<br>\n";
-	$decoded = json_decode($row['geojson']);
-	if ($decoded != null) {
+	if (isset($row['geojson'])) {
+		$decoded = json_decode($row['geojson']);
 		$multiPolygon = $decoded->features[0]->geometry->coordinates;
 		$nr_intersections = 0;
 		$xout = $row['maxX']+1;  // point outside the region

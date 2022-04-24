@@ -61,7 +61,7 @@ if ($id !="") {
 	$y = sin($λ2-$λ1) * cos($φ2);
 	$x = cos($φ1)*sin($φ2) - sin($φ1)*cos($φ2)*cos($λ2-$λ1);
 	$θ = atan2($y, $x);
-	$angle = ($θ*180/M_PI + 360) % 360; // in degrees
+	$angle = round(($θ*180/M_PI + 360)) % 360; // in degrees
 	
 //	echo "($locLat, $locLong)($lat,$long) angle: $angle\r";
 	$dir = "";
