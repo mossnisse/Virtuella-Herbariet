@@ -1,7 +1,7 @@
 <?php
 // funktioner för konvertering av Koordinater
 // Konverterar RT90 koordinater till WGS
-function RT90ToWGS ($RiketsN, $RiketsO) {
+function RT90ToWGS (float $RiketsN, float $RiketsO) {
     
     if (strlen($RiketsN)!=7) {
         if (strlen($RiketsN)==6) $RiketsN.="0";
@@ -42,7 +42,7 @@ function RT90ToWGS ($RiketsN, $RiketsO) {
 }
 
 
-Function Sweref99TMToWGS($north, $east) {
+Function Sweref99TMToWGS(float $north, float $east) {
     //echo "Sweref99Tm$north, $east";
     $degToRad = M_PI/180;
     $radToDeg = 180/M_PI;
@@ -445,13 +445,13 @@ function CalcCoord($row, $con) {
     }
     
     if (isset($row['Sweref99TMN']) and isset($row['Sweref99TME']) and $row['Sweref99TMN']!=0 and $row['Sweref99TME']!=0 ) {
-		$WGS = Sweref99TMToWGS($row['Sweref99TMN'], $row['Sweref99TME']);
+		$WGS = Sweref99TMToWGS(floatval($row['Sweref99TMN']), floatval($row['Sweref99TME']));
         $WGS['Source'] = "Sweref99TM-coordinates";
         $WGS['Value'] = "$row[Sweref99TMN]N, $row[Sweref99TME]E";
     }
     
     elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0 ) {
-        $WGS = RT90ToWGS($row['RiketsN'], $row['RiketsO']);
+        $WGS = RT90ToWGS(floatval($row['RiketsN']), floatval($row['RiketsO']));
         $WGS['Source'] = "RT90-coordinates";
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
@@ -496,8 +496,16 @@ function CalcCoord($row, $con) {
                 $WGS['Value'] = $row2['locality'];
             }
             
-            $WGS['Source'] = "LocalityVH";
-            $WGS['Prec'] = $row2['Coordinateprecision'];
+            if ($WGS['Long']!="") {
+				$WGS['Source'] = "LocalityVH";
+				$WGS['Prec'] = $row2['Coordinateprecision'];
+			} else {
+				$WGS['Lat'] = 0;
+				$WGS['Long'] = 0;
+				$WGS['Source'] = "None";
+				$WGS['Value'] = "";
+				$WGS['Prec'] = "";
+			}
          }
     }
     
@@ -575,10 +583,16 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     
         $test = 0;
         while($row = $result->fetch()) {
-            if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database') {
+            if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database'  ) {
                 $koord = CalcCoord($row, $con);
                 $cvalue = SQLf($koord['Value']);
-                $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
+				if ($row['CSource']!='None') {
+					 $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
+				} else {
+					$query2 = "UPDATE specimens SET `Long`= NULL, Lat = NULL, CSource = 'None', CValue = NULL, CPrec = NULL WHERE ID='$row[ID]'";
+				}
+				//echo $query2;
+               
                 $result2 = $con->query($query2);
                 if (!$result2) {
                    echo "error when updating coordinate:". $con->error. "<br/>";
@@ -593,8 +607,8 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
                     ob_flush();
                     flush();
                 }
-            $i++;
-            }
+				$i++;
+            } 
             $test++;
         }
     }
