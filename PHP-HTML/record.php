@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <?php
 // Code Written By Nils Ericson 2009-11-21
@@ -20,10 +20,17 @@ if (isset($_GET['AccessionNo']))
 
 if (isset($_GET['ID'])) $ID = $_GET['ID'];
 
-if (isset($_GET['ARecord'])) {
-    $_GET['Page'] =$_GET['ARecord'];
+if (!isset($_GET['Page'])) {
+    $_GET['Page'] = 1;
 }
 
+if (isset($_GET['ARecord'])) {
+    $_GET['Page'] = $_GET['ARecord'];
+}
+
+if (!isset($_GET['nrRecords'])) {
+    $_GET['nrRecords'] = 1;
+}
 /*
 if (!isset($_GET['Page'])) {
      $_GET['Page'] = 1;
@@ -62,7 +69,7 @@ if (isset($_GET['Page'])) {
         $sort = "";
         $limit = "";
     }
-} else {
+} else if (isset($GET['ID'])) {
     $wherestat = "WHERE specimens.ID = '$ID'";
     $_GET['Page'] = 1;
     $nr=1;
