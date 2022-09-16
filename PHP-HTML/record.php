@@ -586,9 +586,9 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
                 <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
             </table>";
     }
-} elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {
-    $filenamesub = "http://herbarium.bioenv.gu.se/web/images/$row[Image1].jpg";
-    $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image1]_small.jpg";
+} elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {   
+    $filenamesub = "http://herbarium.gu.se/web/images/$row[Image1].jpg";
+    $thumb = "http://herbarium.gu.se/web/images/$row[Image1]_small.jpg";
     echo "
     <table>
             <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
