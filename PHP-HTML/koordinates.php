@@ -93,6 +93,52 @@ Function Sweref99TMToWGS(float $north, float $east) {
     return $WGS;
 }
 
+Function WGStoSweref99TM(float $north, float $east) {
+	$sweref99TM_flattening = 1.0 / 298.257222101; // GRS 80.
+	$sweref99TM_axis = 6378137.0; // GRS 80.
+	$sweref99TM_centralMeridian = 0.26179938779914943653855361527329; //radians
+	$sweref99TM_false_easting = 500000.0;
+	$sweref99TM_scale = 0.9996;
+	
+	$e2 = $sweref99TM_flattening * (2.0 - $sweref99TM_flattening);
+	$n = $sweref99TM_flattening / (2.0 - $sweref99TM_flattening);
+	$a_roof = $sweref99TM_axis / (1.0 + $n) * (1.0 + $n**2.0 / 4.0 + $n**4 / 64.0);
+	    //double A = e2;
+	$B = (5.0 * $e2**2 - $e2**3) / 6.0;
+	$C = (104.0 * $e2 ** 3 - 45.0 * $e2**4) / 120.0;
+	$D = (1237.0 * $e2**4) / 1260.0;
+	$beta1 = $n / 2.0 - 2.0 * $n**2 / 3.0 + 5.0 * $n**3 / 16.0 + 41.0 * $n**4 / 180.0;
+	$beta2 = 13.0 * $n**2 / 48.0 - 3.0 * $n**3 / 5.0 + 557.0 * $n**4 / 1440.0;
+	$beta3 = 61.0 * $n**3 / 240.0 - 103.0 * $n**4 / 140.0;
+	$beta4 = 49561.0 * $n**4 / 161280.0;
+			
+	$phi = $north * M_PI/180.0;
+    $lambda = $east * M_PI/180.0;
+    $lambda_zero = $sweref99TM_centralMeridian;
+
+    $phi_star = $phi - sin($phi) * cos($phi) * ($e2 +
+                $B * pow(sin($phi), 2) +
+                $C * pow(sin($phi), 4) +
+                $D * pow(sin($phi), 6));
+    $delta_lambda = $lambda - $lambda_zero;
+    $xi_prim = atan(tan($phi_star) / cos($delta_lambda));
+    $eta_prim = atanh(cos($phi_star) * sin($delta_lambda));
+    $x = $sweref99TM_scale * $a_roof * ($xi_prim +
+                $beta1 * sin(2.0 * $xi_prim) * cosh(2.0 * $eta_prim) +
+                $beta2 * sin(4.0 * $xi_prim) * cosh(4.0 * $eta_prim) +
+                $beta3 * sin(6.0 * $xi_prim) * cosh(6.0 * $eta_prim) +
+                $beta4 * sin(8.0 * $xi_prim) * cosh(8.0 * $eta_prim));
+    $y = $sweref99TM_scale * $a_roof * ($eta_prim +
+                $beta1 * cos(2.0 * $xi_prim) * sinh(2.0 * $eta_prim) +
+                $beta2 * cos(4.0 * $xi_prim) * sinh(4.0 * $eta_prim) +
+                $beta3 * cos(6.0 * $xi_prim) * sinh(6.0 * $eta_prim) +
+                $beta4 * cos(8.0 * $xi_prim) * sinh(8.0 * $eta_prim)) +
+        		$sweref99TM_false_easting;
+	$sweref['north'] = round($x);
+	$sweref['east'] = round($y);
+	return $sweref;
+}
+
 // Konverterar RUBIN koordinater till RT-90
     
 function alphaNum3($char) {
@@ -460,7 +506,8 @@ function CalcCoord($row, $con) {
         $WGS['Source'] = "RUBIN";
         $WGS['Value'] = $row['RUBIN'];
     }
-    elseif (isset($row['locality_ID']) and $row['locality_ID']!= "" ) {  //and $row['Long'] !=""
+    elseif (isset($row['locality_ID']) and $row['locality_ID']!= 0 ) {  //and $row['Long'] !=""
+		$WGS['Source'] = "LocalityVH";
         $locality_ID = $row['locality_ID'];
         $specimen_ID =
         $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $locality_ID";
@@ -494,16 +541,17 @@ function CalcCoord($row, $con) {
 			}
          }
     }
-    
-    elseif (isset($row['Locality']) and $row['Locality']!= "" and $row['Long'] !="") { 
+    elseif (isset($row['Locality']) and $row['Locality']!= "" and $row['Long'] !="") {  // 
         $WGS['Lat'] = $row['Lat'];
         $WGS['Long'] = $row['Long'];
         $WGS['Source'] = "Locality";
         $WGS['Value'] = $row['Locality'];
         $WGS['Prec'] = $row['Coordinateprecision'];
     }
-    elseif (isset($row['District']) and $row['District'] !=0) {
+    elseif (isset($row['District']) and $row['District'] !="") {
+		
         if (isset($row['Longitude']) and $row['Longitude'] !="" ) {
+			//echo "calc from district $row[District] $row[ID] <br>";
             $WGS['Lat'] = $row['Latitude'];
             $WGS['Long'] = $row['Longitude'];
 			if (isset($row['typeNative']) and $row['typeNative']!="") {
@@ -511,11 +559,11 @@ function CalcCoord($row, $con) {
 			} else {
 				$WGS['Source'] = "District";
 			}
-            
             $WGS['Value'] = $row['District'];
             $WGS['Prec'] = $row['precision'];
         }
         else {
+			//echo "calc from district error $row[District] $row[ID] <br>";
             $WGS['Lat'] = 0;
             $WGS['Long'] = 0;
             $WGS['Source'] = "None";
@@ -554,6 +602,8 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
             LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID
             $Where ";
             
+	echo "$query3 <br/>";
+			
     While( $test == $batch) {
         echo "Batch no  $counter <br />";
         echo "
@@ -572,8 +622,8 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
             if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database'  ) {
                 $koord = CalcCoord($row, $con);
                 $cvalue = SQLf($koord['Value']);
-				//echo "$koord[Source] - $koord[Value]<br>";
-				if ($row['CSource']!='None') {
+				//echo "$koord[Source] - $koord[Value] - ID $row[ID]<br>";
+				if ($koord['Source']!='None') {
 					 $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
 				} else {
 					$query2 = "UPDATE specimens SET `Long`= NULL, Lat = NULL, CSource = 'None', CValue = NULL, CPrec = NULL WHERE ID='$row[ID]'";
