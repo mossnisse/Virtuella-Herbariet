@@ -80,7 +80,9 @@ if ($_POST['mypassword'] == "baconas")
 									echo "New Locality: $row[Locality], $row[Province], $row[Country] <br />";
 									// calculate SWEREF99TM
 									if ($row['Country'] == "Sweden") {
-										$sweref = WGStoSweref99TM($row['lat'], $row['long']);
+										$lat = (float) str_replace (',', '.', $row['lat']);
+										$long = (float) str_replace (',', '.', $row['long']);
+										$sweref = WGStoSweref99TM($lat, $long);
 									} else {
 										$sweref['north'] = 'NULL';
 										$sweref['east'] = 'NULL';
