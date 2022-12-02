@@ -5,6 +5,7 @@
         <meta name="author" content="Nils Ericson" />
         <title> Virtuella herbariet importera lokaler</title>
         <link rel="shortcut icon" href="favicon.ico" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     </head>
     <body>
         <div>
@@ -16,8 +17,8 @@
         Province (Sträng)</br>
         Country (Sträng)</br>
         Continent (Sträng)</br>
-        Lat (WGS84 decimaltal med decimalpunkt)</br>
-        Long (WGS84 decimaltal med decimalpunkt)</br>
+        Lat (WGS84 decimaltal med decimalpunkt eller decimalkomma)</br>
+        Long (WGS84 decimaltal med decimalpunkt eller decimalkomma)</br>
         RT90N (7 siffrigt heltal, bara för lokaler från Sverige)</br>
         RT90E (7 siffrigt heltal, bara för lokaler från Sverige)</br>
         Alternative names (Sträng)</br>
@@ -27,9 +28,11 @@
         Created (Datum YYYY-MM-DD)</br>
         Modified (Datum YYYY-MM-DD)</br>
         Created by (Sträng)</br>
+
         <form enctype="multipart/form-data" action="do_import_localities.php" method="post" accept-charset="utf-8">
-            Choose a file to upload: <input name="lfile" type="file" /> <br/>
+            Choose a file to upload: <input name="uploadedfile" type="file" /> <br/>
             Password: <input type="password" name ="mypassword" /> <br/>
+            <input type="hidden" name="MAX_FILE_SIZE" value="1000000000" />
             <input type="hidden" name ="kontroll" value = "OK" /> 
             <input type="submit" value="Upload File" />  <br/>
         </form>

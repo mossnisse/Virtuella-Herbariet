@@ -15,18 +15,15 @@ $timer = new Timer();
 $pass = $_POST['mypassword'];
 if ($pass == 'baconas') {
     $file = $_POST['delfile_ID'];
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
-    //mysql_set_charset('utf8', $con);
+    $con = getConA();
     CalcCoordBatchM($con, $timer, $file);
 } else {
     echo "wrong password";
 }
-
-  echo "
+echo "
         <a href=\"do_Coordinates.php\">back</a> <br />
         <a href=\"admin.php\">admin page</a> <br />
         <a href=\"../\">start page</a> <br />";
-    
 ?>
 </body>
 </html>

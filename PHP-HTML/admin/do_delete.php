@@ -14,14 +14,19 @@ setUpdating2(true);
 if ($_POST['mypassword'] == "baconas") 
 {
     $delfile_ID = $_POST['delfile_ID'];
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
-    $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
+    $con = getConA();
+    $query = "DELETE FROM specimens WHERE sFile_ID = :delfile_ID;";
     echo "<p> $query <p>";
-    $result = $con->query($query);
-    $query2 = "update sfiles set nr_records = 0 where ID = '$delfile_ID';";
+    $stmt = $con->prepare($query);
+    $stmt->BindValue(':delfile_ID', $delfile_ID, PDO::PARAM_STR);
+    $stmt->execute();
+    
+    $query2 = "update sfiles set nr_records = 0 where ID = :delfile_ID;";
     echo "<p> $query2 <p>";
-    $result = $con->query($query2);
-    //echo $result;
+    $stmt = $con->prepare($query2);
+    $stmt->BindValue(':delfile_ID', $delfile_ID, PDO::PARAM_STR);
+    $stmt->execute();
+
     echo "<p> records deleted from file $delfile_ID <p>";
     echo "
         <a href=\"delete.php\">back</a> <br />

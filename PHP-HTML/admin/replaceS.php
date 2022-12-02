@@ -1,25 +1,16 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <?php
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
     include("admin_scripts.php");
-    $desc = " <h3> 2. Exportera nytt data från FileMaker till en .csv fil </h3> ";
-   /*    Välj meny Poster->Visa alla  <br />
-    Välj meny Arkiv->Exportera poster... <br />
-    Välj filformat Kommaavgänsad tex (*.csv) <br />
-    skriv in filnamn klicka på knappen Spara <br />
-    flytta fält så att alla fält som ska vara med kommer i rätt ordning <br />
-    
-    CatologueNumber, `Genus`, `Species`,  SspVarForm, Basionym, Type_status, collector, Collectornumber,
-    `Exsiccata`, `Exs_no`, `Year`, `Month`, `Day`, continent, country, province, district, `Original_text`, habitat,
-    `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `RUBIN`, RiketsN, RiketsO, 
-	AltMin, AltMax, comments, `image1`, `image2`, `image3`, `image4` <br />
-     välj Teckenuppsätning i utdatafil: Unicode (UTF-8) <br />
-     kryssa för använd aktuell layout för formatering <br />
-     tryck på knappen Exportera <br />";*/
+     $desc = "<h3> 2. Exportera nytt data från eran databas till en .csv fil </h3>
+        Alla fält måste vara i rätt ordning <br />
+        (`AccessionNo`, @Day, @Month, @Year, `Genus`, @Species, collector, Collectornumber, notes, @continent, country, province, district, `Original_text`, `Exsiccata`, `Exs_no`,
+		@RUBIN1, @RUBIN2, RiketsN, RiketsO, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, LasModifiedFM, Basionym, Type_status, habitat
+		, image1, image2, image3, image4) <br />
+        .csv filen får inte vara för stor ca 150M <br />";
         
-    $con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+    $con2 = getConS();
      
-    replacepage("S_Kärlväxter", "do_replaceS.php", $desc, "S", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\\r\">\\r - Mac</option>", $con2);
+    replacepage("S_Kärlväxter", "do_replaceS2021.php", $desc, "S", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\\r\\n\">\\r\\n - DOS/Windows</option>", $con2);
 ?>
-

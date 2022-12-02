@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include("../herbes.php");
 
 function flush_buffers(){
@@ -126,42 +126,33 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
 }
 
 function instable($con, $sfileName, $instCode, $collCode) {
-    $query = "INSERT INTO sfiles (name, inst, coll) values ('$sfileName', '$instCode', '$collCode');";
-    $result = $con->query($query);
-    if (!$result) {
-        echo "Query: $query </P>";
-        echo mysql_error();
-        return false;
-    } else {
-        $res = $con->query("SELECT LAST_INSERT_ID()");
-        $ro = $res->fetch();
-        return $ro[0];
-    }
+    $query = "INSERT INTO sfiles (name, inst, coll) values (:sfileName, :instCode, :collCode);";
+    $stmt = $con->prepare($query);
+    $stmt->BindValue(':sfileName', $sfileName, PDO::PARAM_STR);
+    $stmt->BindValue(':instCode', $instCode, PDO::PARAM_STR);
+    $stmt->BindValue(':collCode', $collCode, PDO::PARAM_STR);
+    $stmt->execute();
+    $res = $con->query("SELECT LAST_INSERT_ID()");
+    $ro = $res->fetch();
+    return $ro[0];
 }
 
 function instablenr($con, $sfileID) {
-    $query = "SELECT count(*) from specimens WHERE sFile_ID = $sfileID Group by sFile_ID";
-    $res = $con->query($query);
-    //echo "Query: $query </p>";
-    if (!$res) {
-        echo "instablenr error Query: $query </p>";
-        echo mysql_error();
-        return false;
-    } else {    
-        $ro = $res->fetch();
-        $nr = $ro[0];
-        $query = "UPDATE sfiles set nr_records = $nr WHERE ID = $sfileID";
-        $res2 = $con->query($query);
-        //echo "Query: $query </p>";
-         if (!$res2) {
-            echo "error Query: $query </p>";
-            echo mysql_error();
-            return false;
-        }
-    }
+    $query = "SELECT count(*) as nr from specimens WHERE sFile_ID = :sfileID Group by sFile_ID;";
+    $stmt = $con->prepare($query);
+    $stmt->BindValue(':sfileID', $sfileID, PDO::PARAM_STR);
+    $stmt->execute();
+    $ro = $stmt->fetch(PDO::FETCH_ASSOC);
+    $nr = $ro['nr'];
+    $query = "UPDATE sfiles set nr_records = :nr WHERE ID = :sfileID";
+    $stmt = $con->prepare($query);
+    $stmt->BindValue(':nr', $nr, PDO::PARAM_INT);
+    $stmt->BindValue(':sfileID', $sfileID, PDO::PARAM_INT);
+    $stmt->execute();
 }
 
-function doreplace($con, $query, $sfileName, $file_ID) {
+function doreplace($con, $query, $sfileName, $file_ID, $uploadfile, $char_set, $line_endings, $instCode, $collCode) {
+    echo "<br /> query: $query <br />";
     $timer = new Timer();
    
     echo "
@@ -170,12 +161,20 @@ function doreplace($con, $query, $sfileName, $file_ID) {
     ob_flush();
     flush();
     $stmt = $con->prepare($query);
+    $stmt->BindValue(':uploadfile', $uploadfile, PDO::PARAM_STR);
+    echo ":uploadfile', $uploadfile <br>";
+    $stmt->BindValue(':char_set',  $char_set, PDO::PARAM_STR);
+    echo "':char_set',  $char_set<br>";
+    $stmt->BindValue(':fileID', $file_ID, PDO::PARAM_INT);
+    echo "':fileID', $file_ID<br>";
+    $stmt->BindValue(':instCode', $instCode, PDO::PARAM_STR);
+    echo "':instCode', $instCode<br>";
+    $stmt->BindValue(':collCode', $collCode, PDO::PARAM_STR);
+    echo "':collCode', $collCode<p>";
+    
     $stmt->execute();
-    //$result = $con->query($query);
-    //$stmt = $con->query('SHOW WARNINGS');
-    //echo "Warnings<br/>";
-    //var_dump($stmt->fetchAll());
     warningFormat($con,$sfileName);
+    
     echo "<p/>";
     if($stmt->errorCode() == 0) {
         instablenr($con, $file_ID);
@@ -187,6 +186,7 @@ function doreplace($con, $query, $sfileName, $file_ID) {
             $delfile_ID = $_POST['delfile_ID'];
             delfile($con, $delfile_ID, $sfileName);
         echo "
+            done. Time: " .$timer->getTime() ."
             <h3> 4. Changing name for geografical regions</h3>";
             ob_flush();
             flush();
@@ -220,7 +220,7 @@ function doreplace($con, $query, $sfileName, $file_ID) {
 }
 
 function emptycache() {
-    $dir = 'C:\\inetpub\\wwwroot\\cache\\';
+    $dir = 'c:\\Apache24\\htdocs\\cache\\';
     $mydir = opendir($dir);
     while(false !== ($file = readdir($mydir))) {
         if($file != "." && $file != "..") {
@@ -240,26 +240,34 @@ function emptycache() {
 function delfile($con, $delfile_ID, $sfileName) {
     echo "delfile ID: $delfile_ID <br>";
     if ($delfile_ID == -2) {
-        $delIDQuery = "SELECT ID FROM sfiles where name = \"$sfileName\" and not nr_records =0;";
-        $IDresult = $con->query($delIDQuery);
+        $delIDQuery = "SELECT ID FROM sfiles where name = :fileName;";
+        $Stm = $con->prepare($query);
+        $Stm->bindValue(':filename',$sfileName, PDO::PARAM_STR);
+        $Stm->execute();
+        $IDresult = $Stm->fetch(PDO::FETCH_ASSOC);
         if (!$IDresult) {
             $delfile_ID = -1;
             echo "no old file with that name not deleting old records";
         }
-        $delfileIDA = $IDresult->fetch();
+        $delfileIDA = $Stm-->fetch();
         $delfile_ID = $delfileIDA[0];
         echo "updal del id: $delfile_ID";
     } 
      if ($delfile_ID!=-1) {
         echo "
             delete file $delfile_ID from db <br />";
-        $query = "DELETE FROM specimens WHERE sFile_ID = '$delfile_ID'";
-        $query2 = "update sfiles set nr_records = 0 where ID = $delfile_ID";
-        //echo "$query <p>";
-        $result = $con->query($query);
+        $query = "DELETE FROM specimens WHERE sFile_ID = :delfile_ID";
+        $Stm = $con->prepare($query);
+        $Stm->bindValue(':delfile_ID',$delfile_ID, PDO::PARAM_INT);
+        $Stm->execute();
+        $result = $Stm->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            $result2 = $con->query($query2);
-            echo "$query2 <br />";
+            $query = "update sfiles set nr_records = 0 where ID = :delfile_ID";
+            $Stm2 = $con->prepare($query);
+            $Stm2->bindValue(':delfile_ID',$delfile_ID, PDO::PARAM_INT);
+            $Stm2->execute();
+            $result2 = $Stm2->fetch(PDO::FETCH_ASSOC);
+            //echo "$query2 <br />";
             if (!$result2) {
                 echo "error updating sfiles table $query2 <br/>";
             }
@@ -269,20 +277,21 @@ function delfile($con, $delfile_ID, $sfileName) {
         } else {
             echo "
                 error when trying delete $delfile_ID. <br />
-                error: ".mysql_error($con)."<br />
                 query: $query <br />";
             return false;
         }
-       
-
     } else {
         echo "no file to delete chosen <p />";
     }
 }
 
 function calcModified($con, $delfileDate) {
-    $query = "UPDATE specimens SET lastModified = $delfileDate dff WHERE sfile = $file;"; // ej färdig
-    $result = $con->query($query);
+    $query = "UPDATE specimens SET lastModified = :delfileDate dff WHERE sfile = :file;"; // ej färdig
+    $Stm = $con->prepare($query);
+    $Stm->bindValue(':delfileDate',$file_ID, PDO::PARAM_STR);
+    $Stm->bindValue(':file',$file_ID, PDO::PARAM_STR);
+    $Stm->execute();
+    $result = $Stm->fetch(PDO::FETCH_ASSOC);
     if ($result) {
         echo "
             last Modified now fixed for $file <br />";
@@ -297,107 +306,81 @@ function calcModified($con, $delfileDate) {
 }
 
 function fixGeoNames($con, $file_ID) {
-    $con->query("Call fix_geonames_f($file_ID);");
-    //mysql_query("Call UKProv();", $con);
-    //mysql_query("Call fixProv();", $con);
+    $Stm = $con->prepare("Call fix_geonames_f(:file_ID);");
+    $Stm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+    $Stm->execute();
 }
 
 function fixIdLinks($con, $file_ID, $timer) {
      // fixa lokaldatabasen  update specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID where specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;
     
     if ($file_ID == "-1") {
-        $query1 = "UPDATE specimens SET Genus_ID = Null;";
-        $query2 = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID;";
-        $query3 = "UPDATE specimens SET Taxon_ID = Null";
-        $query4 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid;";
-        $query5 = "UPDATE specimens SET Geo_ID = Null;";
-        //$query6 = "UPDATE specimens join district using (district, province, country) SET Geo_ID = district.ID;"; // Collate binnary
-        $query6 = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country  SET Geo_ID = district.ID";
-        $query7 = "UPDATE specimens SET Sign_ID = Null;";
-        $query8 = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID;";
-        //$query9 = "UPDATE specimens SET Dyntaxa_ID = Null;";
-        //$query10 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Dyntaxa_ID = xnames.taxonid;";
-        $query11 ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;";
+        $UGenusQuery = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID;";
+        $UnameQuery = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid;";
+        $UDistrictQuery = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country  SET Geo_ID = district.ID";
+        $USignaturQuery = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID;";
+        $USpecimenLocQuery ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;";
     } else {
-        $query1 = "UPDATE specimens SET Genus_ID = Null WHERE sFile_ID = '$file_ID';";
-        $query2 = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID WHERE sFile_ID = '$file_ID';";
-        $query3 = "UPDATE specimens SET Taxon_ID = Null WHERE sFile = '$file_ID';";
-        $query4 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid WHERE sFile_ID = '$file_ID';";
-        $query5 = "UPDATE specimens SET Geo_ID = Null WHERE sFile = '$file_ID';";
-        //$query6 = "UPDATE specimens join district using (district, province, country) SET Geo_ID = district.ID WHERE sFile_ID = '$file_ID';"; // Collate binnary
-        $query6 = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country SET Geo_ID = district.ID WHERE sFile_ID ='$file_ID'";
-        $query7 = "UPDATE specimens SET Sign_ID = Null WHERE sFile_ID = '$file_ID';";
-        $query8 = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID  WHERE sFile_ID = '$file_ID';";
-        //$query9 = "UPDATE specimens SET Dyntaxa_ID = Null WHERE sFile_ID = '$file_ID';";
-        //$query10 = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Dyntaxa_ID = xnames.taxonid WHERE sFile_ID = '$file_ID';";
-        $query11 ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode and sFile_ID = '$file_ID';";
-        
+        $UGenusQuery = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID WHERE sFile_ID = :file_ID;";
+        $UnameQuery = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid WHERE sFile_ID = :file_ID;";
+        $UDistrictQuery = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country SET Geo_ID = district.ID WHERE sFile_ID = :file_ID";
+        $USignaturQuery  = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID  WHERE sFile_ID = :file_ID;";
+        $USpecimenLocQuery ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode and sFile_ID = :file_ID;";
         //fix specimen_locality link with ID
         // use something like update specimen_locality join specimens using (InstitutionCode, AccessionNo) set specimen_locality.specimen_ID = specimens.ID where sFile_ID = "627";
     }
-
+    
+    $UGenusStm = $con->prepare($UGenusQuery);
+    $UnameStm = $con->prepare($UnameQuery);
+    $UDistrictStm = $con->prepare($UDistrictQuery);
+    $USignaturStm = $con->prepare($USignaturQuery);
+    $USpecimenLocStm = $con->prepare($USpecimenLocQuery);
+    
+    if ($file_ID != "-1") {
+        $UGenusStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+        $UnameStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+        $UDistrictStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+        $USignaturStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+        $USpecimenLocStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+    }
+        
     echo "
         creating Genus_ID.. <br />";
-    $result = $con->query($query2);
+    $UGenusStm->execute();
+    echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
-    if (!$result) {
-        echo "
-        error when creating Genus_ID:".mysql_error($con)." <br />
-        query: $query2 <br />";
-        
-    }
-    echo "Time: ".$timer->getTime()."<br />";
+    
     echo "
         creating Taxon_ID.. <br />";
-    $result = $con->query($query4);
+    $UnameStm->execute();
+    echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
-    if (!$result) {
-        echo "
-        error when creating Taxon_ID:".mysql_error($con)." <br />
-        query: $query4 <br />";
-        
-    }
-   echo "Time: ".$timer->getTime()."<br />";
+    
     echo "
         creating Geo_ID.. <br />";
-    $result = $con->query($query6);
+    $UDistrictStm->execute();
+    echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
-    if (!$result) {
-        echo "
-        error when creating Geo_ID:".mysql_error($con)." <br />
-        query: $query6 <br />";
-    }
-   echo "Time: ".$timer->getTime()."<br />";
     echo "
         creating Sign_ID.. <br />";
-    $result = $con->query($query8);
+    $USignaturStm->execute();
+    echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
-    if (!$result) {
-        echo "
-        error when creating Sign_ID:".mysql_error($con)." <br />
-        query: $query8 <br />";
-    }
-    echo "Time: ".$timer->getTime()."<br />";
-  echo "
+    
+    echo "
         creating specimen ID in the locality db.. <br />";
-    $result = $con->query($query11);
+    $UDistrictStm->execute();
+    echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
-    if (!$result) {
-        echo "
-        error when creating specimen_ID:".mysql_error($con)." <br />
-        query: $query11 <br />";
-    }
-    echo "Time: ".$timer->getTime()."<br />";
+    
     echo "
     done fixing id links <br />";
 }
-
-
 
 function filetable($con2) {
     echo "
@@ -446,18 +429,9 @@ function upploadfile($backpage) {
         return false;
     } else
     {
-        $uploaddir = 'C:/inetpub/wwwroot/uploads/';
+        $uploaddir = 'C:/uploads/';
         $uploadfile = $uploaddir . basename($_FILES['uploadedfile']['name']);
         $file = basename($_FILES['uploadedfile']['name']);
-        //echo "file: $file <br />";
-        $delfile_ID = $_POST['delfile_ID'];
-        //echo "delfile: $delfile <br />";
-        $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-        $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-        $char_set = $_POST['char_set'];
-        $line_endings = $_POST['line_endings'];
         if (substr($file,-4)!=".csv" and substr($file,-4)!=".txt") {
             echo "
                 it should be a .csv or .txt file <br />
@@ -465,8 +439,10 @@ function upploadfile($backpage) {
             return false;
         }
         elseif (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $uploadfile)) {
+            $temp_file = $_FILES['uploadedfile']['tmp_name'];
+            echo "tempfile: $temp_file </br>";
+            //echo phpinfo();
             echo "
-            
                     file $file of ". round(($_FILES["uploadedfile"]["size"] / 1024)) . " Kb is uploaded <br />";
                     $fd[0]=$file;
                     $fd[1]=$uploadfile;
@@ -492,7 +468,7 @@ function warningFormat($con, $sfileName) {
             echo "<tr><td>$w[Level]</td><td>$w[Message]</td></tr>";
         }
         echo "</Table>";
-        $myfile = fopen("C:/inetpub/wwwroot/uploadlogs/$sfileName.txt", "w") or die("Unable to open file!");
+        $myfile = fopen("C:/Apache24/htdocs/uploadlogs/$sfileName.txt", "w") or die("Unable to open file!");
         foreach ($errors as $w) {
             fwrite($myfile, "$w[Level]: $w[Message]\r\n");
         }
@@ -501,276 +477,4 @@ function warningFormat($con, $sfileName) {
         echo "no warnings?";
     }
 }
-
-/*
-function insertFileUME($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-    
-   
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    
-    $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings'
-            (`AccessionNo`, `Day`, `Month`, `Year`, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
-            `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
-            `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`, `RiketsN`,
-            `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `LastModified`)
-            SET `sFile_ID` = '$File_id', institutionCode = '$instCode', collectionCode = '$collCode'";
-    echo " $query <p />";
-    try {
-        $result = $con->query($query);
-         echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } catch (PDOException $e) {
-        echo 'error when trying to insert: ' . $e->getMessage();
-        echo "<br /> query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileLINREG($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    
-    $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings'
-            (`AccessionNo`, `Day`, `Month`, `Year`, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
-            `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
-            `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`, `RiketsN`,
-            `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `LastModified`,
-            `linereg`, `Type_status`, `Basionym`, `TAuctor`)
-            SET `sFile_ID` = '$File_id', institutionCode = '$instCode', collectionCode = '$collCode'";
-    //echo " $query <p />";
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileOHN($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $separated = $_POST['separated'];
-    $enclosed = $_POST['enclosed'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    
-    $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY '$separated' ENCLOSED BY '$enclosed' LINES TERMINATED BY '$line_endings'
-            (`AccessionNo`, @scientific_name, @datum, @North, @East, @Presicion, @Koordsys, Continent,
-            Country, `Province`, `District`, @OriginalLokal, `Collector`, `Original_name`, `Original_text`, @Que, @Notes)
-            SET `sFile_ID` = $File_id, institutionCode = '$instCode', collectionCode = '$collCode',
-                Year = PYear(@datum),
-                Month = PMonth(@datum),
-                Day = PDay(@datum),
-                Genus = Genera(CONVERT(@scientific_name USING utf8)),
-                Species = Species2(CONVERT(@scientific_name USING utf8)),
-                SspVarForm = Ssp(CONVERT(@scientific_name USING utf8)),
-                HybridName = OHNHybrid(CONVERT(@scientific_name USING utf8)),
-                RiketsN = PRT90N(@North, @Koordsys, @Presicion),
-                RiketsO = PRT90E(@East, @Koordsys, @Presicion),
-                CSource = OHNCSource(@Koordsys, @Presicion),
-                `Lat` = OHNLat(@North, @East, @Koordsys),
-                `Long` = OHNLong(@East,  @North, @Koordsys),
-                linereg = OHNLinreg(@Presicion, CONVERT(@Locality USING utf8)),
-                Locality = OHNLocality(@Presicion, CONVERT(@Locality USING utf8)),
-                Notes = OHNNotes(CONVERT(@Notes USING utf8))";
-                
-                //Country = PCountry(CONVERT(@SWCountry USING utf8)),
-                //Continent = PContinent(CONVERT(@SWCountry USING utf8),Province),
-                
-    //echo " $query <p />";
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileUPS($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-    
-   
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    // 
-    
-   $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$line_endings'
-        (`AccessionNo`, `Day`, `Month`, `Year`, `Genus`, @Species, @irang, @iepi, collector, Collectornumber, notes, continent, country, province, district, original_text,
-        habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, @dumy, Type_status, Basionym) 
-        SET `sFile_ID` = '$File_id', institutionCode = 'UPS', collectionCode = '',
-            SspVarForm = concat(@irang, ' ', @iepi),
-            CSource = CSource(@Lat, @Long),
-            `Long` = ToNum(@Long),
-            `Lat` = ToNum(@Lat),
-            HybridName = UPSHybrid(@Species),
-            Species = UPSSpecies(@Species)
-            " ;
-    //echo " $query <p />";
-    //
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileS($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    
-   $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$line_endings' IGNORE 1 LINES 
-    (`AccessionNo`, `Genus`, `Species`,  SspVarForm, Basionym, Type_status, collector, Collectornumber,
-    `Exsiccata`, `Exs_no`, `Year`, `Month`, `Day`, @continent, country, province, district, `Original_text`, habitat,
-    `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `RUBIN`, RiketsN, RiketsO, @AltMin, @AltMax, comments)
-    SET `sFile_ID` = '$File_id',
-    institutionCode = '$instCode',
-    CollectionCode = '$collCode',
-    Altitude_meter = SAlt(@AltMin, @AltMax),
-    continent = SContinent(@continent, @country)";
-    echo " $query <p />";
-    //
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileKryptoS($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    
-   $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$line_endings' IGNORE 1 LINES 
-    (`AccessionNo`, @Taxon, Basionym, Type_status, collector, Collectornumber,
-    `Exsiccata`, `Exs_no`, `Year`, `Month`, `Day`, @continent, country, province, district, `Original_text`, habitat,
-    `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, comments)
-    SET `sFile_ID` = '$File_id',
-    institutionCode = '$instCode',
-    CollectionCode = '$collCode',
-    Genus = Genera(@Taxon),
-    Species = Species2(@Taxon),
-    SspVarForm = Ssp(@Taxon),
-    continent = SContinent(@continent, @country)";
-    echo " $query <p />";
-    //
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}
-
-function insertFileIMG($con, $uploadfile, $sfileName) {
-    //echo "   Inserting file $uploadfile. <p />";
-
-    $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
-    $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
-    $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
-    $File_id = instable($con, $sfileName, $instCode, $collCode);
-    
-    
-    $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings'
-            (`AccessionNo`, `Day`, `Month`, `Year`, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
-            `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
-            `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`, `RiketsN`,
-            `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `LastModified`,
-            `linereg`, `Type_status`, `Basionym`, `TAuctor`, `image1`, `image2`, `image3`)
-            SET `sFile_ID` = '$File_id', institutionCode = '$instCode', collectionCode = '$collCode'";
-    //echo " $query <p />";
-    $result = $con->query($query);
-    if ($result) {
-        echo "
-            $sfileName now inserted in db <br />";
-        return $File_id ;
-    } else {
-        echo "
-            error when trying to insert $sfileName into the db. <br />
-            error: ".mysql_error($con)."<br />
-            query: $query <br />";
-        return false;
-    }
-}*/
-
 ?>

@@ -1,10 +1,6 @@
 <?php
-
 include("..\herbes.php");
-
 $fileID = $_GET['FileID'];
-
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
 
 echo "<head>
 		<title> Fil rapport</title>
@@ -24,7 +20,7 @@ echo "<head>
 	 Använd: Africa, Antarctica, Asia, Europe, Oceania, North America, (South & Central America?)<br/>
 	 <a href = \"rapportVärldsdelar.php?FileID=$fileID\">Världsdelar</a> <br/>
 	 <H3>Länder</H3>
-	 Tabell med Länder som saknas <a href = \"rapportLänder.php?FileID=$fileID\">Länder</a>
+	 Tabell med Länder som saknas <a href = \"rapportLänder.php?FileID=$fileID\">Länder</a> <br/>
 	 <H3>Provinser</H3>
 	 <a href = \"rapportProvinserS.php?FileID=$fileID\">Provinser i Sverige</a> <br/>
 	 <a href = \"rapportProvinser.php?FileID=$fileID\">Provinser hela världen</a>
@@ -32,6 +28,8 @@ echo "<head>
 	 <a href = \"rapportDistrictS.php?FileID=$fileID\">District i Sverige</a> <br />
 	 <a href = \"rapportDistrict.php?FileID=$fileID\">District</a>
 	 <H3>Lokaler och Koordinater</H3>
+     kollekt med koordinater utanför länders boudning box <a href = \"rapportCountriesCoord.php?FileID=$fileID\">Länder</a> <br/>
+     kollekt med koordinater utanför provinsers boudning box <a href = \"rapportProvincesCoord.php?FileID=$fileID\">Provinser</a>
 	 <H3>Datum</h3>
 	 <a href = \"rapportDatum.php?FileID=$fileID\">Datum</a>
 	<h3>Räkna om länkarna</hr>
@@ -40,11 +38,8 @@ echo "<head>
             <tr> <td> Password: </td> <td> <input type=\"password\" name =\"mypassword\" />
             <tr> <td> FileID: </td> <td> <input type=\"text\" name =\"FileID\" value = \"$fileID\"/>
             <input type=\"hidden\" name =\"kontroll\" value = \"OK\" /> </td> </tr>
-             
-            
             <tr> <td> <input type=\"submit\" value=\"redo idLinks\" /> </td> </tr>
         </form>
 </div>
 </body>";
-
 ?>

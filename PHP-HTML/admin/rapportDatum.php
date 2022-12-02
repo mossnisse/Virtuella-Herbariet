@@ -2,7 +2,7 @@
 include("..\herbes.php");
 $fileID = $_GET['FileID'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
 echo "<head>
 		<title>Rapport Datum</title>
@@ -17,10 +17,13 @@ echo "<head>
 
 $now = date("Y")+1;
 		
-$query = "Select specimens.ID, AccessionNo, specimens.Year, specimens.Month, specimens.Day, specimens.Collector from specimens where sFile_ID = $fileID and
-(((Year > $now or Year < 1600) and not Year = \"\") or ((Month > 12 or Month < 1) and not Month = \"\" ) or ((Day > 31 or Day < 1) and not Day = \"\")) Limit 1000;";
-$result = $con->query($query);
-while($row = $result->fetch()) {
+$query = "Select specimens.ID, AccessionNo, specimens.Year, specimens.Month, specimens.Day, specimens.Collector from specimens where sFile_ID = :fileID and
+(((Year > :now or Year < 1600) and not Year = \"\") or ((Month > 12 or Month < 1) and not Month = \"\" ) or ((Day > 31 or Day < 1) and not Day = \"\")) Limit 1000;";
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->bindValue(':now', $now, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Year]</TD><TD>$row[Month]</TD><TD>$row[Day]</TD><TD>$row[Collector]</TD></TR>";
 }
 echo "</table></body>";

@@ -5,7 +5,7 @@ ini_set('display_errors', '1');
 include("admin_scripts.php");
 //include("..\herbes.php");
 if ($_POST['mypassword'] == "baconas") {
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
+    $con = getConA();
     $FileID = $_POST['FileID'];
     $timer = new Timer();
     fixIdLinks($con, $FileID, $timer);

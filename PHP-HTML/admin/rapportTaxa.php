@@ -2,7 +2,7 @@
 include("..\herbes.php");
 $fileID = $_GET['FileID'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
 echo "<head>
 		<title>rapportTaxa</title>
@@ -15,15 +15,16 @@ echo "<head>
 	 <Table>
 		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH>Species</TH><TH>Ssp/Var/Form</TH><TH>Hybrid name</TH><TH>Original name</TH></TR>";
 	 
-	 $query = "Select ID, AccessionNo, Genus, Species, SspVarForm, HybridName, Original_name from specimens where specimens.sFile_ID =$fileID
+	 $query = "Select ID, AccessionNo, Genus, Species, SspVarForm, HybridName, Original_name from specimens where specimens.sFile_ID = :fileID
 	 and ((not trim(Genus) = Genus or not trim('\\t' from Genus) = Genus)
 	 or (not trim(Species) = Species or not trim('\\t' from Species) = Species)
 	 or (not trim(SspVarForm) = SspVarForm or not trim('\\t' from SspVarForm) = SspVarForm)
 	 or (not trim(HybridName) = HybridName or not trim('\\t' from HybridName) = HybridName))
 	 LIMIT 1000;";
-$result = $con->query($query);
-
-while($row = $result->fetch()) {
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[SspVarForm]</TD><TD>$row[HybridName]</TD><TD>$row[Original_name]</TD></TR>";
 }	 
 	 
@@ -34,9 +35,11 @@ echo "
 	 <Table>
 		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH>Species</TH><TH>Ssp/Var/Form</TH><TH>Hybrid name</TH><TH>Original name</TH></TR>";
 		
-$query = "Select ID, AccessionNo, Genus, Species, SspVarForm, HybridName, Original_name from specimens where specimens.sFile_ID =$fileID and Taxon_ID is null and Country = \"Sweden\" LIMIT 1000;";
-$result = $con->query($query);
-while($row = $result->fetch()) {
+$query = "Select ID, AccessionNo, Genus, Species, SspVarForm, HybridName, Original_name from specimens where specimens.sFile_ID = :fileID and Taxon_ID is null and Country = \"Sweden\" LIMIT 1000;";
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[SspVarForm]</TD><TD>$row[HybridName]</TD> <TD>$row[Original_name]</TD></TR>";
 }
 echo "</table></body>";

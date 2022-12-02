@@ -2,7 +2,7 @@
 include("..\herbes.php");
 $fileID = $_GET['FileID'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
 echo "<head>
 		<title>Rapport Provinser i Sverige</title>
@@ -21,10 +21,11 @@ echo "<head>
 	 <table>
 		<TR><TH>Catalogue No.</TH><TH>Province</TH></TR>";
 	 
-$query = "Select ID, AccessionNo, Province from specimens where specimens.sFile_ID =$fileID and (not trim(Province) = Province or not trim('\\t' from Province) = Province) LIMIT 1000;";
-$result = $con->query($query);
-
-while($row = $result->fetch()) {
+$query = "Select ID, AccessionNo, Province from specimens where specimens.sFile_ID = :fileID and (not trim(Province) = Province or not trim('\\t' from Province) = Province) LIMIT 1000;";
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
 }
 
@@ -36,11 +37,12 @@ echo
 		<TR><TH>Catalogue No.</TH><TH>Province</TH></TR>";
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Province from specimens left join district on district.Country = specimens.Country and district.Province = specimens.Province
-			where sFile_ID = $fileID and specimens.Country = \"Sweden\" and district.id is null and NOT specimens.province = \"\" LIMIT 1000";
+			where sFile_ID = :fileID and specimens.Country = \"Sweden\" and district.id is null and NOT specimens.province = \"\" LIMIT 1000";
 			
-//echo $query;
-$result = $con->query($query);
-while($row = $result->fetch()) {
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
 }
 echo "</table>";
@@ -52,10 +54,11 @@ echo
 <tr><th>NR</th><th>Species</th><th>Provins</th><th>Samlare</th><th>datum</th><th>text</th></tr>";
 
 $query = "select specimens.ID, Genus, Species, SspVarForm, Year, Month, Day, specimens.AccessionNo, Province, oProvince, oDistrict, collector, Original_text from specimen_locality join specimens on specimen_locality.specimen_ID = specimens.ID
-where not oProvince =\"\" and not oProvince = specimens.province and specimens.sFile_ID = $fileID order by Genus;";
-$result = $con->query($query);
-
-while($row = $result->fetch())
+where not oProvince =\"\" and not oProvince = specimens.province and specimens.sFile_ID = :fileID order by Genus;";
+$Stm = $con->prepare($query);
+$Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
+$Stm->execute();
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) 
 {
 	$species = "$row[Genus] $row[Species] $row[SspVarForm]";
 	$datum = "$row[Year]-$row[Month]-$row[Day]";

@@ -13,9 +13,9 @@
         error_reporting(E_ALL);
         ini_set('display_errors', '1');
         include("admin_scripts.php");
-        $con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+        $con = getConS();
         //mysql_set_charset('utf8', $con2);
-        filetable($con2);
+        filetable($con);
     ?>
     </table>
     <table>

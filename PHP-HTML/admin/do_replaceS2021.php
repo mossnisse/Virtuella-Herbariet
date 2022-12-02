@@ -11,7 +11,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 include("admin_scripts.php");
 
-
 if (isUpdating2()) {
     updateText();
 } else {
@@ -21,13 +20,19 @@ if (isUpdating2()) {
     ob_flush();
     flush();
     
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
+    $con = getConA();
     $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
     $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
     $char_set = $_POST['char_set'];
     $line_endings = $_POST['line_endings'];
+    $fline_endings = '\\r\\n';
+    if ($line_endings == '\r\n') {
+        $fline_endings = '\\r\\n';
+    } elseif ($line_endings == '\n') {
+        $fline_endings = '\\n';
+    } elseif($line_endings == '\r') {
+        $fline_endings = '\\r';
+    }
 
     $a = upploadfile("replaceS.php");
 
@@ -36,15 +41,14 @@ if (isUpdating2()) {
         $uploadfile = $a[1];
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
-        $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$line_endings'
+        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '$fline_endings'
         (`AccessionNo`, @Day, @Month, @Year, `Genus`, @Species, collector, Collectornumber, notes, @continent, @country, province, district, `Original_text`, `Exsiccata`, `Exs_no`,
 		@RUBIN1, @RUBIN2, RiketsN, RiketsO, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, LasModifiedFM, Basionym, Type_status, habitat
-		, image1, image2, image3, image4)
+		,image1, image2, image3, image4)
     
-			SET `sFile_ID` = '$File_id',
-			institutionCode = '$instCode',
-			CollectionCode = '$collCode',
-
+			SET `sFile_ID` = :fileID,
+			institutionCode = :instCode,
+			CollectionCode = :collCode,
 			Continent = SContinent(@continent, @country),
 			Country = @country,
 			Species = SSpecies(@Species),
@@ -55,9 +59,8 @@ if (isUpdating2()) {
             Day = ToInt(@Day),
 			RUBIN = Concat(@RUBIN1, @RUBIN2);";
 		//Altitude_meter = SAlt(@AltMin, @AltMax),
-		//echo $query;
 
-        doreplace($con,$query, $sfileName, $File_id);
+        doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);
 }

@@ -10,7 +10,7 @@
         Datum ska vara i formen ÅÅÅÅ-MM-DD alt ÅÅÅÅ-MM alt ÅÅÅÅ. <br />
         .csv filen får inte vara för stor ca 150M <br />";
         
-    $con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+    $con2 = getConS();
      
-    replacepage("OHN", "do_replaceOHN.php", $desc, "OHN", "<option value=\"latin1\">latin1 - cp1252 West European</option>", "<option value=\"\r\n\">\r\n - DOS/Windows</option>", $con2);
+    replacepage("OHN", "do_replaceOHN.php", $desc, "OHN", "<option value=\"latin1\">latin1 - cp1252 West European</option>", "<option value=\"\\r\\n\">\\r\\n - DOS/Windows</option>", $con2);
 ?>

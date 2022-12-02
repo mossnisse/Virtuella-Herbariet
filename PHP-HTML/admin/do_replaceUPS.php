@@ -21,13 +21,18 @@ if (isUpdating2()) {
     ob_flush();
     flush();
     
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
+    $con = getConA();
     $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
     $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
     $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
+    $fline_endings = '\\r\\n';
+    if ($line_endings == '\r\n') {
+        $fline_endings = '\\r\\n';
+    } elseif ($line_endings == '\n') {
+        $fline_endings = '\\n';
+    } elseif($line_endings == '\r') {
+        $fline_endings = '\\r';
+    }
 
     $a = upploadfile("replaceUPS.php");
 
@@ -36,21 +41,22 @@ if (isUpdating2()) {
         $uploadfile = $a[1];
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
-       $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$line_endings'
-        (`AccessionNo`, @Day, @Month, @Year, `Genus`, @Species, @irang, @iepi, collector, Collectornumber, notes, continent, country, province, district, original_text,
+       $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY '$fline_endings'
+        (`AccessionNo`, @Day, @Month, @Year, @Genus, @Species, @irang, @iepi, @higerTaxa, collector, Collectornumber, notes, continent, country, province, district, original_text,
         habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, @dumy, Type_status, Basionym) 
-        SET `sFile_ID` = '$File_id', institutionCode = 'UPS', collectionCode = '',
+        SET `sFile_ID` = :fileID, institutionCode = :instCode, collectionCode = :collCode,
             SspVarForm = concat(@irang, ' ', @iepi),
-            CSource = CSource(@Lat, @Long),
+            CSource = UPSSource(@Lat, @Long),
             `Long` = ToNum(@Long),
             `Lat` = ToNum(@Lat),
+            Genus = UPSGenus(@Genus,@higerTaxa),
             HybridName = UPSHybrid(@Species),
             Species = UPSSpecies(@Species),
             Year = ToInt(@Year),
             Month = ToInt(@Month),
             Day = ToInt(@Day);";
 
-        doreplace($con,$query, $sfileName, $File_id);
+        doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);
 }
@@ -59,7 +65,6 @@ echo "
         <a href=\"replaceUPS.php\">back</a> <br />
         <a href=\"admin.php\">admin page</a> <br />
         <a href=\"../\">start page</a> <br />";
-
 ?>
     </body>
 </html>

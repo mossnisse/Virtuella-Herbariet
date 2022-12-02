@@ -1,77 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+        <title> Virtuella herbariet Admin page </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
 <?php
-	ini_set('post_max_size','100M');
-	ini_set('upload_max_filesize','100M');
-	set_time_limit(120);
+	//ini_set('post_max_size','100M');
+	//ini_set('upload_max_filesize','100M');
+	set_time_limit(240);
+	error_reporting(E_ALL);
     ini_set('display_errors', 1);
-    error_reporting(E_ALL);
     include("admin_scripts.php");
 	//include("../koordinates.php");
 if ($_POST['mypassword'] == "baconas")
 {
-	
-    if ($_FILES["lfile"]["error"] > 0)
-    {
-        echo "Error: " . $_FILES["collectorfile"]["error"] . "<br />";
-    }
-    else
-    {
-	    $uploaddir = 'C:/inetpub/wwwroot/uploads/';
-        $uploadfile = $uploaddir . basename($_FILES['lfile']['name']);
-        $file = basename($_FILES['lfile']['name']);
-        if (substr($file,-4)!=".csv") {
-            echo "it should be a .csv file";
+	$con = getConA();
+	$a = upploadfile("import_localities.php");
+	if ($a) {
+        $sfileName = $a[0];
+        $uploadfile = $a[1];
+		
+				
+		echo "empty temp table<br />";
+				
+		$query = "delete from locality_temp";
+		$result = $con->query($query);
+        if (!$result) {
+            echo "
+            <p /> eror:".mysql_error($con2)."<p /> query: $query <br />";
+            echo "<p> <a href=\"admin.php\"> back to admin page </a>";
         }
-        else
-        { 
-            if (move_uploaded_file($_FILES['lfile']['tmp_name'], $uploadfile))
-			{ 
-                 echo "
-                    file $file of ". ($_FILES["lfile"]["size"] / 1024) . " Kb is uploaded <br />
-                    inserting in temp table<br />" ;
-				$con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
-				
-				echo "empty temp table<br />";
-				
-				
-				$query = "delete from locality_temp";
-				$result = $con2->query($query);
-                if (!$result) {
-                        echo "
-                        <p /> eror:".mysql_error($con2)."<p /> query: $query <br />";
-                        echo "<p> <a href=\"admin.php\"> back to admin page </a>";
-                }
-                $query = "LOAD DATA INFILE '$uploadfile'
+        $loadQuery = "LOAD DATA INFILE :uploadfile
                             INTO TABLE locality_temp FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\\r\\n'
                             (Locality, District, Province, Country, Continent, lat, `long`, RiketsN, RiketsO, AlternativeNames, Comments, Coordinateprecision, CoordinateSource, Created, Modified, RegisteredBy)";
-                echo "<p> $query <p />";
-				$result = $con2->query($query);
-                if (!$result) {
-                        echo "
-                        <p /> eror:".mysql_error($con2)."<p /> query: $query <br />";
-                        echo "<p> <a href=\"admin.php\"> back to admin page </a>";
-                } else { 
-                    //echo $result. "<br />";
-                    echo "File now inserted into temp table <p />
+        echo "<p>$loadQuery<p />";
+		$loadStmt = $con->prepare($loadQuery);
+		$loadStmt->BindValue(':uploadfile', $uploadfile, PDO::PARAM_STR);
+				
+		$LocCountQuery = "Select Count(*) as numbr from locality where Locality = :locality and Province = :province and Country = :country";
+		$LocCountStmt = $con->prepare($LocCountQuery);
+		$LocCountStmt->BindParam(':locality', $Locality, PDO::PARAM_STR);
+		$LocCountStmt->BindParam(':province', $Province, PDO::PARAM_STR);
+		$LocCountStmt->Bindparam(':country', $Country, PDO::PARAM_STR);
+				
+		$insLocalQuery = "Insert into Locality (locality, district, province, country, continent, lat, `long`, RT90N, RT90E,
+											alternative_names, lcomments, coordinate_source, createdby, created, modified, Coordinateprecision, SWTMN, SWTME)
+											Select Locality, District, Province, Country, Continent,
+											IF (lat='', null, CAST(REPLACE(lat,',','.')  as DECIMAL(10,7))),  IF (`long`='',null,CAST(REPLACE(`long`,',','.')  as DECIMAL(10,7))),
+											IF (RiketsN = '',null, CAST(RiketsN AS UNSIGNED) ),  IF (RiketsN = '',null, CAST(RiketsO AS UNSIGNED)),
+											AlternativeNames, Comments, CoordinateSource, RegisteredBy, STR_TO_DATE(Created,'%Y-%m-%d') , STR_TO_DATE(Modified,'%Y-%m-%d'), IF (Coordinateprecision ='', null, CAST(Coordinateprecision AS UNSIGNED)),
+											:SWTMN, :SWTME
+											from Locality_temp where ID = :ID";
+		$insLocalStmt = $con->prepare($insLocalQuery);
+		$insLocalStmt->BindParam(':SWTMN', $SwTMN, PDO::PARAM_INT);
+		$insLocalStmt->BindParam(':SWTME', $SwTME, PDO::PARAM_INT);
+		$insLocalStmt->BindParam(':ID', $ID, PDO::PARAM_INT);
+				
+		$getTempListQuery="Select Locality, Province, Country, ID, lat, `long` from locality_temp";
+		$getTempListStmt = $con->prepare($getTempListQuery);
+				
+		$loadStmt->execute();
+				
+        echo "File now inserted into temp table <p />
 						Merging table <br/>";
-					//$query= "Update locality_temp set SWTMN = $swtmn, SMTME = $swtmE where country = \"Sweden\"";
 						
-					$query = "Select Locality, Province, Country, ID, lat, `long` from locality_temp";
-					$result = $con2->query($query);
-					while ($row = $result->fetch())
-					{
-						$locality = str_replace("'", "\\'", $row['Locality']);
-						$Province = str_replace("'", "\\'", $row['Province']);
-						$Country = str_replace("'", "\\'", $row['Country']);
-						$query2 = "Select Count(*), lat, `long` from locality where Locality = '$locality' and Province = '$Province' and Country = '$Country'";
-						if ($result2 = $con2->query($query2))
-						{
-							if ($result2->fetchColumn() > 0)
-							{
-								echo "Locality already existst: $row[Locality], $row[Province], $row[Country] <br />";
-							}
-							else
-							{ 
-								if ($row['lat'] == '' || $row['long'] == null)
+		$getTempListStmt->execute();
+		while ($row = $getTempListStmt->fetch(PDO::FETCH_ASSOC)) {
+			$Locality = $row['Locality'];
+			$Province = $row['Province'];
+			$Country = $row['Country'];
+			$LocCountStmt->execute();
+			$result2 = $LocCountStmt->fetch(PDO::FETCH_ASSOC);
+			$antal = $result2['numbr'];
+				
+			//echo "number of localities $row[Locality] - $row[Province] - $row[Country] - $antal <br>";
+			if($antal==0)
+			{			
+							if ($row['lat'] == '' || $row['long'] == null)
 								{
 									echo "Locality lack WGS84 coordinates and is omited: $row[Locality], $row[Province], $row[Country] <br /> ";
 								}
@@ -87,39 +93,25 @@ if ($_POST['mypassword'] == "baconas")
 										$sweref['north'] = 'NULL';
 										$sweref['east'] = 'NULL';
 									}
-									$query3 = "Insert into Locality (locality, district, province, country, continent, lat, `long`, RT90N, RT90E,
-											alternative_names, lcomments, coordinate_source, createdby, created, modified, Coordinateprecision, SWTMN, SWTME)
-											Select Locality, District, Province, Country, Continent,
-											IF (lat='', null, CAST(REPLACE(lat,',','.')  as DECIMAL(10,7))),  IF (`long`='',null,CAST(REPLACE(`long`,',','.')  as DECIMAL(10,7))),
-											IF (RiketsN = '',null, CAST(RiketsN AS UNSIGNED) ),  IF (RiketsN = '',null, CAST(RiketsO AS UNSIGNED)),
-											AlternativeNames, Comments, CoordinateSource, RegisteredBy, STR_TO_DATE(Created,'%Y-%m-%d') , STR_TO_DATE(Modified,'%Y-%m-%d'), IF (Coordinateprecision ='', null, CAST(Coordinateprecision AS UNSIGNED)),
-											$sweref[north], $sweref[east]
-											from Locality_temp where ID = $row[ID]";
-									
-									//echo $query3; 												
-									if ($con2->query($query3)) {
-										echo "Locality insterted: $row[Locality], $row[Province], $row[Country] <br/>";
-									} else {
-										echo "error inserting new locality: $query3 <br />";
-									}
+									$SwTMN = $sweref['north'];
+									$SwTME = $sweref['east'];
+									$ID = $row['ID'];
+									$insLocalStmt->execute();
+									$result = $insLocalStmt->fetch(PDO::FETCH_ASSOC);
 								}
-							}
-						} else {
-							echo "error: $query2 <br />";
-						}
+				}else {
+						echo "Locality already exists in db: $row[Locality], $row[Province], $row[Country] <br />";
 					}
-					echo "Empty temp table";
-					$query = "DELETE from locality_temp";
-					//$con2->query($query);
+			} 
+			echo "Empty temp table";
+			$emptyTableQuery = "DELETE from locality_temp";
+			$con->query($query);
 					
-                    echo "<p> <a href=\"admin.php\"> back to admin page </a>";
-                }
-            } else {
-                echo "Possible file upload attack!\n";
-            }
-        }
-    } 
-} else {
-    echo "wrong password <a href=\"uppdat.html\"> try again? </a>";
+        echo "<p> <a href=\"admin.php\"> back to admin page </a>";
+    } else {
+        echo "Possible file upload attack!\n";
+    }
 }
 ?>
+</body>
+</html>

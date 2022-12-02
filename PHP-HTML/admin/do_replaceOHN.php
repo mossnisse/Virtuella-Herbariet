@@ -9,9 +9,7 @@
 set_time_limit(2400);
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-//include("../herbes.php");
 include("admin_scripts.php");
-
 
 if (isUpdating2()) {
     updateText();
@@ -22,15 +20,19 @@ if (isUpdating2()) {
     ob_flush();
     flush();
     
-    $con = conDatabase($MySQLHost, $MySQLDB, $MySQLAUser, $MySQLAPass);
+    $con = getConA();
     $collCode = $_POST['CollectionCode'];
-        //echo "collCode: $collCode <br />";
     $instCode = $_POST['InstitutionCode'];
-        //echo "instCode: $instCode <br />";
     $char_set = $_POST['char_set'];
     $line_endings = $_POST['line_endings'];
-    $separated = '\t';
-    
+    $fline_endings = '\\r\\n';
+    if ($line_endings == '\r\n') {
+        $fline_endings = '\\r\\n';
+    } elseif ($line_endings == '\n') {
+        $fline_endings = '\\n';
+    } elseif($line_endings == '\r') {
+        $fline_endings = '\\r';
+    }
 
     $a = upploadfile("do_replaceOHN.php");
 
@@ -38,20 +40,19 @@ if (isUpdating2()) {
         $sfileName = $a[0];
         $uploadfile = $a[1];
         $File_id = instable($con, $sfileName, $instCode, $collCode);
-        //ENCLOSED BY '$enclosed'
-       $query = "LOAD DATA INFILE '$uploadfile' INTO TABLE specimens CHARACTER SET $char_set FIELDS TERMINATED BY '$separated'  LINES TERMINATED BY '$line_endings'
+        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY '\t' LINES TERMINATED BY '$fline_endings'
             (`AccessionNo`, @scientific_name, @datum, @North, @East, @Presicion, @Koordsys, Continent,
             Country, `Province`, `District`, @OriginalLokal, `Collector`, `Original_name`, `Original_text`, @Que, @Notes)
-            SET `sFile_ID` = $File_id, institutionCode = '$instCode', collectionCode = '$collCode',
-                Year = PYear(@datum),
-                Month = PMonth(@datum),
-                Day = PDay(@datum),
-                Genus = Genera(CONVERT(@scientific_name USING utf8)),
-                Species = Species2(CONVERT(@scientific_name USING utf8)),
-                SspVarForm = Ssp(CONVERT(@scientific_name USING utf8)),
+            SET `sFile_ID` = :fileID, institutionCode = :instCode, collectionCode = :collCode,
+                Year = OHNYear(@datum),
+                Month = OHNMonth(@datum),
+                Day = OHNDay(@datum),
+                Genus = OHNGenus(CONVERT(@scientific_name USING utf8)),
+                Species = OHNSpecies(CONVERT(@scientific_name USING utf8)),
+                SspVarForm = OHNSspVarForm(CONVERT(@scientific_name USING utf8)),
                 HybridName = OHNHybrid(CONVERT(@scientific_name USING utf8)),
-                RiketsN = PRT90N(@North, @Koordsys, @Presicion),
-                RiketsO = PRT90E(@East, @Koordsys, @Presicion),
+                RiketsN = OHNRT90N(@North, @Koordsys, @Presicion),
+                RiketsO = OHNRT90E(@East, @Koordsys, @Presicion),
                 CSource = OHNCSource(@Koordsys, @Presicion),
                 `Lat` = OHNLat(@North, @East, @Koordsys),
                 `Long` = OHNLong(@East,  @North, @Koordsys),
@@ -59,7 +60,7 @@ if (isUpdating2()) {
                 Locality = OHNLocality(@Presicion, CONVERT(@Locality USING utf8)),
                 Notes = OHNNotes(CONVERT(@Notes USING utf8))";
 
-        doreplace($con,$query, $sfileName, $File_id);
+        doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);
 }

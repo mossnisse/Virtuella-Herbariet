@@ -10,12 +10,12 @@
      <?php
         //include("../herbes.php");
         include("admin_scripts.php");
-        $con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 		  echo "
     <table>
         <tr> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
-    $query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
-    $result = $con2->query($query);
+$query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
+$result = $con2->query($query);
     if (!$result) {
         echo mysql_error();
     }

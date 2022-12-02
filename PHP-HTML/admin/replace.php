@@ -18,8 +18,8 @@
         tryck på knappen Exportera <br />
         .csv filen får inte vara för stor ca 150M <br />";
         
-    $con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+    $con2 = getConS();
      
-    replacepage("UME", "do_replace.php", $desc, "UME", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\r\n\">\r\n - DOS/Windows</option>", $con2);
+    replacepage("UME", "do_replace.php", $desc, "UME", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\\r\\n\">\\r\\n - DOS/Windows</option>", $con2);
 ?>
 
