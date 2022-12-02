@@ -2,15 +2,18 @@
 header("Content-Type: application/json; charset=UTF-8");
 include("../herbes.php");
 include("mathstuff.php");
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 //mysql_set_charset('utf8',$con);
-$east = SQLf($_GET['East']);
-$north = SQLf($_GET['North']);
-$query = "SELECT ID, geojson, english, native, maxX, maxY FROM countries where maxX>$east and minX<$east and maxY>$north and minY <$north;";
+$east = $_GET['East'];
+$north = $_GET['North'];
+$query = "SELECT ID, geojson, english, native, maxX, maxY FROM countries where maxX>:east and minX<:east and maxY>:north and minY <:north;";
 //echo "$query <p>";
-$result = $con->query($query);
+$Stm = $con->prepare($query);
+$Stm->bindValue(':east',$east, PDO::PARAM_STR);
+$Stm->bindValue(':north',$north, PDO::PARAM_STR);
+$Stm->execute();
 $nrHits =0;
-while($row = $result->fetch()) {
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	$name = $row['english'];
 	//echo "Name: ".$name."<br>\n";
 	if (isset($row['geojson'])) {

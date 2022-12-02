@@ -319,7 +319,7 @@ function getLocality(WGS84) {
 		//console.log(json);
 		var loc = JSON.parse(json);
 		if(loc.name !== "") {
-			document.getElementById("locality").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a> "+loc.distance+"m "+loc.direction;
+			document.getElementById("locality").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
 		} else {
 			document.getElementById("locality").innerHTML = "No locality in the db within 10km";
 		}

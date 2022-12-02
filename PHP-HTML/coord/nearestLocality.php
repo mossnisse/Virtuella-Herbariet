@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 include("../herbes.php");
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 //mysql_set_charset('utf8',$con);
 $radius = 6371009;
 
@@ -21,15 +21,21 @@ $latmax = $lat+$rlat;
 $latmin = $lat-$rlat;
 $longmax = $long+$rlong;
 $longmin = $long-$rlong;
-$query = "SELECT ID, locality, lat, `long` FROM locality where lat>$latmin and `long`>$longmin and lat<$latmax and `long`<$longmax;";
-$result = $con->query($query);
+$query = "SELECT ID, locality, lat, `long` FROM locality where lat>:latmin and `long`>:longmin and lat<:latmax and `long`<:longmax;";
+
+$Stm = $con->prepare($query);
+$Stm->bindValue(':latmin', $latmin, PDO::PARAM_STR);
+$Stm->bindValue(':latmax', $latmax, PDO::PARAM_STR);
+$Stm->bindValue(':longmin', $longmin, PDO::PARAM_STR);
+$Stm->bindValue(':longmax', $longmax, PDO::PARAM_STR);
+$Stm->execute();
 //echo $query."<br>\n";
 //echo "search lat: $lat long: $long \r";
 $distsqMin = 200000000000;
 $name = "";
 $id = "";
 
-while($row = $result->fetch()) {
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "Name: ".$row['locality']." lat= ".$row['lat']." long= ".$row['long']." <br>\r";
 	$dlat = ($lat-$row['lat'])*M_PI/180;
 	$dlong = ($long-$row['long'])*M_PI/180;
