@@ -11,7 +11,7 @@
 			<?php
 			try {
 				include("herbes.php");
-				$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+				$con = $con = getConS();
 				$stmt = "";
 				if (isset($_GET['ID'])) {
 					$stmt = $con->prepare("SELECT * FROM Locality WHERE ID = :id");
@@ -32,12 +32,17 @@
 				$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
 				$row = $stmt->fetch();
 				$create_date = substr ($row['created'],0,10 );
-				$mod_date = substr ($row['modified'],0,10 );
+                if (isset($row['modified'])) {
+                    $mod_date = substr ($row['modified'],0,10 );
+                } else {
+                    $mod_date = '';
+                }
+				
 				echo "<tr><td>Locality: </td><td> $row[locality]</td></tr>";
 				echo "<tr><td>Alternative names: </td> <td> $row[alternative_names]</td></tr>";
-				echo "<tr><td>Country: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/country.php?Country=$row[country]\"> $row[country] </a></td></tr>";
-				echo "<tr><td>Province: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/province.php?Province=$row[province]&Country=$row[country]\"> $row[province] </a></td></tr>";
-				echo "<tr><td>District: </td><td> <a href=\"http://herbarium.emg.umu.se/maps/district.php?District=$row[district]&Province=$row[province]&Country=$row[country]\">$row[district]</a>    </td></tr>";
+				echo "<tr><td>Country: </td><td> <a href=\"/maps/country.php?Country=$row[country]\"> $row[country] </a></td></tr>";
+				echo "<tr><td>Province: </td><td> <a href=\"/maps/province.php?Province=$row[province]&Country=$row[country]\"> $row[province] </a></td></tr>";
+				echo "<tr><td>District: </td><td> <a href=\"/maps/district.php?District=$row[district]&Province=$row[province]&Country=$row[country]\">$row[district]</a>    </td></tr>";
 				echo "<tr><td>WGS84: </td><td>$row[lat], $row[long]</td></tr>";
 				echo "<tr><td>RT90: </td><td>$row[RT90N], $row[RT90E]</td></tr>";
 				echo "<tr><td>Sweref99TM: </td><td>$row[SWTMN], $row[SWTME]</td></tr>";

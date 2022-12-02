@@ -11,10 +11,10 @@
 			<?php
 				include("herbes.php");
 				try {
-					$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+					$con = getConS();
 
-					$stmt =$con->prepare("SELECT locality, ID, province, district, country FROM Locality WHERE country Like :country COLLATE utf8_Swedish_ci AND province Like :province COLLATE utf8_Swedish_ci AND
-										 district Like :district COLLATE utf8_Swedish_ci AND (locality Like :locality COLLATE utf8_Swedish_ci OR alternative_names Like :alocality COLLATE utf8_Swedish_ci) ORDER BY locality");
+					$stmt =$con->prepare("SELECT locality, ID, province, district, country FROM Locality WHERE country Like :country AND province Like :province AND
+										 district Like :district AND (locality Like :locality OR alternative_names Like :alocality) ORDER BY locality");
 					
 					$stmt->bindParam(':country', $Country);
 					$stmt->bindParam(':province', $Province);
@@ -22,7 +22,6 @@
 					$stmt->bindParam(':locality', $Locality);
 					$stmt->bindParam(':alocality', $ALocality);
 
-					
 					$Country   = str_replace("*","%",$_GET['country']);
 					$Province = str_replace("*","%",$_GET['province']);
 					$District = str_replace("*","%",$_GET['district']);

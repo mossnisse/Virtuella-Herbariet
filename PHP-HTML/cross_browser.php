@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Code Written By Nils Ericson 2009-11-21
 // crossbrowser page
 ini_set('display_errors', 1);
@@ -121,7 +121,7 @@ if ($SpatNr != 0 and $SysNr != 0 and $Herbaria != 'All') {
 }
 
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = $con = getConS();
 
 // ---------- SQL query för att få fram en lita med antal kollekt för mindre systematiska enheter m.m. --------
 $query = "SELECT $WhatSpatSQL, $WhatSysSQL, COUNT(specimens.Genus) FROM specimens LEFT JOIN xgenera
@@ -381,7 +381,12 @@ if ($SysNr == 7) {
                 $SysDownValueR = $row[$SysDownLevel];
             }
             $SysDownValue = $row[$SysDownLevel];
-            $UrlSysDownValue = urlencode($SysDownValue);
+            if (isset($SysDownValue )) {
+                $UrlSysDownValue = urlencode($SysDownValue);
+            } else {
+                $UrlSysDownValue = "";
+            }
+            
             $nr = $row['COUNT(specimens.Genus)'];
             echo    "
                 $tr

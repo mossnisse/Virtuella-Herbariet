@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <?php
 // Code Written By Nils Ericson 2010-01-04
@@ -7,9 +7,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 include("herbes.php");
 
-
 // skriver ut en tabell med resultat för super search och simple search
-function pressentResult($result,$page, $nrRecords, $adress, $pageSize)
+function pressentResult($Stm, $page, $nrRecords, $adress, $pageSize)
 {
     if (isset($_GET['OrderBy']))
     {
@@ -65,7 +64,8 @@ function pressentResult($result,$page, $nrRecords, $adress, $pageSize)
     echo "
         </tr>";
     $i=($page-1)*$pageSize;
-    while($row = $result->fetch())
+    //echo "size: ".sizeof($result);
+    while($row = $Stm->fetch(PDO::FETCH_ASSOC))
         {
             $i++;
             $collector = $row["Collector"];
@@ -79,7 +79,7 @@ function pressentResult($result,$page, $nrRecords, $adress, $pageSize)
             }
             
             $Image = "";
-            if ($row['Image1']!="") $Image="<img src=\"kamera.jpg\">";
+            if ($row['Image1']!="") $Image="<img src=\"icons/kamera.jpg\">";
            
             $ScientificName = scientificName($row['Genus'], $row['Species'], $row['SspVarForm'], $row['HybridName']);
            
@@ -114,25 +114,30 @@ echo "
 
 $i =0;
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-
+$con = getConS();
 $adr = getSimpleAdr();
 $page = getPageNr();
-$Rubrik = getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$Rubrik = getRubr($con);
 $order = orderBy();
 $OrderAdr = $order['Adr'];
 if (isset($_GET['ARecord'])) {
     $ARecord = SQLf($_GET['ARecord']);
 } else $ARecord = 1;
 
+if (isset($_GET['nrRecords'])) {
+    $nrRecords = $_GET['nrRecords'];
+} else {
+    $nrRecords = -1;
+}
+
 $whatstat = "specimens.ID, AccessionNo, specimens.Genus, specimens.Species, specimens.SspVarForm, Specimens.HybridName, Collector, Collectornumber,
             `Year`, `Month`, `Day`, specimens.Country, specimens.Province, specimens.District, specimens.Locality, InstitutionCode, CollectionCode, Type_status, Basionym, Image1";
             
 $GroupBy = '';
-            
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
-$result = $svar['result'];
-$nr = $svar['nr'];
+        
+$result_o_nr = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
+$result = $result_o_nr[0];
+$nr = $result_o_nr[1];
 
 echo "
     <div class = \"menu1\">
@@ -158,7 +163,7 @@ echo "
 
         <table class = \"outerBox\"> <tr> <td>
             Click on blue numbers to reach specimen records. Click on green headlines to sort colums. <br />";
-
+   
 pressentResult($result, $page, $nr, $adr, $pageSize);
 
 echo "

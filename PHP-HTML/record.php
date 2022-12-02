@@ -11,9 +11,7 @@ include("herbes.php");
 if (isUpdating()) { updateText();}
 else {
 
-
 //list($con2, $user_id, $username) = test_login();
-
 
 if (isset($_GET['AccessionNo']))
     $AccessionNo = $_GET['AccessionNo'];
@@ -36,19 +34,19 @@ if (!isset($_GET['Page'])) {
      $_GET['Page'] = 1;
 }*/
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-//mysql_set_charset('utf8', $con);
+$con = getConS();
+
 if (isset($_GET['Page'])) {
-    $page=$_GET['Page'];
-    $nr = $_GET['nrRecords'];
+    $page = SQLf($_GET['Page']);
+    $nr =  SQLf($_GET['nrRecords']);
     $adr = getSimpleAdr();
     $a2dr = getSimpleAdr2();
     $order2 = orderBy();
     $OrderAdr = $order2['Adr'];
     if (isset($_GET['AaccNr'])) {
-        $AccessionNo = $_GET['AaccNr'];
-        $instCode = $_GET['Ainst'];
-        $collCode = $_GET['Acoll'];
+        $AccessionNo =  SQLf($_GET['AaccNr']);
+        $instCode = SQLf($_GET['Ainst']);
+        $collCode = SQLf($_GET['Acoll']);
         $ID = $_GET['Aid'];
         $wherestat = "WHERE specimens.AccessionNo = '$AccessionNo' and specimens.InstitutionCode = '$instCode' and CollectionCode = '$collCode'";
         $sort = "";
@@ -57,13 +55,13 @@ if (isset($_GET['Page'])) {
         $order2['SQL'];
         $whatstat = "specimens.ID, specimens.AccessionNo, specimens.InstitutionCode, CollectionCode";
         $GroupBy = '';
-        $svar = wholeSQL($con, $whatstat, $page, 1, $GroupBy, $order2);
-        $result = $svar['result'];
-        $row3 = $result->fetch();
+        $arr = wholeSQL($con, $whatstat, $page, 1, $GroupBy, $order2, $nr);
+        //$arr = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row3 = $arr[0]->fetch(PDO::FETCH_ASSOC);
         $ID = $row3['ID'];
-        $AccessionNo = $row3['AccessionNo'];
-        $instCode = $row3['InstitutionCode'];
-        $collCode = $row3['CollectionCode'];
+        $AccessionNo = SQLf($row3['AccessionNo']);
+        $instCode = SQLf($row3['InstitutionCode']);
+        $collCode = SQLf($row3['CollectionCode']);
         //mysql_close($con);
         $wherestat = "WHERE specimens.AccessionNo = '$AccessionNo' and specimens.InstitutionCode = '$instCode' and CollectionCode = '$collCode'";
         $sort = "";
@@ -94,7 +92,6 @@ $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.Ssp
                  LEFT JOIN district ON specimens.Geo_ID = district.ID)
                  
           $wherestat $sort $limit";
-
 
 //echo "<p>query 2: $query <p>";
  
@@ -143,8 +140,6 @@ while($row2 = $result->fetch())
     }
 }
 
-
-
 $province = $row['Province'];
 $district = $row['District'];
 $locality = $row['Locality'];
@@ -180,9 +175,7 @@ if ($row['Efternamn'] == "") {
 } else {
     $samlare = "<a href=\"collector.php?collectorID=$row[samlar_ID]\"> ". CComments($row['Fornamn']." ".$row['Efternamn']). "</a>";
 }
-$Rubrik = getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-
-
+$Rubrik = getRubr($con);
 //pageANav($page, $nr, "record.php?".$a2dr.$OrderAdr, 1);
 
 echo "

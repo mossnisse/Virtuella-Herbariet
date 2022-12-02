@@ -466,7 +466,7 @@ function RubinCorners($RUBIN) {
     return $WGSsq;
 }
 
-function CalcCoord($row, $con) {
+function CalcCoord($row,$con) {
     if ($row['CSource'] == "UPS Database" ) {
         $WGS['Lat'] = $row['Lat'];
         $WGS['Long'] = $row['Long'];
@@ -506,74 +506,45 @@ function CalcCoord($row, $con) {
         $WGS['Source'] = "RUBIN";
         $WGS['Value'] = $row['RUBIN'];
     }
-    elseif (isset($row['locality_ID']) and $row['locality_ID']!= 0 ) {  //and $row['Long'] !=""
+    elseif (isset($row['locality_ID'])) { 
 		$WGS['Source'] = "LocalityVH";
-        $locality_ID = $row['locality_ID'];
-        $specimen_ID =
-        $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $locality_ID";
+        $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $row[locality_ID]";
         $result = $con->query($querys);
-        if (!$result) {
-            echo "
-            error when trying to select from locality tabel:".mysql_error($con)." <br /> 
-            query: ".$querys;
+        $row2 = $result->fetch(PDO::FETCH_ASSOC);
+        $WGS['Prec'] = $row2['Coordinateprecision'];
+        $WGS['Lat'] = $row2['lat'];
+        $WGS['Long'] = $row2['long'];
+        if ($row['distance']!='') {
+            $WGSD = DistDirectWGS84($WGS, $row['distance'], $row['direction']);
+            $WGS['Lat'] =  $WGSD['Lat'];
+            $WGS['Long'] =  $WGSD['Long'];
+            $WGS['Value'] = $row['distance']."m ".$row['direction']." " .$row2['locality'];
         } else {
-            $row2 = $result->fetch();
-            $WGS['Lat'] = $row2['lat'];
-            $WGS['Long'] = $row2['long'];
-            if ($row['distance']!='') {
-                $WGSD = DistDirectWGS84($WGS, $row['distance'], $row['direction']);
-                $WGS['Lat'] =  $WGSD['Lat'];
-                $WGS['Long'] =  $WGSD['Long'];
-                $WGS['Value'] = $row['distance']."m ".$row['direction']." " .$row2['locality'];
-            } else {
-                $WGS['Value'] = $row2['locality'];
-            }
-            
-            if ($WGS['Long']!="") {
-				$WGS['Source'] = "LocalityVH";
-				$WGS['Prec'] = $row2['Coordinateprecision'];
-			} else {
-				$WGS['Lat'] = 0;
-				$WGS['Long'] = 0;
-				$WGS['Source'] = "None";
-				$WGS['Value'] = "";
-				$WGS['Prec'] = "";
-			}
-         }
+            $WGS['Value'] = $row2['locality'];
+        }    
     }
-    elseif (isset($row['Locality']) and $row['Locality']!= "" and $row['Long'] !="") {  // 
-        $WGS['Lat'] = $row['Lat'];
-        $WGS['Long'] = $row['Long'];
+    elseif (isset($row['Locality']) and $row['Locality']!= "" and isset($row['LocLong']) and $row['LocLong'] !="") {  // 
+        $WGS['Lat'] = $row['LocLat'];
+        $WGS['Long'] = $row['LocLong'];
         $WGS['Source'] = "Locality";
         $WGS['Value'] = $row['Locality'];
-        $WGS['Prec'] = $row['Coordinateprecision'];
+        $WGS['Prec'] = $row['LocPrec'];
     }
-    elseif (isset($row['District']) and $row['District'] !="") {
-		
-        if (isset($row['Longitude']) and $row['Longitude'] !="" ) {
-			//echo "calc from district $row[District] $row[ID] <br>";
-            $WGS['Lat'] = $row['Latitude'];
-            $WGS['Long'] = $row['Longitude'];
-			if (isset($row['typeNative']) and $row['typeNative']!="") {
-				$WGS['Source'] = "District($row[typeNative])";
-			} else {
-				$WGS['Source'] = "District";
-			}
-            $WGS['Value'] = $row['District'];
-            $WGS['Prec'] = $row['precision'];
-        }
-        else {
-			//echo "calc from district error $row[District] $row[ID] <br>";
-            $WGS['Lat'] = 0;
-            $WGS['Long'] = 0;
-            $WGS['Source'] = "None";
-            $WGS['Value'] = "";
-            $WGS['Prec'] = "";
-        }
+    elseif (isset($row['District']) and $row['District'] !="" and isset($row['Longitude']) and $row['Longitude'] !="" ) {
+		//echo "calc from district $row[District] $row[ID] <br>";
+        $WGS['Lat'] = $row['distrLat'];
+        $WGS['Long'] = $row['distrLong'];
+		if (isset($row['typeNative']) and $row['typeNative']!="") {
+			$WGS['Source'] = "District($row[typeNative])";
+		} else {
+			$WGS['Source'] = "District";
+		}
+        $WGS['Value'] = $row['District'];
+        $WGS['Prec'] = $row['distrPrec'];
     }
     else {
-        $WGS['Lat'] = 0;
-        $WGS['Long'] = 0;
+        $WGS['Lat'] = null;
+        $WGS['Long'] = null;
         $WGS['Source'] = "None";
         $WGS['Value'] = "";
         $WGS['Prec'] = "";
@@ -586,57 +557,58 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
     $batch = 50000;
     $test = $batch;
     $counter = 0;
+    // preparing SELECT the query to get the data to calculate the coordinates from
     if ($file_ID == 0) {
-        $Where = "";
+        $Where = '';
     } else {
-        $Where = "WHERE specimens.sFile_ID = '$file_ID'";
+        $Where = 'WHERE specimens.sFile_ID = :file_ID';
     }
-    
-    $query3 = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long`, locality.Lat, locality.Coordinateprecision,
-                    RUBIN, linereg, RiketsN, RiketsO, Sweref99TMN, Sweref99TME,
-                    Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude, district.Latitude, district.precision,
-                    CSource, specimen_locality.locality_ID, specimens.InstitutionCode, direction, distance, district.typeNative
+    $selectQuery = "SELECT specimens.ID, specimens.Province, specimens.District, specimens.Locality, locality.`Long` as LocLong, locality.Lat as LocLat, locality.Coordinateprecision as LocPrec,
+                    locality.locality as LocLocality, RUBIN, linereg, RiketsN, RiketsO, Sweref99TMN, Sweref99TME,
+                    Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, district.Longitude as distrLong, district.Latitude as distrLat, district.precision as distrPrec,
+                    CSource, specimens.InstitutionCode, direction, `distance`, district.typeNative, specimen_locality.locality_ID
             FROM specimens
 			LEFT JOIN district ON specimens.Geo_ID=district.ID
             LEFT JOIN locality ON specimens.locality = locality.locality and specimens.district = locality.district and specimens.province = locality.province
-            LEFT JOIN specimen_locality on specimens.ID = specimen_locality.specimen_ID
-            $Where ";
+            LEFT JOIN specimen_locality ON specimens.ID = specimen_locality.specimen_ID
+            $Where LIMIT :counter, :batch;";
             
-	echo "$query3 <br/>";
-			
-    While( $test == $batch) {
+    $SelectStm = $con->prepare($selectQuery);
+    if ($file_ID != 0) {
+        $SelectStm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
+    }
+    $SelectStm->bindParam(':counter',$counter, PDO::PARAM_INT);
+    $SelectStm->bindParam(':batch',$batch, PDO::PARAM_INT);
+    
+    // preparing the query to update coordinates
+    $updateQuery = "UPDATE specimens SET `Long` = :Long, Lat = :Lat, CSource = :CSource, CValue = :CValue, CPrec = :CPrec WHERE ID = :specimenID";
+    $updateStm = $con->prepare($updateQuery);
+    $updateStm->bindParam(':Long',$long,PDO::PARAM_STR);
+    $updateStm->bindParam(':Lat',$lat,PDO::PARAM_STR);
+    $updateStm->bindParam(':CSource',$CSource,PDO::PARAM_STR);
+    $updateStm->bindParam(':CValue',$cvalue,PDO::PARAM_STR);
+    $updateStm->bindParam(':CPrec',$CPrec,PDO::PARAM_STR);
+    $updateStm->bindParam(':specimenID',$specimenID,PDO::PARAM_INT);
+
+    While($test == $batch) {
         echo "Batch no  $counter <br />";
         echo "
-         $query3 LIMIT $counter, $batch <br /> <br />";
-        
-        $result = $con->query($query3." LIMIT $counter, $batch;");
-        if ($result === TRUE)
-            echo "error when selecting batch to calc coordinates".$con->error. ' <br />';
-         
-         $counter += $batch;
-        
+        $selectQuery <br>\"counter: $counter, batch: $batch , sFileID: $file_ID \"<br /> <br />";
+        $SelectStm->execute();
+        $counter += $batch;
         $i=0;
-    
         $test = 0;
-        while($row = $result->fetch()) {
+        
+        while($row = $SelectStm->fetch(PDO::FETCH_ASSOC)) {
             if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database'  ) {
-                $koord = CalcCoord($row, $con);
-                $cvalue = SQLf($koord['Value']);
-				//echo "$koord[Source] - $koord[Value] - ID $row[ID]<br>";
-				if ($koord['Source']!='None') {
-					 $query2 = "UPDATE specimens SET `Long`='$koord[Long]', Lat='$koord[Lat]', CSource='$koord[Source]', CValue='$cvalue', CPrec='$koord[Prec]' WHERE ID='$row[ID]'";
-				} else {
-					$query2 = "UPDATE specimens SET `Long`= NULL, Lat = NULL, CSource = 'None', CValue = NULL, CPrec = NULL WHERE ID='$row[ID]'";
-				}
-				//echo $query2;
-               
-                $result2 = $con->query($query2);
-                if (!$result2) {
-                   echo "error when updating coordinate:". $con->error. "<br/>";
-                  // echo "error";
-                    echo "query2: ".$query2. "<br/>";
-                }
-                //echo "query coord: ".$query2. "<br/>";
+                $koord = CalcCoord($row,$con);
+                $long = $koord['Long'];
+                $lat = $koord['Lat'];
+                $CSource = $koord['Source'];
+                $cvalue = $koord['Value'];
+                $CPrec = $koord['Prec'];
+                $specimenID = $row['ID'];
+                $updateStm->execute();
                 if(!($i % 5000)) {
                     $t = $timer->getTime();
                     echo "

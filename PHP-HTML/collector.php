@@ -19,16 +19,22 @@ echo "
     </head>
     <body id =\"collector\"> ";
 
-$con7 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-$query = "SELECT Fornamn, Efternamn, Ful_Fornamn, Ful_Efternamn, birth, death, signatur FROM samlare JOIN signaturer ON samlare.ID = signaturer.samlar1_ID WHERE samlare.ID=$ID";
+$con7 = getConS();
+$query = "SELECT Fornamn, Efternamn, Ful_Fornamn, Ful_Efternamn, birth, death, signatur FROM samlare JOIN signaturer ON samlare.ID = signaturer.samlar1_ID WHERE samlare.ID=:id";
 //echo $query. '<p>';
-$result = $con7->query($query);
-$row = $result->fetch();
 
-$query2 = "SELECT count(*) as nrRec FROM ((specimens LEFT JOIN signaturer ON specimens.Sign_ID = signaturer.ID) LEFT JOIN samlare ON signaturer.samlar1_ID = samlare.ID) WHERE samlare.ID = $ID";
+$Stm = $con7->prepare($query);
+$Stm->bindValue(':id', $ID, PDO::PARAM_INT);
+$Stm->execute();
+$row = $Stm->fetch(PDO::FETCH_ASSOC);
 
-$result2 = $con7->query($query2);
-$row2 = $result2->fetch();
+$query2 = "SELECT count(*) as nrRec FROM ((specimens LEFT JOIN signaturer ON specimens.Sign_ID = signaturer.ID) LEFT JOIN samlare ON signaturer.samlar1_ID = samlare.ID) WHERE samlare.ID = :id";
+
+$Stm2 = $con7->prepare($query2);
+$Stm2->bindValue(':id', $ID, PDO::PARAM_INT);
+$Stm2->execute();
+$row2 = $Stm2->fetch(PDO::FETCH_ASSOC);
+
 
 echo "
 <div class = \"menu1\">
@@ -56,7 +62,7 @@ echo "
         <table>
             <tr> <th> Recorded signatures: </th> </tr>
             <tr> <td> $row[signatur] </td> </tr>";
-while($row = $result->fetch()) {
+while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
     echo "
             <tr> <td> $row[signatur] </td> </tr>";
 }

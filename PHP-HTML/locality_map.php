@@ -11,7 +11,7 @@
 			<?php
 				include("herbes.php");
 				try {
-					$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+					$con = getConS();
 
 					$stmt =$con->prepare("SELECT * FROM Locality WHERE country Like :country COLLATE utf8_Swedish_ci AND province Like :province COLLATE utf8_Swedish_ci AND
 										 district Like :district COLLATE utf8_Swedish_ci AND (locality Like :locality COLLATE utf8_Swedish_ci OR alternative_names Like :alocality COLLATE utf8_Swedish_ci)");
@@ -20,7 +20,6 @@
 					$stmt->bindParam(':district', $District);
 					$stmt->bindParam(':locality', $Locality);
 					$stmt->bindParam(':alocality', $ALocality);
-
 					
 					$Country   = str_replace("*","%",$_GET['country']);
 					$Province = str_replace("*","%",$_GET['province']);
@@ -31,14 +30,7 @@
 					$stmt->execute();
 					//$stmt->debugDumpParams();
 					$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-					
-					/*
-					var infowindow = new google.maps.InfoWindow({
-						content:"Hello World!"
-					});*/
 
-				
-					
 					echo"
 					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 

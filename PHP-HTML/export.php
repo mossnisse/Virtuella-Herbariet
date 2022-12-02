@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <?php
@@ -19,7 +19,8 @@ $adr = getSimpleAdr();
 $order = orderBy();
 $OrderAdr = $order['Adr'];
 $nr = $_GET['nrRecords'];
-$Rubrik = getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
+$Rubrik = getRubr($con);
 $pages = ceil($nr/100000);
 
 
@@ -51,29 +52,29 @@ echo "
     <table class = \"Box\"> <tr> <td>";
     echo "Export result set as xml (Darwin Core) (";
     for ($p=1; $p<$pages+1; $p++) {
-        echo "<a href =\"export/dwcxml.php?$adr&amp;Page=$p\">page$p</a>, ";
+        echo "<a href =\"export/dwcxml.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }
     echo ")<br />
     Export result set as xml (ENSE) (";
     for ($p=1; $p<$pages+1; $p++) {
-        echo "<a href =\"export/ENSExml.php?$adr&amp;Page=$p\">page$p</a>, ";
+        echo "<a href =\"export/ENSExml.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }
     echo ")<br /> 
     Export result set as simple CSV (tab separeted text in utf8, first row collumn names) (";
     for ($p=1; $p<$pages+1; $p++) {
-        echo "<a href =\"export/CSV.php?$adr&amp;Page=$p\">page$p</a>, ";
+        echo "<a href =\"export/CSV.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }
     echo ") <br />
     Export result set as xml (Excel xml spreadsheet file) (";
     for ($p=1; $p<$pages+1; $p++) {
-        echo "<a href =\"export/xlsxml.php?$adr&amp;Page=$p\">page$p</a>, ";
+        echo "<a href =\"export/xlsxml.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }
     echo ") <br />
     Export result set as Artportalen excellmall (Excel xml spreadsheet file) (";
     for ($p=1; $p<$pages+1; $p++) {
-        echo "<a href =\"export/artp.php?$adr&amp;Page=$p\">page$p</a>, ";
+        echo "<a href =\"export/artp.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }
-    echo"
+    echo")
     </td> </tr> </table>";
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);

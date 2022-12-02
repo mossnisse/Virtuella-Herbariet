@@ -1,5 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <?php
 // Code Written By Nils Ericson 2010-01-04
 // plots the specimen records from a search on a google map
@@ -13,15 +12,16 @@ include("herbes.php");
 if (isUpdating()) { updateText();}
 else {
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
 $page = getPageNr();
 
 //$Limit = pageSQL($page, $MapPageSize);
 //$wherestat = simpleSQL($con);
 $adr = getSimpleAdr();
-$Rubrik = getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$Rubrik = getRubr($con);
 $nrRecords = $_GET['nrRecords'];
+
 if (isset($_GET['ARecord'])) {
     $ARecord = $_GET['ARecord'];
 } else $ARecord = 1;
@@ -44,13 +44,13 @@ $GroupBy = "GROUP BY `Long`, `Lat`";
 $nr = $_GET['nrRecords'];
 $_GET['nrRecords'] = null;
 
-$svar = wholeSQL($con, $whatstat, $page, $MapPageSize, $GroupBy, $order);
-$result = $svar['result'];
+$svar = wholeSQL($con, $whatstat, $page, $MapPageSize, $GroupBy, $order, $nr);
+$result = $svar[0];
 
 //$nr = $svar['nr'];
 //echo "<br />Time before query: ". $timer->getTime();
 
-$nrBlipps = $svar['nr']; 
+$nrBlipps = $svar[1]; 
 
 $nrPages = ceil($nrBlipps/$MapPageSize);
 $nrOfSpecimens = 0;
@@ -83,7 +83,8 @@ $imges[6] = "icons/red-dot3.png";
 $blipps;
 if (isset($_GET['OrderBy'])) $OrderByAdr = "&OrderBy=$_GET[OrderBy]"; else  $OrderByAdr = "";
     $i=0;
-    while($row = $result->fetch())
+    //while($row = $result->fetch())
+    foreach($result as $row)
     {
         $Nr = $row['COUNT(*)'];
         if (isset($row['CSource']) and $row['CSource'] != "None")

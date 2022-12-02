@@ -5,7 +5,7 @@ include("herbes.php");
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_localitydb.csv"');
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 $query = "SELECT * FROM locality";
 $result = $con->query($query);
 while($row = $result->fetch())

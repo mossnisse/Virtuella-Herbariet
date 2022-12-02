@@ -85,7 +85,7 @@ function curPageURL() {
 // ------------  functions to handle page caching -------------------
 function curPageURLCache() {
  $pageURL = $_SERVER["REQUEST_URI"];
- $cacheDir = "C:\\inetpub\\wwwroot\\cache\\";
+ $cacheDir = "C:\\Apache24\\htdocs\\cache\\";
  $pageURL = str_replace ( "/" , "" , $pageURL );
  $pageURL = str_replace ( "\\" , "" , $pageURL );
  $pageURL = $cacheDir.str_replace ( ".php?" , "@" , $pageURL );
@@ -116,21 +116,6 @@ function cacheEnd() {
     fclose($fp); 
     // Send the output to the browser
     ob_end_flush();
-}
-
-
-//------------------ DB connection --------------------------------------//
-// Kopplar upp mot databasen (herbes) med en avnändre med endast SELECT rättigheter
-//   och returnerar kopplingen
-function conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass)
-{   
-    try {
-	$con = new PDO('mysql:host=localhost;dbname=samhall;charset=utf8', $MySQLSUser, $MySQLSPass);
-	return $con;
-    } catch (PDOException $e) {
-	print "Error!: " . $e->getMessage() . "<br/>";
-	die();
-    }
 }
 
 // loggar åtkomster i av php sidorna i tabellen logg med ip adress och URL
@@ -275,7 +260,7 @@ function xmlf($str) {
 			"'" => "&#39;",
 			"\v" => "\n"
 		);
-		foreach ($xml_entities as $key => $value) { 
+		foreach ($xml_entities as $key => $value) {
 			$str = str_replace($key, $value, $str); 
 		} 
 		return $str;
@@ -298,9 +283,13 @@ function CSVf($str) {
 // fixar specialtecken till SLQ strängar och så att det inte går att göra injections
 function SQLf($text) {
 	if ($text == null) {
-		return null;
+   return '';
 	} else {
-		return str_replace ( "'" , "\'" , $text );
+  $str = str_replace ( "\\" , "\\\\" , $text );
+  $str = str_replace ( "'" , "\\'" , $str);
+  $str = str_replace ( "\"" , "\\\"" , $str );
+  $str = str_replace ( ";" , "\\;" , $str );
+   return $str;
 	}
 }
 
@@ -379,284 +368,354 @@ function dyntaxaID($con) {
 	}
 }
 
-// klipper och klistrar ihop delar av SQL SELECT query från URL vid utsökning av arter
-// i list.php, collect.php och list.php
-function simpleSQLS($con, $dyntaxaID) {
-    function ahh($wherestat, $qq) {
-        if($wherestat!="") {
-            $wherestat .= "AND $qq";
-        } else $wherestat = "WHERE $qq";
-        return $wherestat;
-    }
-	
-	function ahhor($wherestat, $qq) {
-        if($wherestat!="") {
-            $wherestat .= "OR $qq";
-        } else $wherestat = "WHERE $qq";
-        return $wherestat;
-    }
 
-	$dyntaxa_syns = false;
-	$xgenera = false;
-	$collectorID = false;
-	$SvenskaNamn = false;
-	$Geo = false;
-	
-	$specialwhere ='';
-	if ($dyntaxaID != null) {
-		$Genus = "genus = \"$_GET[Genus]\"";
-	
-		$Species = '';
-		if (array_key_exists('Species', $_GET) and $_GET['Species'] != '*') {
-			$Species = " and species = \"$_GET[Species]\"";
-		} 
-	
-		$SspVarForm = '';
-		if (array_key_exists('SspVarForm', $_GET) and $_GET['SspVarForm'] != '*') {
-			$SspVarForm = " and SspVarForm = \"$_GET[SspVarForm]\"";
-		} 
-	
-		$HybridName = '';
-		if (array_key_exists('HybridName', $_GET) and $_GET['HybridName'] != '*') {
-			$HybridName = " and HybridName = \"$_GET[HybridName]\"";
-		}
-		$specialwhere = '('.$Genus.$Species.$SspVarForm.$HybridName.' or Dyntaxa_ID ='.$dyntaxaID.')';
+function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $orderBy, $nr_records) {
+ $parameters;
+ $WhereQueryparts;
+ $tables[] = 'grr';
+ $DyntaxaID = dyntaxaID($con);
+     
+ // fixa synonymisering via dyntaxa. om DyntaxaID finns så söks det på Dyntaxa ID och/eller art;
+ if($DyntaxaID != null and (array_key_exists('Genus', $_GET) and $_GET['Genus'] != '*')) {
+    $tables[] = 'specimens';
+    $spsynspart;
+    if (array_key_exists('Genus', $_GET) and $_GET['Genus'] != '*') {
+     $spsynspart[] = 'specimens.Genus = :Genus';
+     $parameters['Genus'] = $_GET['Genus'];
+    }
+    if (array_key_exists('Species', $_GET) and $_GET['Species'] != '*') {
+     $spsynspart[] = 'specimens.Species = :Species';
+     $parameters['Species'] = $_GET['Species'];
+    }
+    if (array_key_exists('SspVarForm', $_GET) and $_GET['SspVarForm'] != '*') {
+     $spsynspart[] = 'specimens.SspVarForm = :SspVarForm';
+     $parameters['SspVarForm'] = $_GET['SspVarForm'];
+    }
+    if (array_key_exists('HybridName', $_GET) and $_GET['HybridName'] != '*') {
+     $spsynspart[] = 'specimens.HybridName = :HybridName';
+     $parameters['HybridName'] = $_GET['HybridName'];
+    }
+    $spsynstext = implode(' AND ', $spsynspart);
+    $WhereQueryparts[] = "(specimens.Dyntaxa_ID = $DyntaxaID OR ($spsynstext))";
+ }
+ 
+ if (array_key_exists('Group', $_GET) and $_GET['Group'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.`Group` = :pGroup';
+   $parameters['pGroup'] = $_GET['Group'];
 	}
-	
-	$wherestat = "";
-	
-    foreach ($_GET as $SearchItem => $SearchValue) {
-		$SearchItem = SQLf($SearchItem);
-		$SearchValue = SQLf($SearchValue);
-    if (notSpecial($SearchItem, $SearchValue))
-    {
-		/*if ($dyntaxa_syns and ($SearchItem == "Genus" or $SearchItem == 'Species' or $SearchItem == 'HybridName'or $SearchItem == 'SspVarForm')) {
-			$wherestat = ahh($wherestat, " xnames.`$SearchItem` = '$SearchValue' ") ;
-		} else*/
-		
-		if ($dyntaxaID != null and ($SearchItem == "Genus" or $SearchItem == 'Species' or $SearchItem == 'HybridName'or $SearchItem == 'SspVarForm')) {
-		} else
-		
-        if ($SearchItem == "CollectorID") {
-            $wherestat = ahh($wherestat, " samlare.ID = $SearchValue ");
-			$collectorID = true;
-        } else
-        if ($SearchItem == "YearStart") {
-            $wherestat = ahh($wherestat, " Year >= '$SearchValue' ");
-        } elseif ($SearchItem == "YearEnd") {
-            $wherestat = ahh($wherestat, " Year <= '$SearchValue' ");
-        } elseif ($SearchItem == "AltStart") {
-            $wherestat = ahh($wherestat, " Altitude_meter >= '$SearchValue' ");
-        } elseif ($SearchItem == "AltEnd") {
-            $wherestat = ahh($wherestat, " Altitude_meter <= '$SearchValue' ");
-        /*} elseif ($SearchItem == "Original_name" || $SearchItem == "Original_text") {
-            $h = explode(" ",$SearchValue);
-            $SearchValue="";
-            foreach ($h as $v) {
-                $SearchValue.=" +$v";
-            }
-            $wherestat = ahh($wherestat, " MATCH ($SearchItem) AGAINST ('$SearchValue' IN BOOLEAN MODE) ");*/
-		} elseif ($SearchItem == "Original_name") {
-            $h = explode(" ",$SearchValue);
-            $SearchValue="";
-            foreach ($h as $v) {
-                $SearchValue.=" +$v";
-            }
-            $wherestat = ahh($wherestat, " MATCH ($SearchItem) AGAINST ('$SearchValue' IN BOOLEAN MODE) ");
-		} elseif ($SearchItem == "Original_text") {
-            $h = explode(" ",$SearchValue);
-            $SearchValue="";
-            foreach ($h as $v) {
-                $SearchValue.=" +$v";
-            }
-            $wherestat = ahh($wherestat, " MATCH (Original_text, Notes) AGAINST ('$SearchValue' IN BOOLEAN MODE)");
-        } elseif ($SearchItem == "Where") {
-            if ($SearchValue !="" ) {
-                $wherestat = ahh($wherestat, " MATCH(specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality, specimens.Cultivated, specimens.Original_text)
-												AGAINST('$SearchValue' IN BOOLEAN MODE)");
-            }
-        } elseif ($SearchItem == "What") {
-            if ($SearchValue !="" ) {
-                $wherestat = ahh($wherestat, "(MATCH(specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.Original_Name, specimens.HybridName, specimens.Notes)
-								 AGAINST('$SearchValue' IN BOOLEAN MODE)
-								OR MATCH(xnames.Svenskt_namn, xnames.Syns) AGAINST('$SearchValue' IN BOOLEAN MODE)
-								OR MATCH(xgenera.Family, xgenera.`Order`, xgenera.Class, xgenera.Phylum, xgenera.Kingdom, xgenera.`Group`, xgenera.`Subgroup`) AGAINST('$SearchValue' IN BOOLEAN MODE) )");
+ if (array_key_exists('Subgroup', $_GET) and $_GET['Subgroup'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.Subgroup = :Subgroup';
+   $parameters['Subgroup'] = $_GET['Subgroup'];
+	}
+ if (array_key_exists('Genus', $_GET) and $_GET['Genus'] != '*' and $DyntaxaID == null) {
+    $tables[] = 'specimens';
+    $WhereQueryparts[] = 'specimens.Genus = :Genus';
+    $parameters['Genus'] = $_GET['Genus'];
+	}
+ if (array_key_exists('Species', $_GET) and $_GET['Species'] != '*' and $DyntaxaID == null) {
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Species = :Species';
+   $parameters['Species'] = $_GET['Species'];
+	}
+ if (array_key_exists('SspVarForm', $_GET) and $_GET['SspVarForm'] != '*' and $DyntaxaID == null) {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.SspVarForm = :SspVarForm';
+  $parameters['SspVarForm'] = $_GET['SspVarForm'];
+ }
+ 
+ if (array_key_exists('HybridName', $_GET) and $_GET['HybridName'] != '*' and $DyntaxaID == null) {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.HybridName = :HybridName';
+  $parameters['HybridName'] = $_GET['HybridName'];
+ }
+ 
+ if (array_key_exists('Continent', $_GET) and $_GET['Continent'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Continent = :Continent';
+  $parameters['Continent'] = $_GET['Continent'];
+ }
+
+ if (array_key_exists('Country', $_GET) and $_GET['Country'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Country = :Country';
+  $parameters['Country'] = $_GET['Country'];
+ }
+ if (array_key_exists('Province', $_GET) and $_GET['Province'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Province = :Province';
+  $parameters['Province'] = $_GET['Province'];
+ }
+ if (array_key_exists('District', $_GET) and $_GET['District'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.District = :District';
+  $parameters['District'] = $_GET['District'];
+ }
+ if (array_key_exists('InstitutionCode', $_GET) and $_GET['InstitutionCode'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.InstitutionCode = :InstitutionCode';
+  $parameters['InstitutionCode'] = $_GET['InstitutionCode'];
+ }
+ 
+ if (array_key_exists('AccessionNo', $_GET) and $_GET['AccessionNo'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.AccessionNo = :AccessionNo';
+  $parameters['AccessionNo'] = $_GET['AccessionNo'];
+ }
+
+ if (array_key_exists('SmartCollector', $_GET) and $_GET['SmartCollector'] != '*') {
+  $WhereQueryparts[] = "MATCH (Collector) AGAINST (:SmartCollector IN BOOLEAN MODE)";
+  $tables[] = 'specimens';
+  $h = explode(' ',$_GET['SmartCollector']);
+  $parameters['SmartCollector'] = '+'.implode(' +',$h);
+ }
+ 
+ if (array_key_exists('Collectornumber', $_GET) and $_GET['Collectornumber'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Collectornumber = :Collectornumber';
+  $parameters['Collectornumber'] = $_GET['Collectornumber'];
+ }
+ 
+ if (array_key_exists('YearStart', $_GET) and $_GET['YearStart'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Year > :YearStart';
+  $parameters['YearStart'] = $_GET['YearStart'];
+ }
+ 
+ if (array_key_exists('YearEnd', $_GET) and $_GET['YearEnd'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Year < :YearEnd';
+  $parameters['YearEnd'] = $_GET['YearEnd'];
+ }
+ 
+if (array_key_exists('Year', $_GET) and $_GET['Year'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Year = :Year';
+  $parameters['Year'] = $_GET['Year'];
+}
+ 
+if (array_key_exists('Month', $_GET) and $_GET['Month'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Month = :Month';
+  $parameters['Month'] = $_GET['Month'];
+}
+
+if (array_key_exists('Day', $_GET) and $_GET['Day'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = 'specimens.Day = :Day';
+  $parameters['Day'] = $_GET['Day'];
+}
                 
-            }
-        } elseif ($SearchItem == "Who") {
-            if ($SearchValue !="" ) {
-				$wherestat = ahh($wherestat, "(MATCH(specimens.collector) AGAINST('$SearchValue' IN BOOLEAN MODE)) ");
-                $collectorID = true;
-            }
-        } elseif ($SearchItem == "SmartCollector") {
-            if ($SearchValue !="" ) {
-				$words = explode(' ', $SearchValue);
-                $SearchValue = '+'.implode(' +', $words);
-				$wherestat = ahh($wherestat, " (MATCH(specimens.collector) AGAINST('$SearchValue' IN BOOLEAN MODE) ) ");
-				//$collectorID = true;
-            }  
-        } elseif ($SearchItem == "RUBIN") {
-            if ($SearchValue !="" ) {
-                $WGSsq = RubinCorners($SearchValue);
-                $wherestat = ahh($wherestat, " `long` >= '$WGSsq[LongMin]' AND `long` <= '$WGSsq[LongMax]' AND `Lat` >= '$WGSsq[LatMin]' AND `Lat` <= '$WGSsq[LatMax]' AND CSource != 'District'");
-            }
-        } elseif ($SearchItem == "Family" || $SearchItem == "Order" || $SearchItem == "Class" || $SearchItem == "Phylum" || $SearchItem == "Kingdom" || $SearchItem == "Group" || $SearchItem == "Subgroup") {
-            if ( !isset($_GET["Genus"]) or ( isset($_GET["Genus"]) and $_GET["Genus"] == "*")) {
-                if ($SearchValue != "") {
-                    $wherestat = ahh($wherestat, " xgenera.`$SearchItem` = '$SearchValue' ") ;
-                } else {
-                    $wherestat = ahh($wherestat, " (xgenera.`$SearchItem` = '' OR xgenera.`$SearchItem` IS NULL) " );
-                }
-				$xgenera = true;
-            }
-			
-        } elseif ($SearchItem == "Svenskt_namn") {
-            $wherestat = ahh($wherestat, " xsvenska_namn.`$SearchItem` = '$SearchValue' ");
-			$SvenskaNamn = true;
-        } elseif ($SearchItem == "Kommun") {
-            $wherestat = ahh($wherestat, " district.`$SearchItem` = '$SearchValue' ");
-			$Geo = true;
-        } elseif ($SearchItem == "Lan") {
-            $wherestat = ahh($wherestat, " district.`Län` = '$SearchValue' ");
-			$Geo = true;
-        } elseif ($SearchItem == "Type_status" and $SearchValue == "All") {
-            $wherestat = ahh($wherestat, " Type_status IN('Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material','conserved type') ");
-		} elseif ($SearchItem == "Basionym") {
-            $h = explode(" ",$SearchValue);
-            $SearchValue="";
-            foreach ($h as $v) {
-                $SearchValue.=" +$v";
-            }
-            $wherestat = ahh($wherestat, " MATCH ($SearchItem) AGAINST ('$SearchValue' IN BOOLEAN MODE) ");
-		} elseif ($SearchItem == "InstitutionCode" and $SearchValue == "All") {
-		} elseif ($SearchItem == "Image" ) {
-			if ($SearchValue == "Yes") {
-				$wherestat = ahh($wherestat, " Image1 != '' ");
-			} elseif ($SearchValue == "No") {
-				$wherestat = ahh($wherestat, " (Image == '' or Image is NULL)");
-			}
-		} elseif ($SearchItem == "CSource" and $SearchValue == "District") {
-			$wherestat = ahh($wherestat, "CSource Like 'District%' ");
-		} elseif($SearchItem == "Taxonlist") {
-			$TaxonList = explode("\n", $SearchValue );
-			/*$wherestattemp = " (";
-            foreach ($TaxonList as $Taxon) {
-				$STaxon = explode(" ", $Taxon );
-				//echo "Genus: $STaxon[0] Species: $STaxon[1]";
-				if ($wherestattemp==" (") {
-					$wherestattemp = "$wherestattemp (specimens.Genus = '$STaxon[0]' and specimens.Species = '$STaxon[1]') ";
-				} else {
-					$wherestattemp = "$wherestattemp OR (specimens.Genus = '$STaxon[0]' and specimens.Species = '$STaxon[1]') ";
-				}
-			}
-			$wherestattemp = "$wherestattemp) ";*/
-			$wherestattemp = ""; 
-			foreach ($TaxonList as $Taxon) {
-				if ($wherestattemp=="") {
-					$wherestattemp = "Concat(Genus,\" \", Species) IN (\"$Taxon\" ";
-				} else {
-					$wherestattemp = "$wherestattemp,  \"$Taxon\"";
-				}
-				 
-				
-			}
-			$wherestattemp = $wherestattemp.")";
-			$wherestat = ahh($wherestat, " $wherestattemp ");
-		} else {
-            if ($SearchValue != "") {
-               $wherestat = ahh($wherestat, " specimens.`$SearchItem` = '$SearchValue' ") ;  //COLLATE utf8_swedish_ci 
-            } else
-            {
-                $wherestat = ahh($wherestat, " (specimens.`$SearchItem` = '' OR specimens.`$SearchItem` IS NULL) " );
-            }
-        } 
-    }
-    }
-	
-	$joins = "FROM specimens";
-	if ($xgenera) {
+if (array_key_exists('Original_name', $_GET) and $_GET['Original_name'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = "MATCH (Original_name) AGAINST (:Original_name IN BOOLEAN MODE)";
+  $h = explode(' ',$_GET['Original_name']);
+  $parameters['Original_name'] = '+'.implode(' +',$h);
+}
+
+if (array_key_exists('Original_text', $_GET) and $_GET['Original_text'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = "MATCH (Original_text, Notes) AGAINST (:Original_text IN BOOLEAN MODE)";
+  $h = explode(' ',$_GET['Original_text']);
+  $parameters['Original_text'] = '+'.implode(' +',$h);
+}
+
+if (array_key_exists('Image', $_GET) and $_GET['Image'] != '*') {
+  $tables[] = 'specimens';
+  if ($_GET['Image'] == 'Yes') {
+   $WhereQueryparts[] = 'specimens.image1 != \'\'';   // Slow query fix
+  } elseif ($_GET['Image'] == "No") {
+   $WhereQueryparts[] = 'specimens.image1 = \'\' or image1 is NULL';
+  }
+}
+
+if (array_key_exists('Type_status', $_GET) and $_GET['Type_status'] != '*') {
+  $tables[] = 'specimens';
+  if ($_GET['Type_status'] == "All") {
+   //$WhereQueryparts[] = 'specimens.Type_status != \'\'';  // Slow query
+   $WhereQueryparts[] = "specimens.Type_status IN('Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material','conserved type')";
+  } else {
+   $WhereQueryparts[] = 'specimens.Type_status = :Type_status';
+     $parameters['Type_status'] = $_GET['Type_status'];
+  }
+}
+
+if (array_key_exists('Basionym', $_GET) and $_GET['Basionym'] != '*') {
+  $tables[] = 'specimens';
+  $WhereQueryparts[] = "MATCH (Basionym) AGAINST (:Basionym IN BOOLEAN MODE)";
+  $h = explode(' ',$_GET['Basionym']);
+  $parameters['Basionym'] = '+'.implode(' +',$h);
+}
+
+if (array_key_exists('Svenskt_namn', $_GET) and $_GET['Svenskt_namn'] != '*') {
+  $tables[] = 'xsvenska_namn';
+  $WhereQueryparts[] = 'xsvenska_namn.Svenskt_namn= :Svenskt_namn';
+  $parameters['Svenskt_namn'] = $_GET['Svenskt_namn'];
+}
+
+if (array_key_exists('Lan', $_GET) and $_GET['Lan'] != '*') {
+  $tables[] = 'district';
+  $WhereQueryparts[] = 'district.Län= :Lan';
+  $parameters['Lan'] = $_GET['Lan'];
+}
+
+if (array_key_exists('Kommun', $_GET) and $_GET['Kommun'] != '*') {
+  $tables[] = 'district';
+  $WhereQueryparts[] = 'district.Kommun= :Kommun';
+  $parameters['Kommun'] = $_GET['Kommun'];
+}
+
+if (array_key_exists('Kingdom', $_GET) and $_GET['Kingdom'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.Kingdom = :Kingdom';
+   $parameters['Kingdom'] = $_GET['Kingdom'];
+}
+
+if (array_key_exists('Phylum', $_GET) and $_GET['Phylum'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.Phylum = :Phylum';
+   $parameters['Phylum'] = $_GET['Phylum'];
+}
+
+if (array_key_exists('Class', $_GET) and $_GET['Class'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.Class = :Class';
+   $parameters['Class'] = $_GET['Class'];
+}
+
+if (array_key_exists('Order', $_GET) and $_GET['Order'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.`Order` = :Order';
+   $parameters['Order'] = $_GET['Order'];
+}
+
+if (array_key_exists('Family', $_GET) and $_GET['Family'] != '*') {
+   $tables[] = 'xgenera';
+   $WhereQueryparts[] = 'xgenera.Family = :Family';
+   $parameters['Family'] = $_GET['Family'];
+}
+if (array_key_exists('RUBIN', $_GET) and $_GET['RUBIN'] != '*') {
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Family = :Family';
+   $parameters['Family'] = $_GET['Family'];
+}
+if (array_key_exists('SFile', $_GET) and $_GET['SFile'] != '*') {
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.sFile_ID = :SFile';
+   $parameters['SFile'] = $_GET['SFile'];
+}
+if (array_key_exists('Long', $_GET) and $_GET['Long'] != '*') {   // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.`Long` = :Long';
+   $parameters['Long'] = $_GET['Long'];
+}
+if (array_key_exists('Lat', $_GET) and $_GET['Lat'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Lat = :Lat';
+   $parameters['Lat'] = $_GET['Lat'];
+}
+if (array_key_exists('CSource', $_GET) and $_GET['CSource'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.CSource = :CSource';
+   $parameters['CSource'] = $_GET['CSource'];
+}
+
+
+ $joins = "specimens";
+	if (in_array('xgenera', $tables)) {
 		$joins = $joins." JOIN xgenera ON specimens.Genus_ID = xgenera.ID";
 	}
-	if ($dyntaxa_syns) {
+	if (in_array('xnames', $tables)) {
 		$joins = $joins." JOIN xnames ON specimens.Dyntaxa_ID = xnames.taxonID";
 	}
-	if ($SvenskaNamn) {
+	if (in_array('xsvenska_namn', $tables)) {
 		$joins = $joins." JOIN xsvenska_namn ON specimens.Dyntaxa_ID = xsvenska_namn.taxonID";
 	}
-	if ($Geo) {
+	if (in_array('district', $tables)) {
 		$joins = $joins." JOIN district ON specimens.Geo_ID = district.ID";
 	}
-	if ($collectorID) {
+	if (in_array('signaturer', $tables)) {
 		$joins = $joins." JOIN signaturer ON specimens.Sign_ID = signaturer.ID JOIN samlare ON signaturer.samlar1_ID = samlare.ID";
 	}
-	
-    $svar["FROM"] = $joins;
-	if ($wherestat!='') {
-		if ($specialwhere !='') {
-			$svar["WHERE"] = $wherestat.' and '.$specialwhere;
-		} else {
-			$svar["WHERE"] = $wherestat;
-		}
-	} else {
-		if ($specialwhere !='') {
-			$svar["WHERE"] = 'WHERE '.$specialwhere;
-		} else {
-			$svar["WHERE"] = '';
-		}
-	}
-    return $svar;
+ 
+ // the WHERE part in the SELECT Querry
+ if (empty($WhereQueryparts)){
+  $wheretext = '';
+ }
+ else {
+  $wheretext = 'WHERE '.implode(' AND ', $WhereQueryparts);
+ }
+ 
+ // add the text to calculate number of rows returned if needed in the query
+ $select = '';
+ if ($nr_records < 0) {
+  $select = 'SELECT SQL_CALC_FOUND_ROWS';
+ } else {
+  $select = 'SELECT';
+ }
+ 
+ //echo "<p>order by: $orderBy[SQL] <p>";
+ 
+ // paste together al parts of the query
+ $query = "$select $whatstat FROM $joins $wheretext $GroupBy $orderBy[SQL] LIMIT :ofsetp, :pagesize;"; //$Limit;";
+ //echo "<p>query: $query<p>";
+ $Stm = $con->prepare($query);
+ 
+ //Bind all the parameters to values in an way to avoid SQL injections have to be done after prepare the query;
+ 
+ if(empty($parameters)) {
+  
+ } else {
+ foreach($parameters as $key=>$value) {
+   //echo ":$key, $value<br>";
+   $Stm->bindValue(':'.$key,$value, PDO::PARAM_STR);
+ }
 }
 
-function simpleSQL($con, $dynstaxaID) {
-        $svar = simpleSQLS($con, $dynstaxaID);
-		$svar2 = $svar["FROM"]." ".$svar["WHERE"];
-		return $svar2;
+$offset = ($page-1)*$pageSize;
+$Stm->bindValue(':ofsetp',$offset, PDO::PARAM_INT);
+$Stm->bindValue(':pagesize',$pageSize, PDO::PARAM_INT);
+
+$Stm->execute();
+//$result = $Stm->fetchAll(PDO::FETCH_ASSOC);
+if ($nr_records < 0) {
+   $nr_records = $con->query("SELECT FOUND_ROWS();")->fetchColumn();
+}
+//echo "nr reccords: $nr_records <p>";
+return [$Stm, $nr_records];
 }
 
-function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order) {
-
-	$DyntaxaID = dyntaxaID($con);
-	//$order = orderBy();
-	$sort = SQLf($order['SQL']);
-	$wherestat = simpleSQL($con, $DyntaxaID);
-	$Limit = pageSQL($page, $pageSize);
-	
-	if (isset($_GET['nrRecords'])) {
-		$query = "SELECT ".$whatstat." ".$wherestat.' '.$GroupBy.' '.$sort." ".$Limit;
-		$query. "<p>";
-		$result = $con->query($query);
-		$nr = $_GET['nrRecords'];
-	} else {
-			$query = "SELECT SQL_CALC_FOUND_ROWS ".$whatstat." ".$wherestat." ".$GroupBy.' '.$sort." ".$Limit;
-		$query. "<p>";
-		$result = $con->query($query);
-		$nr = getNrRecords ($con);
-	}
-	//echo "query:$query";
-	$svar['nr'] = $nr;
-	$svar['result'] = $result;
-	return $svar;
-}
 
 // returners SQL coden m.m. för sortering av poster från URL
 function orderBy() {
     if (isset($_GET['OrderBy']))
     {
         if ($_GET['OrderBy'] == "Taxon") {
-            $OrderBySQL = " ORDER BY specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.ID ";
+            $OrderBySQL = "ORDER BY specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName, specimens.ID";
         } elseif ($_GET['OrderBy'] == "Date") {
-            $OrderBySQL = " ORDER BY specimens.Year, specimens.Month, specimens.Day, specimens.ID ";
+            $OrderBySQL = "ORDER BY specimens.Year, specimens.Month, specimens.Day, specimens.ID";
         } elseif ($_GET['OrderBy'] == "AccessionNo") {
-            $OrderBySQL = " ORDER BY specimens.AccessionNo, specimens.ID ";
+            $OrderBySQL = "ORDER BY specimens.AccessionNo, specimens.ID";
+        } elseif ($_GET['OrderBy'] == "InstitutionCode") {
+            $OrderBySQL = "ORDER BY specimens.InstitutionCode, specimens.ID"; 
+        } elseif ($_GET['OrderBy'] == "Country") {
+            $OrderBySQL = "ORDER BY specimens.Country, specimens.Province, specimens.ID"; 
+        } elseif ($_GET['OrderBy'] == "Province") {
+            $OrderBySQL = "ORDER BY specimens.Province, specimens.District, specimens.ID";
+        } elseif ($_GET['OrderBy'] == "District") {
+            $OrderBySQL = "ORDER BY specimens.District, specimens.ID";
+        } elseif ($_GET['OrderBy'] == "Collector") {
+            $OrderBySQL = "ORDER BY specimens.Collector, specimens.ID";
         } else {
-            $OrderBySQL = " ORDER BY specimens.$_GET[OrderBy], specimens.AccessionNo COLLATE utf8_swedish_ci "; 
+            $OrderBySQL = "";
         }
         $OrderByAdr = "&OrderBy=$_GET[OrderBy]";
         $OrderByRub = "$_GET[OrderBy]";
     }
     else {
         //$OrderBySQL = " ORDER BY specimens.ID ";
-		$OrderBySQL = "";
+        $OrderBySQL = "";
         $OrderByAdr = "";
         $OrderByRub = "";
     }
@@ -667,7 +726,7 @@ function orderBy() {
 }
 
 // returnerar rubrik från URL
-function getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass) {
+function getRubr($con) {
     function getRVal($Rubrik, $RValue, $RItem) {
         if ($Rubrik !="")
             if ($RItem == "Species" || $RItem == "SspVarForm") {
@@ -678,11 +737,15 @@ function getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass) {
         else
             return $Rubrik  = $RValue;
     }
+    $query = "SELECT Fornamn, Efternamn FROM samlare WHERE samlare.ID = :RValue";
+    $Stm = $con->prepare($query);
+    $RValue ='';
+    $Stm->bindValue(':RValue',$RValue, PDO::PARAM_STR);
     $Rubrik = "";
     foreach ($_GET as $RItem => $RValue)
     {
         //if($RValue != "*" and $RItem != "search" and $RItem != "Page" and $RItem != "Life" and $RItem != "World" and $RItem != "slemocota" and $RItem!= "andromeda" and $RItem!= "OrderBy" and $RItem != "nrRecords" and $RItem != "ARecord" )
-	if(notSpecial($RItem , $RValue))
+        if(notSpecial($RItem , $RValue))
         {
                
                     if ($RItem == "Continent") {
@@ -692,11 +755,11 @@ function getRubr($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass) {
                             $Rubrik = getRVal($Rubrik, $RValue, $RItem);
                         }
                     } elseif($RItem == "CollectorID") {
-                        $con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
-                        $query = "SELECT Fornamn, Efternamn FROM samlare WHERE samlare.ID = $RValue";
+                        $Stm->execute();
                         //echo "$query <p>";
-                        $result = $con->query($query);
-                        $row = $result->fetch();
+                        //$result = $con->query($query);
+                        //$row = $result->fetch();
+                        $row = $Stm->fetch(PDO::FETCH_ASSOC);
                         $RValue = $row['Fornamn']. ' ' . $row['Efternamn'];
                         $Rubrik = getRVal($Rubrik, $RValue, $RItem);
                     } else {
@@ -812,7 +875,6 @@ function pageANav($page, $nrRecords, $adress, $pageSize) {
        
     }
 }
-
 
 function getPageNr() {
     if (isset($_GET['Page'])) {
