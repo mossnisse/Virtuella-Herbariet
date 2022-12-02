@@ -5,7 +5,7 @@ header('Content-type: text/html; charset=utf-8');
 include("../herbes.php");
 if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 $query = "SELECT count(*) as tot from specimens where InstitutionCode = \"UPS\";";
 $result = $con->query($query);
 
