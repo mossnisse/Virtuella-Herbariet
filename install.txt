@@ -1,0 +1,22 @@
+install MySQL, webserver(apache) and php
+
+the port for MysQL (3306) and the webserver have to be open
+
+MySQL config my.ini  on windows in ProgramData\MySQL\MYSQL server
+	sql-mode="NO_ENGINE_SUBSTITUTION"  - if strict mode the updating will stop on instead of throw a warning so problematic
+	secure-file-priv = <upload folder>  - set the folder load data commands can use
+	ft_stopword_file = ""  - the stopwords is not relevant for how I use fulltext search
+create users for the web server (should only be reachable from localhost) and the coordinate tool with relevant 
+ 
+Apache config
+	- enable php as an module
+
+php config - php.ini in the php install folder
+	post_max_size = 900M 			- updating needs to upload big files
+	file_uploads = On			- updating needs to upload big files
+	upload_tmp_dir = <temp upload folder>	- temp folder for uploading files
+	upload_max_filesize = 500M		- updating needs to upload big files
+	extension=pdo_mysql			- php uses pdo drivers for MYSQL
+
+On windows
+	MYSQL and apache needs rights to read and write in the <upload folder> and <temp uplad folder> the rights get inherited from the temp foder not the final so MYSQL need rights on the tempfolder even if it should not touch the files there.
