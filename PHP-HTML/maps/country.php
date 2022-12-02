@@ -16,23 +16,30 @@
 	</head>
 <?php
 include("../herbes.php");
-	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+	$con = getConS();
 	$count = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
-		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments FROM countries where ID = \"$ID\";";
-		$result = $con->query($query);
-		$row = $result->fetch();
+		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments FROM countries where ID = :ID;";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':ID', $ID, PDO::PARAM_STR);
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 		$country = $row['english'];
 	} else {
 		$country = $_GET['Country'];
-		$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english=\"$country\"";
-		$result = $con->query($query);
-		$row = $result->fetch();
+		$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english = :country";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':country', $country, PDO::PARAM_STR);
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
 	
-	$query = "select Province from Provinces where country=\"$country\"";
-	$result2 = $con->query($query);
+	$query = "select Province from Provinces where country = :country";
+	$Stm = $con->prepare($query);
+	$Stm->bindValue(':country', $country, PDO::PARAM_STR);
+	$Stm->execute();
+		//$row = $Stm->fetch(PDO::FETCH_ASSOC)
 
 echo "
 	<body id= \"country\">
@@ -55,7 +62,7 @@ echo "
 		<div id=\"map\"></div>
 	Provinces
 	<table>";
-	while ($row2 = $result2->fetch()) {
+	while ($row2 = $Stm->fetch(PDO::FETCH_ASSOC)) {
 		
 		echo "<tr><td><a href=\"province.php?Country=$country&Province=$row2[Province]\">$row2[Province]</a></td></tr>";
 	}

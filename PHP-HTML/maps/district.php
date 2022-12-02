@@ -14,34 +14,45 @@
 	</head>
 <?php
 	include("../herbes.php");
-	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+	$con = getConS();
 	$row = "";
 	$dist = "";
 	$prov = "";
 	$count = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
-		$query = "SELECT District, Province, Country, code, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district where ID = \"$ID\";";
-		$result = $con->query($query);
-		$row = $result->fetch();
+		$query = "SELECT District, Province, Country, `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district where ID = :ID;";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':ID', $ID, PDO::PARAM_INT);
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 		$dist = $row['District'];
 		$prov = $row['Province'];
 		$count = $row['Country'];
-		
 	} else {
 		$dist = $_GET['District'];
 		$prov = $_GET['Province'];
 		$count = $_GET['Country'];
-		$query = "SELECT code, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district where district = \"$dist\" and province = \"$prov\";";
-		$result = $con->query($query);
-		$row = $result->fetch();
+		$query = "SELECT `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district WHERE `District` = :district AND `Province` = :province AND Country = :country;";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':district', $dist, PDO::PARAM_STR);
+		$Stm->bindValue(':province', $prov, PDO::PARAM_STR);
+		$Stm->bindValue(':country', $count, PDO::PARAM_STR);
+		//echo "dist: $dist, prov: $prov <br>";
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	$result = $con->query($query);
+	//$result = $con->query($query);
 	//echo $query;
-	$row = $result->fetch();
+	//$row = $result->fetch();
 	
-	$query = "select locality, ID from locality where district=\"$dist\" and province=\"$prov\"";
-	$result2 = $con->query($query);
+	$query = "select locality, ID from locality where district = :district and province = :province and country = :country;";
+	$Stm2 = $con->prepare($query);
+	$Stm2->bindValue(':district', $dist, PDO::PARAM_STR);
+	$Stm2->bindValue(':province', $prov, PDO::PARAM_STR);
+	$Stm2->bindValue(':country', $count, PDO::PARAM_STR);
+		//echo "dist: $dist, prov: $prov <br>";
+	$Stm2->execute();
 
 echo "
 	<body id= \"district\">
@@ -59,7 +70,7 @@ echo "
 	Localities
 	<table>";
 
-	while ($row2 = $result2->fetch()) {
+	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
 		
 		echo "<tr><td><a href =\"..\\locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
 	}

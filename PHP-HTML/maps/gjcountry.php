@@ -1,18 +1,22 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 include("../herbes.php");
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 if (array_key_exists('country', $_GET)) {
-   $value = SQLf($_GET['country']);
-   $query = "SELECT geojson FROM countries where english = \"$value\";";
+   $country = $_GET['country'];
+   $query = "SELECT geojson FROM countries where english = :country;";
+   $Stm = $con->prepare($query);
+   $Stm->bindValue(':country', $country, PDO::PARAM_STR);
 } else {
-   $id = SQLf($_GET['ID']);
-   $query = "SELECT geojson FROM countries where ID = \"$id\";";
+   $id = $_GET['ID'];
+   $query = "SELECT geojson FROM countries where ID = :id;";
+   $Stm = $con->prepare($query);
+   $Stm->bindValue(':id', $id, PDO::PARAM_INT);
 }
 //echo "$query <p>";
-$result = $con->query($query);
-$row = $result->fetch();
-if($result ) {
+$Stm->execute();
+$row = $Stm->fetch(PDO::FETCH_ASSOC);
+if($row ) {
  echo $row['geojson'];
 } else {
     echo "couldnt find the geojson data: "+$query;

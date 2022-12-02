@@ -14,27 +14,36 @@
 	</head>
 <?php
 	include("../herbes.php");
-	$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+	$con = getConS();
 	$prov = "";
 	$count = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
-		$query = "SELECT Province, Country, maxX, maxY, minX, minY, code, type_eng, type_native, alt_names FROM provinces where ID = \"$ID\";";
-		$result = $con->query($query);
-		$row = $result->fetch();
+		$query = "SELECT Province, Country, maxX, maxY, minX, minY, code, type_eng, type_native, alt_names FROM provinces where ID = :id;";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':id', $ID, PDO::PARAM_INT);
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 		$prov = $row['Province'];
 		$count = $row['Country'];
 	} else {
 		$count = $_GET['Country'];
 		$prov = $_GET['Province'];
-		$query = "select maxX, maxY, minX, minY, code, type_eng, type_native, alt_names from provinces where country=\"$count\" and province = \"$prov\"";
-		$result = $con->query($query);
-		//echo $query;
-		$row = $result->fetch();
+		$query = "select maxX, maxY, minX, minY, code, type_eng, type_native, alt_names from provinces where country = :count and province = :prov;";
+		$Stm = $con->prepare($query);
+		$Stm->bindValue(':prov', $prov, PDO::PARAM_STR);
+		$Stm->bindValue(':count', $count, PDO::PARAM_STR);
+		//echo "dist: $dist, prov: $prov <br>";
+		$Stm->execute();
+		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
 
-	$query = "select District from District where country=\"$count\" and province=\"$prov\"";
-	$result2 = $con->query($query);
+	$query = "select District from District where country= :count and province = :prov";
+	$Stm2 = $con->prepare($query);
+	$Stm2->bindValue(':prov', $prov, PDO::PARAM_STR);
+	$Stm2->bindValue(':count', $count, PDO::PARAM_STR);
+		//echo "dist: $dist, prov: $prov <br>";
+	$Stm2->execute();
 
 echo "
 	<body id= \"province\">
@@ -50,8 +59,7 @@ echo "
 	Districts
 	<table>";
 
-	while ($row2 = $result2->fetch()) {
-		
+	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
 		echo "<tr><td><a href=\"district.php?Province=$prov&District=$row2[District]&Country=$count\">$row2[District]</tr>";
 	}
 	
