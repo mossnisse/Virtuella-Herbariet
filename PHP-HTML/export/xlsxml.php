@@ -3,10 +3,9 @@
 include("../herbes.php");
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_export.xml"');
-
 $pageURL = xmlf(curPageURL());
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.AccessionNo, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
           specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day,
           specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
@@ -18,17 +17,15 @@ $pageSize = 100000;
 
 $GroupBy = "";
 $order['SQL'] = "";
+$nrRecords=$_GET['nrRecords'];
 
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
-$result = $svar['result'];
-$nr = $svar['nr'];
+$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
+$result = $svar[0];
+//$nr = $svar['nr'];
 
 //$result = $con->query($query);
 //$nr = getNrRecords ($con);
-$rows = $nr+1;
-
-
-
+//$rows = $nr+1;
 
 //echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\tNotes\tComments\tContinent\tCountry\tProvince\tDistrict\tLocality\tWGS84N\tWGS84S\tScientificName\tGenus\tSpecificEpithet\tIntraspecificEpithet\tRT90-N\tRT90-E\tRUBIN\tOriginalName\tOriginalText\r\n";
 echo "<?xml version=\"1.0\"?>
@@ -73,7 +70,7 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">Type Auctor</Data></Cell>
             </Row>";
 
-while($row = $result->fetch())
+foreach($result as $row)
 {
      //Date Collected
     if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")

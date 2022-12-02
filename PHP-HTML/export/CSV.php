@@ -16,15 +16,16 @@ $page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
+$nrRecords=$_GET['nrRecords'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
-$result = $svar['result'];
-$nr = $svar['nr'];
+$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
+$result = $svar[0];
+//$nr = $svar['nr'];
 echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\tNotes\tComments\tContinent\tCountry\tProvince\tDistrict\tLocality\tWGS84N\tWGS84S\tCSource\tcoordinateUncertaintyInMeters\tCValue\tScientificName\tGenus\tSpecificEpithet\tIntraspecificEpithet\tRT90-N\tRT90-E\tRUBIN\tOriginalName\tOriginalText\tType-status\tTAuctor\tBasionym\tgeoreferenceRemarks\tImageLinks\tImageThumbLinks\r";
 
-while($row = $result->fetch())
+foreach($result as $row)
 {
      //Date Collected
     if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
@@ -40,8 +41,7 @@ while($row = $result->fetch())
     $CRemarks = "Coordinate generated from $row[CSource]: $row[CValue] Precision: $row[CPrec]m";
     $ImageLinks = "";
     $ImageThumbLinks = "";
-    
-    
+
     if ($row['institutionCode'] == "LD" and !$row['image1'] == "") {
         $directory = "http://www.botmus.lu.se/Lund/Images/";
         if ($row["image1"]!="") {

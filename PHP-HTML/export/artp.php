@@ -15,15 +15,15 @@ $page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
+$nrRecords=$_GET['nrRecords'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
-$result = $svar['result'];
-$nr = $svar['nr'];
+$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
+$result = $svar[0];
+//$nr = $svar['nr'];
 
-$rows = $nr+1;
-
+//$rows = $nr+1;
 
 //echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\tNotes\tComments\tContinent\tCountry\tProvince\tDistrict\tLocality\tWGS84N\tWGS84S\tScientificName\tGenus\tSpecificEpithet\tIntraspecificEpithet\tRT90-N\tRT90-E\tRUBIN\tOriginalName\tOriginalText\r\n";
 echo "<?xml version=\"1.0\"?>
@@ -54,7 +54,7 @@ echo "<?xml version=\"1.0\"?>
             </Row>";
 
 
-while($row = $result->fetch())
+foreach($result as $row)
 {
      //Date Collected
     if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
@@ -74,6 +74,7 @@ while($row = $result->fetch())
     $collector = xmlf($row['Collector']);
     $collecotrnr = xmlf($row['collectornumber']);
     $comments = xmlf($row['Comments']);
+    $orgext = xmlf($row['Original_text']);
     
     $samling ="";
     
@@ -98,8 +99,17 @@ while($row = $result->fetch())
             break;
     }
     
-    $Norr = strtr($row['Lat'],'.',',');
-    $Ost = strtr($row['Long'],'.',',');
+    if (isset($row['Lat'])) {
+        $Norr = strtr($row['Lat'],'.',',');
+    } else {
+        $Norr ='';
+    }
+    
+    if (isset($row['Long'])) {
+        $Ost = strtr($row['Long'],'.',',');
+    } else {
+        $Ost = '';
+    }
     
     echo "
             <Row>
@@ -110,7 +120,7 @@ while($row = $result->fetch())
                 <Cell><Data ss:Type=\"String\"></Data></Cell>
                 <Cell><Data ss:Type=\"String\">$DateCollected</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$DateCollected</Data></Cell>
-                <Cell><Data ss:Type=\"String\">Original name: $row[Original_name] Original_text: $row[Original_text] comments: $row[Comments]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">Original name: $row[Original_name] Original_text: $orgext comments: $row[Comments]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$samling</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[AccessionNo]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$notes</Data></Cell>

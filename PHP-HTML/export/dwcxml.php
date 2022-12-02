@@ -14,23 +14,24 @@ $page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
+$nrRecords=$_GET['nrRecords'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
-$result = $svar['result'];
-$nr = $svar['nr'];
+$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
+$result = $svar[0];
+//$nr = $svar['nr'];
 
 
 echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"; 
 echo "
 <ucr:UMECoreRecordSet
     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-    xsi:schemaLocation=\"http://www.UMECore/ http://130.239.50.112/UMECore.xsd\"
+    xsi:schemaLocation=\"http://www.UMECore/ http://herbarium.emg.umu.se/export/UMECore.xsd\"
     xmlns:ucr=\"http://www.UMECore/\"
     xmlns:dcterms=\"http://purl.org/dc/terms/\"
     xmlns:dwc=\"http://rs.tdwg.org/dwc/terms/\">
-    <ucr:import namespace=\"http://www.UMECore/\" schemaLocation=\"http://130.239.50.112/UMECore.xsd\" />
+    <ucr:import namespace=\"http://www.UMECore/\" schemaLocation=\"http://herbarium.emg.umu.se/export/UMECore.xsd\" />
     
     <ucr:Metadata>
         <dcterms:type>PhysicalObject</dcterms:type>
@@ -42,7 +43,7 @@ echo "
         
 ";
 
-while($row = $result->fetch())
+foreach($result as $row)
 {
     
     if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
@@ -59,8 +60,7 @@ while($row = $result->fetch())
         $Locality = "No locality information available";
     else
         $Locality = xmlf($row['Locality']);
-        
-        
+
     echo  "
         <ucr:UMECoreRecord>
             <ucr:Occurrence>
@@ -82,7 +82,7 @@ while($row = $result->fetch())
     echo "
                 <dwc:country>$country</dwc:country>";
     if ($row['Province']!="") echo "
-                <dwc:stateProvince>$row[Province]</dwc:stateProvince>";
+                <dwc:stateProvince>".xmlf($row['Province'])."</dwc:stateProvince>";
     if ($row['District']!="") echo "        
                 <dwc:county>$row[District]</dwc:county>";
     echo "

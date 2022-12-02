@@ -16,12 +16,13 @@ $page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
+$nrRecords=$_GET['nrRecords'];
 
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 
-$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order);
+$svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
 $result = $svar['result'];
-$nr = $svar['nr'];
+//$nr = $svar['nr'];
 
 echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"; 
 echo "
@@ -39,7 +40,7 @@ echo "
     <ense:RecordSet>
 ";
 
-while($row = $result->fetch())
+foreach($result as $row)
 {
     if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
         $saml ="";
@@ -137,7 +138,7 @@ while($row = $result->fetch())
     echo  "
         <ense:Record>
                 <ense:InstitutionCode>$row[institutionCode]</ense:InstitutionCode>
-                <ense:CollectionCode>$row[collectionCode]</ense:CollectionCode>
+                <ense:CollectionCode></ense:CollectionCode>
                 <ense:GlobalUniqueIdentifier>$row[institutionCode]:$row[AccessionNo]</ense:GlobalUniqueIdentifier>
                 <ense:DateLastModified xsi:nil=\"true\"/>
                 <ense:CatalogNumber>$row[AccessionNo]</ense:CatalogNumber> ";
