@@ -3,35 +3,31 @@ header('Content-type: text/html; charset=utf-8');
 include("../herbes.php");
 if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
     
-$con = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
+$con = getConS();
 $what = "Subgroup";
 $whatDown = "Genus";
 $WhatDD = "Species";
-$value = SQLf($_GET['Subgroup']);
+$value = $_GET['Subgroup'];
 
 if ($value == '') {
-    $wquery = "`$what` = '' or `$what` is NULL";
+    $wquery = "`$what` = :value or `$what` is NULL";
 } else {
-    $wquery = "`$what` = '$value'";
+    $wquery = "`$what` = :value";
 }
 
-$query = "SELECT DISTINCT $whatDown FROM xgenera WHERE $wquery Collate \"UTF8_Swedish_CI\" ORDER BY $whatDown";
+$query = "SELECT DISTINCT $whatDown FROM xgenera WHERE $wquery ORDER BY $whatDown;";
 //echo "$query <p>";
-$result = $con->query($query);
-if($result ) {
-    echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
+$Stm = $con->prepare($query);
+$Stm->bindValue(':value', $value, PDO::PARAM_STR);
+$Stm->execute();
+
+echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
           <option value=\"*\">*</option>";
 
-    while($row = $result->fetch())
-    {
-        echo "<option value=\"$row[$whatDown]\"> $row[$whatDown] </option>";
-    }
-    echo "</select>";
-
-    if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
-} else {
-    echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
-            <option value=\"*\">*</option>
-    </select>";
+while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+{
+    echo "<option value=\"$row[$whatDown]\"> $row[$whatDown] </option>";
 }
+echo "</select>";
+if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>
