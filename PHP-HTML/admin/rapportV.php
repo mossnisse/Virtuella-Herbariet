@@ -15,7 +15,7 @@ $con = getConS();
     <table>
         <tr> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
 $query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
-$result = $con2->query($query);
+$result = $con->query($query);
     if (!$result) {
         echo mysql_error();
     }
