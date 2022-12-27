@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `specimens` (
   `Notes` text CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci COMMENT 'Lappar och kommentarer skrivna på kollektes. Vanligast är det. lappar.',
   `Exsiccata` text CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci,
   `Exs_no` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
-  `RUBIN` varchar(16) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'En alpha nummrerisk kod som beskriver en ruta i sverige. Enligt "Rutin för Biologiska inventeringar". Ska bara fyllas i om det är angivet av samlaren och fältet ska lämnas tomt om det bara finns upgifter som är uppslagna uträknade av herbariet.',
+  `RUBIN` varchar(16) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'En alpha nummrerisk kod som beskriver en ruta i sverige. Enligt "Rutin för Biologiska inventeringar". Ska bara fyllas i om det är angivet av samlaren och fältet ska lämnas tomt om det bara finns upgifter som är uppslagna uträknade av herbariet. 5km ruta är samma som gamla Ekonomiska kartan kartbladsindelning. ',
   `RiketsN` varchar(9) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'RT90 Nord koordinat. Det ska bara vara upgifter som är angivet av samlaren på kollektet. Lägg inte in koordinater som är uträknade/upslagna av herbariet här.',
   `RiketsO` varchar(9) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'RT90 Öst koordinat',
   `Lat_deg` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'Latitude grader. Det ska bara vara upgifter som är angivet av samlaren på kollektet. Lägg inte in koordinater som är uträknade/upslagna av herbariet här. Kan inehålla decimaler, då ska lat_min och lat_sec vara tomt. Odefinierat vilket kartdatum/ellipsoid så det är tyvär inte så noggrant. Moderna upgifter brukar WGS84 eller modernare som bara skiljer sig några dm.',
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `specimens` (
   `LastModified` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
   `prevDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `LasModifiedFM` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
-  `CPrec` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'Fält för koordinater uträknade av VH servern. Ska inehålla upskatad felmarginal av koordinaten angivet i meter',
+  `CPrec` int DEFAULT NULL COMMENT 'Fält för koordinater uträknade av VH servern. Ska inehålla upskatad felmarginal av koordinaten angivet i meter',
   `Type_status` enum('','Epitype','Holotype','Isoepitype','Isolectotype','Isoneotype','Isoparatype','Isosyntype','Isotype','Lectotype','Neotype','Paralectotype','Paratype','Possible type','Syntype','Topotype','Type','Type fragment','type?','original material','conserved type') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'Fält för typmaterial.',
   `TAuctor` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL COMMENT 'Fält för typmaterial. ',
   `Basionym` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'Fält för typmaterial. Kollekt har inte en Basionym utan det är namn som har det. Det är namn som har en basionym. Det ska inehålla det ursprungliga namnet typen är knuten till. Kollekten kan senare vara ombestämd till något annat eller arten kan ha bytt släkte.',
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `specimens` (
   `image3` varchar(90) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'Länk till foto på kollektet. kan vara angivet på olika sätt för olika herbarier',
   `image4` varchar(90) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'Länk till foto på kollektet. kan vara angivet på olika sätt för olika herbarier',
   `Dyntaxa_ID` int DEFAULT NULL COMMENT 'Skapas av VH-servern vid import.  Upsalget Dyntaxa_ID från xnames tabellen.',
-  `Matrix` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'matrix angivet på kollektet eller som synns när man tittar i kollektet. Används som ett mer generiskt begrepp för substrat som arten av intresse växer eller är i.',
+  `Matrix` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci DEFAULT NULL COMMENT 'matrix angivet på kollektet eller som synns när man tittar i kollektet. Används som ett mer generiskt begrepp för substrat som arten av intresse växer eller är i.',
   `Sweref99TMN` int DEFAULT NULL COMMENT 'Sweref99TM nord koordinat. Ska bara vara ifylt om det är angivet på kollektet av sammlaren.',
   `Sweref99TME` int DEFAULT NULL COMMENT 'Sweref99TM öst koordinat',
   `UTM` varchar(45) DEFAULT NULL,
@@ -99,7 +99,9 @@ CREATE TABLE IF NOT EXISTS `specimens` (
   FULLTEXT KEY `oName` (`Original_name`),
   FULLTEXT KEY `Basionym` (`Basionym`),
   FULLTEXT KEY `Collector` (`collector`),
-  FULLTEXT KEY `oText` (`Original_text`,`Notes`)
+  FULLTEXT KEY `oText` (`Original_text`,`Notes`,`Matrix`,`habitat`),
+  FULLTEXT KEY `Habitat` (`habitat`),
+  FULLTEXT KEY `Matrix` (`Matrix`)
 ) ENGINE=InnoDB AUTO_INCREMENT=109914244 DEFAULT CHARSET=utf8mb3 COMMENT='The main table that holds most of the data provided by the Herbaria.';
 
 -- Data exporting was unselected.
