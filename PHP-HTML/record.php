@@ -332,8 +332,14 @@ echo "
             
             
             if ($row['habitat'] != "")
-    echo "
-        <tr> <td> Habitat: </td> <td> $row[habitat]  </td> </tr>";
+                echo "
+        <tr> <td> Habitat: </td> <td>$row[habitat]</td> </tr>";
+            if ($row['Matrix'] != "")
+                echo "
+        <tr> <td> Matrix: </td> <td>$row[Matrix]</td> </tr>";
+            if ($row['Altitude_meter'] != '')
+                echo "
+                <tr> <td> Altitude: </td> <td>$row[Altitude_meter] meter</td> </tr>";
         if ($row['Month']<10 and $row['Month']>0)
             $m = "0$row[Month]";
         else

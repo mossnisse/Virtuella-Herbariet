@@ -516,7 +516,7 @@ if (array_key_exists('Original_name', $_GET) and $_GET['Original_name'] != '*') 
 
 if (array_key_exists('Original_text', $_GET) and $_GET['Original_text'] != '*') {
   $tables[] = 'specimens';
-  $WhereQueryparts[] = "MATCH (Original_text, Notes) AGAINST (:Original_text IN BOOLEAN MODE)";
+  $WhereQueryparts[] = "MATCH (Original_text, Notes, Matrix, habitat) AGAINST (:Original_text IN BOOLEAN MODE)";
   $h = explode(' ',$_GET['Original_text']);
   $parameters['Original_text'] = '+'.implode(' +',$h);
 }
@@ -595,11 +595,7 @@ if (array_key_exists('Family', $_GET) and $_GET['Family'] != '*') {
    $WhereQueryparts[] = 'xgenera.Family = :Family';
    $parameters['Family'] = $_GET['Family'];
 }
-if (array_key_exists('RUBIN', $_GET) and $_GET['RUBIN'] != '*') {
-   $tables[] = 'specimens';
-   $WhereQueryparts[] = 'specimens.Family = :Family';
-   $parameters['Family'] = $_GET['Family'];
-}
+
 if (array_key_exists('SFile', $_GET) and $_GET['SFile'] != '*') {
    $tables[] = 'specimens';
    $WhereQueryparts[] = 'specimens.sFile_ID = :SFile';
@@ -615,44 +611,106 @@ if (array_key_exists('Lat', $_GET) and $_GET['Lat'] != '*') {  // används av ma
    $WhereQueryparts[] = 'specimens.Lat = :Lat';
    $parameters['Lat'] = $_GET['Lat'];
 }
+if (array_key_exists('LongMax', $_GET) and $_GET['LongMax'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Long < :LongMax';
+   $parameters['LongMax'] = $_GET['LongMax'];
+}
+if (array_key_exists('LongMin', $_GET) and $_GET['LongMin'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Long > :LongMin';
+   $parameters['LongMin'] = $_GET['LongMin'];
+}
+if (array_key_exists('LatMin', $_GET) and $_GET['LatMin'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Lat > :LatMin';
+   $parameters['LatMin'] = $_GET['LatMin'];
+}
+if (array_key_exists('LatMax', $_GET) and $_GET['LatMax'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Lat < :LatMax';
+   $parameters['LatMax'] = $_GET['LatMax'];
+}
 if (array_key_exists('CSource', $_GET) and $_GET['CSource'] != '*') {  // används av map.php
    $tables[] = 'specimens';
    $WhereQueryparts[] = 'specimens.CSource = :CSource';
    $parameters['CSource'] = $_GET['CSource'];
 }
+if (array_key_exists('CPrecMax', $_GET) and $_GET['CPrecMax'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.CPrec < :CPrecMax';
+   $parameters['CPrecMax'] = $_GET['CPrecMax'];
+}
+if (array_key_exists('CPrecMin', $_GET) and $_GET['CPrecMin'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.CPrec > :CPrecMin';
+   $parameters['CPrecMin'] = $_GET['CPrecMin'];
+}
 
+if (array_key_exists('AltitudeMin', $_GET) and $_GET['AltitudeMin'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Altitude_meter > :AltitudeMin';
+   $parameters['AltitudeMin'] = $_GET['AltitudeMin'];
+}
+if (array_key_exists('AltitudeMax', $_GET) and $_GET['AltitudeMax'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.Altitude_meter < :AltitudeMax';
+   $parameters['AltitudeMax'] = $_GET['AltitudeMax'];
+}
+if (array_key_exists('RUBIN', $_GET) and $_GET['RUBIN'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WGSsq = RubinCorners($_GET['RUBIN']);
+   $WhereQueryparts[] = 'specimens.`long` >= :RLongMin AND specimens.`long` <= :RLongMax AND specimens.`Lat` >= :RLatMin AND specimens.`Lat` <= :RLatMax';
+   $parameters['RLongMin'] = min($WGSsq['SWLong'], $WGSsq['NWLong']);
+   $parameters['RLongMax'] = max($WGSsq['SELong'], $WGSsq['NELong']);
+   $parameters['RLatMin'] = min($WGSsq['SWLat'], $WGSsq['SELat']);
+   $parameters['RLatMax'] = max($WGSsq['NWLat'], $WGSsq['NELat']);
+}
 
- $joins = "specimens";
-	if (in_array('xgenera', $tables)) {
-		$joins = $joins." JOIN xgenera ON specimens.Genus_ID = xgenera.ID";
-	}
-	if (in_array('xnames', $tables)) {
-		$joins = $joins." JOIN xnames ON specimens.Dyntaxa_ID = xnames.taxonID";
-	}
-	if (in_array('xsvenska_namn', $tables)) {
-		$joins = $joins." JOIN xsvenska_namn ON specimens.Dyntaxa_ID = xsvenska_namn.taxonID";
-	}
-	if (in_array('district', $tables)) {
-		$joins = $joins." JOIN district ON specimens.Geo_ID = district.ID";
-	}
-	if (in_array('signaturer', $tables)) {
-		$joins = $joins." JOIN signaturer ON specimens.Sign_ID = signaturer.ID JOIN samlare ON signaturer.samlar1_ID = samlare.ID";
-	}
+if (array_key_exists('Matrix', $_GET) and $_GET['Matrix'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = "MATCH (Matrix) AGAINST (:Matrix IN BOOLEAN MODE)";
+   $h = explode(' ',$_GET['Matrix']);
+   $parameters['Matrix'] = '+'.implode(' +',$h);
+}
+if (array_key_exists('Habitat', $_GET) and $_GET['Habitat'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = "MATCH (habitat) AGAINST (:Habitat IN BOOLEAN MODE)";
+   $h = explode(' ',$_GET['Habitat']);
+   $parameters['Habitat'] = '+'.implode(' +',$h);
+}
+
+$joins = "specimens";
+if (in_array('xgenera', $tables)) {
+   $joins = $joins." JOIN xgenera ON specimens.Genus_ID = xgenera.ID";
+}
+if (in_array('xnames', $tables)) {
+   $joins = $joins." JOIN xnames ON specimens.Dyntaxa_ID = xnames.taxonID";
+}
+if (in_array('xsvenska_namn', $tables)) {
+   $joins = $joins." JOIN xsvenska_namn ON specimens.Dyntaxa_ID = xsvenska_namn.taxonID";
+}
+if (in_array('district', $tables)) {
+   $joins = $joins." JOIN district ON specimens.Geo_ID = district.ID";
+}
+if (in_array('signaturer', $tables)) {
+   $joins = $joins." JOIN signaturer ON specimens.Sign_ID = signaturer.ID JOIN samlare ON signaturer.samlar1_ID = samlare.ID";
+}
  
  // the WHERE part in the SELECT Querry
  if (empty($WhereQueryparts)){
-  $wheretext = '';
+   $wheretext = '';
  }
  else {
-  $wheretext = 'WHERE '.implode(' AND ', $WhereQueryparts);
+   $wheretext = 'WHERE '.implode(' AND ', $WhereQueryparts);
  }
  
  // add the text to calculate number of rows returned if needed in the query
  $select = '';
  if ($nr_records < 0) {
-  $select = 'SELECT SQL_CALC_FOUND_ROWS';
+   $select = 'SELECT SQL_CALC_FOUND_ROWS';
  } else {
-  $select = 'SELECT';
+   $select = 'SELECT';
  }
  
  //echo "<p>order by: $orderBy[SQL] <p>";

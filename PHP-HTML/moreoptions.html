@@ -1,22 +1,48 @@
 <!Content-type: text/html; charset=utf-8'>
 <table class="SBox">
-    <tr> <th colspan="2"> Select Taxon (using classification) </td> <th> Välj taxon (systematisk indelning) </th> </tr>
-    <tr> <td class="eng"> Kingdom </td> <td class="fbox">
+    <tr> <th colspan="2">Select Taxon (using classification)</td> <th>Välj taxon (systematisk indelning)</th> </tr>
+    <tr> <td class="eng">Kingdom</td> <td class="fbox">
         <select name="Kingdom" size="1" id = "Kingdom" onchange="getList('Kingdom', 'Phylum');">
             <option value="*">*</option>
             <option value=""></option>
-            <option value="Bacteria">Bacteria</option>
-            <option value="Fungi">Fungi</option>
             <option value="Plantae">Plantae</option>
-            <option value="Protoctista">Protoctista</option>
-        </select> </td> <td> Rike </td> </tr>
-    <tr> <td class="eng"> Phylum (Division) </td> <td class="fbox" id="Phylumd"> <input type="text" name="Phylum" id="Phylum" value="*" size="32" onblur="getList('Phylum', 'Class');" onclick="star('Phylum')" /> </td> <td>  Stam (Division) </td> </tr>
-    <tr> <td class="eng"> Class </td> <td class="fbox" id="Classd"> <input type="text" name="Class" id="Class" value="*" size="32" onblur="getList('Class', 'Order'); getSpList('Class', 'Family');" onclick="star('Class')" /> </td> <td> Klass </td> </tr>
-    <tr> <td class="eng"> Order </td> <td class="fbox" id="Orderd"> <input type="text" name="Order" id="Order" value="*" size="32" onblur="getList('Order', 'Family'); " onclick="star('Order')"/> </td> <td>  Ordning </td> </tr>
-    <tr> <td class="eng"> Family (generates list of genera in top box) </td> <td class="fbox" id="Familyd"> <input type="text" name="Family" id="Family" value="*" size="32" onblur="getList('Family', 'Genus');" onclick="star('Family')"/> </td> <td> Familj (skapar lista på släkten i översta boxen) </td> </tr>
+            <option value="Fungi">Fungi</option>
+            <option value="Chromista">Chromista (some algae and oomycetes et c.)</option>
+            <option value="Protozoa">Protozoa (slime moulds et c.)</option>
+            <option value="Bacteria">Bacteria (mostly cyanobactera)</option>
+        </select> </td> <td>Rike</td> </tr>
+    <tr> <td class="eng">Phylum (Division)</td> <td class="fbox" id="Phylumd"> <input type="text" name="Phylum" id="Phylum" value="*" size="32" onblur="getList('Phylum', 'Class');" onclick="star('Phylum')" /> </td> <td>  Stam (Division) </td> </tr>
+    <tr> <td class="eng">Class</td> <td class="fbox" id="Classd"> <input type="text" name="Class" id="Class" value="*" size="32" onblur="getList('Class', 'Order'); getSpList('Class', 'Family');" onclick="star('Class')" /> </td> <td> Klass </td> </tr>
+    <tr> <td class="eng">Order</td> <td class="fbox" id="Orderd"> <input type="text" name="Order" id="Order" value="*" size="32" onblur="getList('Order', 'Family'); " onclick="star('Order')"/> </td> <td>  Ordning </td> </tr>
+    <tr> <td class="eng">Family (generates list of genera in top box) </td> <td class="fbox" id="Familyd"> <input type="text" name="Family" id="Family" value="*" size="32" onblur="getList('Family', 'Genus');" onclick="star('Family')"/> </td> <td> Familj (skapar lista på släkten i översta boxen) </td> </tr>    
 </table>
 
-
+<table class="SBox">
+    <tr> <th colspan="2"> Various extra search options </td> <th> </th> </tr>
+    <tr> <td class ="eng"> Coordinate source </td> <td class="fbox">
+        <select name="CSource">
+            <option value="*">*</option>
+            <option value="None">No availabel coordinate</option>
+            <option value="RT90-coordinates">RT90 2.5 gon V (only Sweden)</option>
+            <option value="Sweref99TM-coordinates">Sweref99TM (only Sweden)</option>
+            <option value="Latitude / Longitude">Latitude / Longitude (unspecified elipsoid)</option>
+            <option value="RUBIN">RUBIN square (only Sweden)</option>
+            <option value="LINEREG">LINEREG (only Sweden, similar to RUBIN)</option>
+            <option value="Locality">Locality (from the herbaria)</option>
+            <option value="LocalityVH">Locality (from the virtual herbaria)</option>
+            <option value="District">District</option>
+            <option value="UPS Database">UPS database</option>
+            <option value="OHN Database">OHN database</option>
+        </select> </td> <td> Koordinat källa </td> </tr>
+    </tr>
+    <tr> <td class ="eng">Estimated coordinate precision</td> <td> Max <input type="text" name="CPrecMax" value="*" size="5" /> Min <input type="text" name="CPrecMin" value="*" size="5" /> </td> <td></td></tr>
+    <tr><td>Latitude (observe that the estimated coordinate for the specimens may not be that exaxt)</td><td> Max <input type="text" name="LatMax" value="*" size="5" /> Min <input type="text" name="LatMin" value="*" size="5" /></td><td>Latitud</td></tr>
+    <tr><td>Longitude</td><td> Max <input type="text" name="LongMax" value="*" size="5" /> Min <input type="text" name="LongMin" value="*" size="5" /></td><td>Longitud</td></tr>
+    <tr><td class="eng">RUBIN (observe that the estimated coordinate for specimens may not be that exaxt)</td><td> <input type="text" name="RUBIN" value="*" size="32" /> </td><td class="fbox">RUBIN</td></tr>
+    <tr><td class="eng">Altitude m. (rarely recorded)</td><td class="fbox"> From <input type="text" name="AltitudeMin" value="*" size="5" /> To <input type="text" name="AltitudeMax" value="*" size="5" />  </td><td>Höjd över havet i meter</td></tr>
+    <tr><td class="eng">Matrix (rarely recorded)</td><td class="fbox"> <input type="text" name="Matrix" value="*" size="32" /> </td><td>Matrix</td></tr>
+    <tr><td class="eng">Habitat / Biotope (rarely recorded)</td><td class="fbox"><input type="text" name="Habitat" value="*" size="32" /></td><td>Habitat / Biotop</td></tr>
+</table>
 
 <table class="SBox">
     
