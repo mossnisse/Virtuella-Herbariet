@@ -21,7 +21,7 @@ $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
 while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
 }	 
 
 	 
@@ -37,7 +37,7 @@ $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
 while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
 }
 
 
