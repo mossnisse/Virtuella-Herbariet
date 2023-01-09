@@ -679,6 +679,11 @@ if (array_key_exists('Habitat', $_GET) and $_GET['Habitat'] != '*') {  // använ
    $h = explode(' ',$_GET['Habitat']);
    $parameters['Habitat'] = '+'.implode(' +',$h);
 }
+if (array_key_exists('ID', $_GET) and $_GET['ID'] != '*') {  // används av map.php
+   $tables[] = 'specimens';
+   $WhereQueryparts[] = 'specimens.ID = :ID';
+   $parameters['ID'] = $_GET['ID'];
+}
 
 $joins = "specimens";
 if (in_array('xgenera', $tables)) {
