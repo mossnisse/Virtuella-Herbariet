@@ -549,9 +549,45 @@ if (array_key_exists('Basionym', $_GET) and $_GET['Basionym'] != '*') {
 }
 
 if (array_key_exists('Svenskt_namn', $_GET) and $_GET['Svenskt_namn'] != '*') {
-  $tables[] = 'xsvenska_namn';
-  $WhereQueryparts[] = 'xsvenska_namn.Svenskt_namn= :Svenskt_namn';
-  $parameters['Svenskt_namn'] = $_GET['Svenskt_namn'];
+  $query = "SELECT xnames.Genus, xnames.Species, xnames.SspVarForm, xnames.HybridName, xnames.TaxonTyp, xsvenska_namn.taxonID FROM xnames JOIN xsvenska_namn ON xnames.Taxonid = xsvenska_namn.Taxonid WHERE xsvenska_namn.Svenskt_namn = :Svenskt_namn";
+  $Stm = $con->prepare($query);
+  $Stm->bindValue(':Svenskt_namn',$_GET['Svenskt_namn'], PDO::PARAM_STR);
+  $Stm->execute();
+  $row = $Stm->fetch(PDO::FETCH_ASSOC);
+  if ($row) {
+   //echo "Genus: $row[Genus], species: $row[Species], TaxonTyp: $row[TaxonTyp]";
+  $spsynspart;
+  if ($row['Genus'] != '') {
+    if($row['TaxonTyp'] == 'family') {
+      $spsynspart[] = 'xgenera.Family = :Family';
+      $parameters['Family'] = $row['Genus'];
+      $tables[] = 'xgenera';
+    } else {
+      $spsynspart[] = 'specimens.Genus = :Genus';
+      $parameters['Genus'] = $row['Genus'];
+    }
+  }
+  if ($row['Species'] != '') {
+    $spsynspart[] = 'specimens.Species = :Species';
+    $parameters['Species'] = $row['Species'];
+  }
+  if ($row['SspVarForm'] != '') {
+    $spsynspart[] = 'specimens.SspVarForm = :SspVarForm';
+    $parameters['SspVarForm'] = $row['SspVarForm'];
+  }
+  if ($row['HybridName'] != '') {
+     $spsynspart[] = 'specimens.HybridName = :HybridName';
+     $parameters['HybridName'] = $row['HybridName'];
+  }
+  $spsynstext = implode(' AND ', $spsynspart);
+  $WhereQueryparts[] = "(specimens.Dyntaxa_ID = :DyntaxaID OR ($spsynstext))";
+  $parameters['DyntaxaID'] = $row['taxonID'];
+  $tables[] = 'specimens';
+  } else {
+     echo "couldnt find the Swedish name \"$_GET[Svenskt_namn]\"";
+     $WhereQueryparts[]  = 'specimens.Genus = "werbasdaerr"';
+     $tables[] = 'specimens';
+  }
 }
 
 if (array_key_exists('Lan', $_GET) and $_GET['Lan'] != '*') {
