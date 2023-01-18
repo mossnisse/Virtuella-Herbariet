@@ -22,11 +22,6 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
     <form enctype=\"multipart/form-data\" action=\"$script\" method=\"post\" accept-charset=\"utf-8\">
 
     <h3> 1. Ersätt fil </h3>";
-        //error_reporting(E_ALL);
-        //ini_set('display_errors', '1');
-    //include("../herbes.php");
-        //include("admin_scripts.php");
-    //$con2 = conDatabase($MySQLHost, $MySQLDB, $MySQLSUser, $MySQLSPass);
     echo "
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
@@ -260,16 +255,16 @@ function delfile($con, $delfile_ID, $sfileName) {
         $Stm = $con->prepare($query);
         $Stm->bindValue(':delfile_ID',$delfile_ID, PDO::PARAM_INT);
         $Stm->execute();
-        $result = $Stm->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
+        if ($Stm) {
+            //$result = $Stm->fetch(PDO::FETCH_ASSOC);
             $query = "update sfiles set nr_records = 0 where ID = :delfile_ID";
             $Stm2 = $con->prepare($query);
             $Stm2->bindValue(':delfile_ID',$delfile_ID, PDO::PARAM_INT);
             $Stm2->execute();
-            $result2 = $Stm2->fetch(PDO::FETCH_ASSOC);
+            $Stm2->fetch(PDO::FETCH_ASSOC);
             //echo "$query2 <br />";
-            if (!$result2) {
-                echo "error updating sfiles table $query2 <br/>";
+            if (!$Stm2) {
+                echo "error updating sfiles table $query <br/>";
             }
             echo "
             $delfile_ID deleted <p />";
