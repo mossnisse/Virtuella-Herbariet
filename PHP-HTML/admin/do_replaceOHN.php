@@ -54,11 +54,15 @@ if (isUpdating2()) {
                 RiketsN = OHNRT90N(@North, @Koordsys, @Presicion),
                 RiketsO = OHNRT90E(@East, @Koordsys, @Presicion),
                 CSource = OHNCSource(@Koordsys, @Presicion),
-                `Lat` = OHNLat(@North, @East, @Koordsys),
-                `Long` = OHNLong(@East,  @North, @Koordsys),
                 linereg = OHNLinreg(@Presicion, CONVERT(@Locality USING utf8)),
                 Locality = OHNLocality(@Presicion, CONVERT(@Locality USING utf8)),
                 Notes = OHNNotes(CONVERT(@Notes USING utf8))";
+                
+                /*
+                 *  `Lat` = OHNLat(@North, @East, @Koordsys),
+                `Long` = OHNLong(@East,  @North, @Koordsys),
+                 *
+                 */
 
         doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
