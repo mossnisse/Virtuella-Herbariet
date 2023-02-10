@@ -1,5 +1,6 @@
 <?php
 // halvfärdig export funktion till darwincore formaterad XML
+set_time_limit(300);
 include("../herbes.php");
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="ENSE.xml"');
