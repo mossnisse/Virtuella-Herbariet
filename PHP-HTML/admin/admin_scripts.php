@@ -307,24 +307,20 @@ function fixGeoNames($con, $file_ID) {
 }
 
 function fixIdLinks($con, $file_ID, $timer) {
-     // fixa lokaldatabasen  update specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID where specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;
-    
     if ($file_ID == "-1") {
         $UGenusQuery = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID;";
         $UnameQuery = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid;";
         $UDistrictQuery = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country  SET Geo_ID = district.ID";
         $USignaturQuery = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID;";
-        $USpecimenLocQuery ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode;";
+        $USpecimenLocQuery ="UPDATE specimen_locality join specimens ON specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode SET specimen_locality.specimen_ID = specimens.ID";        
     } else {
         $UGenusQuery = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID WHERE sFile_ID = :file_ID;";
         $UnameQuery = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid WHERE sFile_ID = :file_ID;";
         $UDistrictQuery = "UPDATE specimens join district on specimens.district=district.district and specimens.province = district.province and specimens.country = district.country SET Geo_ID = district.ID WHERE sFile_ID = :file_ID";
         $USignaturQuery  = "UPDATE specimens join signaturer ON specimens.collector = signaturer.Signatur SET Sign_ID = signaturer.ID  WHERE sFile_ID = :file_ID;";
-        $USpecimenLocQuery ="UPDATE specimen_locality join specimens set specimen_locality.specimen_ID = specimens.ID WHERE specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode and sFile_ID = :file_ID;";
-        //fix specimen_locality link with ID
-        // use something like update specimen_locality join specimens using (InstitutionCode, AccessionNo) set specimen_locality.specimen_ID = specimens.ID where sFile_ID = "627";
+        $USpecimenLocQuery = "UPDATE specimen_locality join specimens ON specimens.AccessionNo = specimen_locality.AccessionNo and specimens.InstitutionCode = specimen_locality.InstitutionCode SET specimen_locality.specimen_ID = specimens.ID WHERE sFile_ID = :file_ID;";        
     }
-    
+     
     $UGenusStm = $con->prepare($UGenusQuery);
     $UnameStm = $con->prepare($UnameQuery);
     $UDistrictStm = $con->prepare($UDistrictQuery);
