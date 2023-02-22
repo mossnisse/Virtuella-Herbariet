@@ -474,14 +474,14 @@ function CalcCoord($row,$con) {
         $WGS['Value'] = "";
         $WGS['Prec'] = "unknown";
     }
-    if ($row['CSource'] == "OHN Database" ) {
+    elseif ($row['CSource'] == "OHN Database" ) {
         $WGS['Lat'] = $row['Lat'];
         $WGS['Long'] = $row['Long'];
         $WGS['Source'] = "OHN Database";
         $WGS['Value'] = "";
         $WGS['Prec'] = "unknown";
     }
-    if (isset($row['Sweref99TMN']) and isset($row['Sweref99TME']) and $row['Sweref99TMN']!=0 and $row['Sweref99TME']!=0 and $row['Sweref99TMN']!="" and $row['Sweref99TME']!="") {
+    elseif (isset($row['Sweref99TMN']) and isset($row['Sweref99TME']) and $row['Sweref99TMN']!=0 and $row['Sweref99TME']!=0 and $row['Sweref99TMN']!="" and $row['Sweref99TME']!="") {
 		$WGS = Sweref99TMToWGS(floatval($row['Sweref99TMN']), floatval($row['Sweref99TME']));
         $WGS['Source'] = "Sweref99TM-coordinates";
         $WGS['Value'] = "$row[Sweref99TMN]N, $row[Sweref99TME]E";
@@ -523,14 +523,14 @@ function CalcCoord($row,$con) {
             $WGS['Value'] = $row2['locality'];
         }    
     }
-    elseif (isset($row['Locality']) and $row['Locality']!= "" and isset($row['LocLong']) and $row['LocLong'] !="") {  // 
+    elseif (isset($row['LocLong']) and $row['LocLong'] !="") {  // 
         $WGS['Lat'] = $row['LocLat'];
         $WGS['Long'] = $row['LocLong'];
         $WGS['Source'] = "Locality";
         $WGS['Value'] = $row['Locality'];
         $WGS['Prec'] = $row['LocPrec'];
     }
-    elseif (isset($row['District']) and $row['District'] !="" and isset($row['Longitude']) and $row['Longitude'] !="" ) {
+    elseif (isset($row['distrLong']) and $row['distrLong'] !="") {
 		//echo "calc from district $row[District] $row[ID] <br>";
         $WGS['Lat'] = $row['distrLat'];
         $WGS['Long'] = $row['distrLong'];
@@ -609,6 +609,10 @@ function CalcCoordBatchM($con, $timer, $file_ID) {
                 $CPrec = $koord['Prec'];
                 $specimenID = $row['ID'];
                 $updateStm->execute();
+                //if (!$updateStm) {
+                    //echo "error $updateQuery <br> $long, $lat - $CSource - $cvalue - $CPrec - $specimenID<br>
+                    //distrLong $row[distrLong] - Locality $row[Locality] - LocLat $row[LocLat] - LocalityID $row[locality_ID] <br>";
+                //}
                 if(!($i % 5000)) {
                     $t = $timer->getTime();
                     echo "
