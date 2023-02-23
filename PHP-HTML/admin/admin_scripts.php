@@ -364,7 +364,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     
     echo "
         creating specimen ID in the locality db.. <br />";
-    $UDistrictStm->execute();
+    $USpecimenLocStm->execute();
     echo "Time: ".$timer->getTime()."<br />";
     ob_flush();
     flush();
