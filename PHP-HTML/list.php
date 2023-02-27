@@ -25,41 +25,41 @@ function pressentResult($Stm, $page, $nrRecords, $adress, $pageSize)
     <table class = \"Box\">
         <tr>";
     if($OrderBy == "InstitutionCode") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode\">Inst.</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode\">Inst.</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a> </td>";
     if($OrderBy == "AccessionNo") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo\"> Catalogue No. </a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\"> Catalogue No. </a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo\"> Catalogue No. </a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\"> Catalogue No. </a> </td>";
     if($OrderBy == "Taxon") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon\">Taxon</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon\">Taxon</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a> </td>";
     if($OrderBy == "Type") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Type\"></a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Type&amp;nrRecords=$nrRecords\"></a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=TType\"></a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=TType&amp;nrRecords=$nrRecords\"></a> </td>";
     if($OrderBy == "Country") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Country\">Country</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Country\">Country</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a> </td>";
     if($OrderBy == "Province") echo "    
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Province\">Province</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Province\">Province</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a> </td>";
     if($OrderBy == "District") echo "    
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=District\">District</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=District\">District</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a> </td>";
     if($OrderBy == "Date") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Date\">Year</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Date\">Year</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a> </td>";
     if($OrderBy == "Collector") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Collector\">Collector</a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a> </td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Collector\">Collector</a> </td>";
+        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a> </td>";
     
     echo "
         </tr>";
