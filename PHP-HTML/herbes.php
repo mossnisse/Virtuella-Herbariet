@@ -669,8 +669,13 @@ if (array_key_exists('LatMax', $_GET) and $_GET['LatMax'] != '*') {  // används
 }
 if (array_key_exists('CSource', $_GET) and $_GET['CSource'] != '*') {  // används av map.php
    $tables[] = 'specimens';
-   $WhereQueryparts[] = 'specimens.CSource = :CSource';
-   $parameters['CSource'] = $_GET['CSource'];
+   if ($_GET['CSource'] == 'District') {
+      $WhereQueryparts[] = 'specimens.CSource Like :CSource';
+      $parameters['CSource'] = $_GET['CSource'].'%';
+   } else {
+      $WhereQueryparts[] = 'specimens.CSource = :CSource';
+     $parameters['CSource'] = $_GET['CSource'];
+   }
 }
 if (array_key_exists('CPrecMax', $_GET) and $_GET['CPrecMax'] != '*') {  // används av map.php
    $tables[] = 'specimens';
