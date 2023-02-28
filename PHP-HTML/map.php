@@ -13,46 +13,52 @@ if (isUpdating()) { updateText();}
 else {
 
 $con = getConS();
-
-$page = getPageNr();
-
-//$Limit = pageSQL($page, $MapPageSize);
-//$wherestat = simpleSQL($con);
 $adr = getSimpleAdr();
 $Rubrik = getRubr($con);
-$nrRecords = $_GET['nrRecords'];
 
-if (isset($_GET['ARecord'])) {
-    $ARecord = $_GET['ARecord'];
-} else $ARecord = 1;
 
-$order['SQL'] = "ORDER BY Lat";
+if (isset($_GET['ARecord']))
+    $ARecordAdr = $_GET['ARecord'];
+else
+    $ARecordAdr = 1;
 
 if (isset($_GET['OrderBy']))
     $OrderAdr = "&OrderBy=$_GET[OrderBy]";
 else
     $OrderAdr = "";
     
-if (isset($_GET['color']))
-    $color = $_GET['color'];
+if (isset($_GET['Page']))
+    $page = $_GET['Page'];
 else
-    $color = "";
+    $page = 1;
+    
+if (isset($_GET['nrRecords']))
+    $nrRecords = $_GET['nrRecords'];
+else
+    $nrRecords = -1;
+    
+if (isset($_GET['nrBlipps'])) 
+    $nrBlipps = $_GET['nrBlipps'];
+else
+    $nrBlipps = -1;
+ 
 
-$whatstat = "CSource, `Long`, `Lat`, COUNT(*)";
-$GroupBy = "GROUP BY `Long`, `Lat`";
+$order['SQL'] = "ORDER BY Lat";
+$whatstat = "CSource, CValue, `Long`, `Lat`, COUNT(*)";
+$GroupBy = "GROUP BY `Long`, `Lat`, CSource";
 
-$nr = $_GET['nrRecords'];
-$_GET['nrRecords'] = null;
-
-$svar = wholeSQL($con, $whatstat, $page, $MapPageSize, $GroupBy, $order, $nr);
+$svar = wholeSQL($con, $whatstat, $page, $MapPageSize, $GroupBy, $order, $nrBlipps);
 $result = $svar[0];
 
 //$nr = $svar['nr'];
 //echo "<br />Time before query: ". $timer->getTime();
 
-$nrBlipps = $svar[1]; 
+$nrBlipps = $svar[1];
+//echo "nrBlipps $nrBlipps<br>";
 
 $nrPages = ceil($nrBlipps/$MapPageSize);
+//echo "nrPages $nrPages <br>";
+
 $nrOfSpecimens = 0;
 $LatMin = +360;
 $LatMax = -360;
@@ -64,7 +70,7 @@ $NrRUBIN = 0;
 $NrLINREG =0;
 $NrLocality = 0;
 $NrLocalityVH = 0;
-$NrDistrict =0 ;
+$NrDistrict = 0;
 $NrLatLong = 0;
 $NrUPS = 0;
 $NrOHN =0;
@@ -81,13 +87,13 @@ $imges[5] = "icons/darkred-dot.png";
 $imges[6] = "icons/red-dot3.png";
 
 $blipps;
-if (isset($_GET['OrderBy'])) $OrderByAdr = "&OrderBy=$_GET[OrderBy]"; else  $OrderByAdr = "";
+
     $i=0;
     //while($row = $result->fetch())
     foreach($result as $row)
     {
         $Nr = $row['COUNT(*)'];
-        if (isset($row['CSource']) and $row['CSource'] != "None")
+        if (isset($row['CSource']) and $row['CSource'] != "None" and $row['Lat'] != '')
         {
             $blipps[$i]['Lat'] = $row['Lat'];
             $blipps[$i]['Long'] = $row['Long'];
@@ -106,69 +112,68 @@ if (isset($_GET['OrderBy'])) $OrderByAdr = "&OrderBy=$_GET[OrderBy]"; else  $Ord
             if ($LongMax < $row['Long']) $LongMax = $row['Long'];
             if ($Nr == 1) $pl = "Specimen";
                 else $pl = "Specimens";
-            $blipps[$i]['Link'] = "<a href=\"list.php?$adr&Long=$row[Long]&Lat=$row[Lat]\" target= \"_blank\"> $Nr $pl </a>";
-            $substr = substr($row['CSource'],0,8);
-            if ( $substr == "District") {
+            if ($row['CValue']!=null) {
+                $CValue = str_replace('\'','\\\'',$row['CValue']);
+            } else {
+                $CValue = '';
+            }
+            $blipps[$i]['Link'] = "<a href=\"list.php?$adr&Long=$row[Long]&Lat=$row[Lat]&nrRecords=$Nr\" target= \"_blank\">$Nr $pl</a> $row[CSource] = $CValue;";  // querry time out when adding &nrRecords=$Nr  - what the fudge???
+            
+            if (substr($row['CSource'],0,8) == "District") {
                 $row['CSource'] ="District";
             }
+            $nrOfSpecimens+=$Nr;
             switch($row['CSource'])
             {
                 case "District":
-                    $nrOfSpecimens+=$Nr;
                     $NrDistrict+=$Nr;
                     $i++;
                     break;
                 case "Locality":
-                    $nrOfSpecimens+=$Nr;
                     $NrLocality+=$Nr;
                     $i++;
                     break;
                  case "LocalityVH":
-                    $nrOfSpecimens+=$Nr;
                     $NrLocalityVH+=$Nr;
                     $i++;
                     break;
                 case "RUBIN":
-                    $nrOfSpecimens+=$Nr;
                     $NrRUBIN+=$Nr;
                     $i++;
                     break;
                 case "Latitude / Longitude":
-                    $nrOfSpecimens+=$Nr;
                     $NrLatLong+=$Nr;
                     $i++;
                     break;
                 case "RT90-coordinates":
-                    $nrOfSpecimens+=$Nr;
                     $NrRT90+=$Nr;
                     $i++;
                     break;
                 case "Sweref99TM-coordinates":
-                    $nrOfSpecimens+=$Nr;
                     $NrSweref+=$Nr;
                     $i++;
                     break;
                 case "UPS Database":
-                    $nrOfSpecimens+=$Nr;
                     $NrUPS+=$Nr;
                     $i++;
                     break;
                 case "OHN Database":
-                    $nrOfSpecimens+=$Nr;
                     $NrOHN+=$Nr;
                     $i++;
                     break;
                 case "LINREG":
-                    $nrOfSpecimens+=$Nr;
                     $NrLINREG+=$Nr;
                     $i++;
                     break;
              }
         } else {
-                    $nrOfSpecimens=$Nr;
                     $NrNone+=$Nr;
         }
     }
+    /*
+    if ($nrRecords == -1) {
+      $nrRecords = $nrOfSpecimens;
+    }*/
     $CenterLat = ($LatMin+$LatMax)/2;
     $CenterLong = ($LongMin+$LongMax)/2;
 
@@ -216,7 +221,7 @@ echo "
                         icon: '$blipp[color]'
                     });
                     
-                   google.maps.event.addListener(marker$i, 'click', function() {
+                    google.maps.event.addListener(marker$i, 'click', function() {
                         infowindow$i.open(map,marker$i);
                     });
                     ";
@@ -225,7 +230,6 @@ echo "
  echo "              
             }
 
-            
             google.maps.event.addDomListener(window, 'load', initialize);
         </script>
 </head>
@@ -241,7 +245,7 @@ echo "
     <div class = \"subMenu\">
         <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Map </h2>
         <h3> Specimens giving hits for : $Rubrik </h3>
-        $nrRecords records found of which ".($NrDistrict + $NrLocality + $NrLocalityVH + $NrRUBIN + $NrLatLong + $NrRT90 + $NrUPS + $NrOHN + $NrLINREG) ." are mapped on this page.";
+        $nrRecords records found of which ".($i) ." are mapped on this page.";
         
         //echo "nrBlipps: $nrBlipps MapPage: $MapPageSize <p>";
         if ($nrPages>1)
@@ -250,27 +254,17 @@ echo "
        echo"
         <div class = \"menu2\">
             <ul>
-                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord\">Map</a> </li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord\">Record</a> </li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord\">Export</a> </li>
+                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">List</a></li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Map</a> </li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Record</a> </li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Export</a> </li>
             </ul>
         </div>";
-
-        $hidden = "";
-        foreach ($_GET as $SearchItem => $SearchValue)
-        {
-            if($SearchValue != "*" and $SearchItem != "search" and $SearchItem != "Page" and $SearchItem != "Life" and $SearchItem != "World" and $SearchItem != "slemocota" and $SearchItem!= "andromeda" and $SearchItem!= "OrderBy" and $SearchItem!= "ARecord" and $SearchItem!='color' and $SearchItem!='color_subm')
-            {
-                $hidden .= "
-                <input type=\"hidden\" name=\"$SearchItem\" value=\"$SearchValue\" />";
-            }
-        }
         
         echo "
         <table class = \"outerBox\"> <tr> <td>";
             
-            pageNav($page, $nrBlipps, 'map.php?'.$adr.$OrderByAdr, $MapPageSize, $nrRecords);
+            pageNav($page, $nrBlipps, 'map.php?'.$adr.$OrderAdr, $MapPageSize, $nrRecords);
         echo "
             <div id=\"googleMap\" class = \"Box\"> Loading... </div>
             <noscript> <p> JavaScript must be enabled in order for you to use this Map. </p> </noscript>
@@ -283,20 +277,18 @@ echo "
             <p />
             <b> Sources for locations of map symbols </b> <br />
             Lack coordinates and are not mapped: <a href=\"list.php?$adr&amp;CSource=None\">$NrNone</a> <br />
-            RT90 2.5 gon V (only Sweden). Coordinate given with accuracy varying from 10 m to 1 km: <a href=\"list.php?$adr&amp;CSource=RT90-coordinates\">$NrRT90</a> records <br />
             Sweref99TM (only Sweden). Coordinate given with accuracy varying from 10 m to 1 km: <a href=\"list.php?$adr&amp;CSource=Sweref99TM-coordinates\">$NrSweref</a> records <br />
+            RT90 2.5 gon V (only Sweden). Coordinate given with accuracy varying from 10 m to 1 km: <a href=\"list.php?$adr&amp;CSource=RT90-coordinates\">$NrRT90</a> records <br />
             Latitude / Longitude. Accuracy varying: <a href=\"list.php?$adr&amp;CSource=Latitude+/+Longitude\">$NrLatLong</a> records <br />
-            RUBIN (only Sweden). Located at centre of RT90 grid square, size usually 5×5 km: <a href=\"list.php?$adr&amp;CSource=RUBIN\">$NrRUBIN</a> records <br />
             LINREG (only Sweden). Located at centre of RT90 grid square, size usually 100×100 m: <a href=\"list.php?$adr&amp;CSource=LINREG\">$NrLINREG</a> records <br />
-            Locality. Coordinate generated from Locality: <a href=\"list.php?$adr&amp;CSource=Locality\">$NrLocality</a> records <br />
+            RUBIN (only Sweden). Located at centre of RT90 grid square, size usually 5×5 km: <a href=\"list.php?$adr&amp;CSource=RUBIN\">$NrRUBIN</a> records <br />
             LocalityVH. Coordinate generated from Locality: <a href=\"list.php?$adr&amp;CSource=LocalityVH\">$NrLocalityVH</a> records <br />
+            Locality. Coordinate generated from Locality: <a href=\"list.php?$adr&amp;CSource=Locality\">$NrLocality</a> records <br />
             District. Located at the centroid: <a href=\"list.php?$adr&amp;CSource=District\">$NrDistrict</a> records <br />
             UPS Database. <a href=\"list.php?$adr&amp;CSource=UPS+Database\">$NrUPS</a> records <br />
             OHN Database. <a href=\"list.php?$adr&amp;CSource=OHN+Database\">$NrOHN</a> records <br />
             </td> </tr> </table>
-        
         </div>
-        
     </body>
 </html>";
 
