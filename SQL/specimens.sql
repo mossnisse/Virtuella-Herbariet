@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -96,13 +96,14 @@ CREATE TABLE IF NOT EXISTS `specimens` (
   KEY `TypeStatus` (`Type_status`),
   KEY `Image` (`image1`),
   KEY `year` (`Year`),
+  KEY `Lat` (`Lat`),
   FULLTEXT KEY `oName` (`Original_name`),
   FULLTEXT KEY `Basionym` (`Basionym`),
   FULLTEXT KEY `Collector` (`collector`),
   FULLTEXT KEY `oText` (`Original_text`,`Notes`,`Matrix`,`habitat`),
   FULLTEXT KEY `Habitat` (`habitat`),
   FULLTEXT KEY `Matrix` (`Matrix`)
-) ENGINE=InnoDB AUTO_INCREMENT=109914244 DEFAULT CHARSET=utf8mb3 COMMENT='The main table that holds most of the data provided by the Herbaria.';
+) ENGINE=InnoDB AUTO_INCREMENT=116222063 DEFAULT CHARSET=utf8mb3 COMMENT='The main table that holds most of the data provided by the Herbaria.';
 
 -- Data exporting was unselected.
 
