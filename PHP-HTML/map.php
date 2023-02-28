@@ -110,6 +110,9 @@ $blipps;
             if ($LatMax < $row['Lat']) $LatMax = $row['Lat'];
             if ($LongMin > $row['Long']) $LongMin = $row['Long'];
             if ($LongMax < $row['Long']) $LongMax = $row['Long'];
+            
+            
+            
             if ($Nr == 1) $pl = "Specimen";
                 else $pl = "Specimens";
             if ($row['CValue']!=null) {
@@ -170,12 +173,19 @@ $blipps;
                     $NrNone+=$Nr;
         }
     }
-    /*
-    if ($nrRecords == -1) {
-      $nrRecords = $nrOfSpecimens;
-    }*/
+ 
     $CenterLat = ($LatMin+$LatMax)/2;
     $CenterLong = ($LongMin+$LongMax)/2;
+    // max start zoom in on map
+    $maxZoom =0.04;
+    if ($LongMax-$LongMin<$maxZoom) {
+       $LongMax = $CenterLong + $maxZoom/2;
+       $LongMin = $CenterLong - $maxZoom/2;
+    }
+    if ($LatMax-$LatMin<$maxZoom) {
+       $LatMax = $CenterLat + $maxZoom/2;
+       $LatMin = $CenterLat - $maxZoom/2;
+    }
 
 echo "
 <html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">
