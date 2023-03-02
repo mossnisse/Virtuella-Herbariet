@@ -467,7 +467,7 @@ function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $orderBy, $nr_rec
  if (array_key_exists('SmartCollector', $_GET) and $_GET['SmartCollector'] != '*') {
   $WhereQueryparts[] = "MATCH (Collector) AGAINST (:SmartCollector IN BOOLEAN MODE)";
   $tables[] = 'specimens';
-  $h = explode(' ',$_GET['SmartCollector']);
+  $h = explode(' ',trim($_GET['SmartCollector']));
   $parameters['SmartCollector'] = '+'.implode(' +',$h);
  }
  
@@ -510,14 +510,14 @@ if (array_key_exists('Day', $_GET) and $_GET['Day'] != '*') {
 if (array_key_exists('Original_name', $_GET) and $_GET['Original_name'] != '*') {
   $tables[] = 'specimens';
   $WhereQueryparts[] = "MATCH (Original_name) AGAINST (:Original_name IN BOOLEAN MODE)";
-  $h = explode(' ',$_GET['Original_name']);
+  $h = explode(' ',trim($_GET['Original_name']));
   $parameters['Original_name'] = '+'.implode(' +',$h);
 }
 
 if (array_key_exists('Original_text', $_GET) and $_GET['Original_text'] != '*') {
   $tables[] = 'specimens';
   $WhereQueryparts[] = "MATCH (Original_text, Notes, Matrix, habitat) AGAINST (:Original_text IN BOOLEAN MODE)";
-  $h = explode(' ',$_GET['Original_text']);
+  $h = explode(' ',trim($_GET['Original_text']));
   $parameters['Original_text'] = '+'.implode(' +',$h);
 }
 
@@ -544,7 +544,7 @@ if (array_key_exists('Type_status', $_GET) and $_GET['Type_status'] != '*') {
 if (array_key_exists('Basionym', $_GET) and $_GET['Basionym'] != '*') {
   $tables[] = 'specimens';
   $WhereQueryparts[] = "MATCH (Basionym) AGAINST (:Basionym IN BOOLEAN MODE)";
-  $h = explode(' ',$_GET['Basionym']);
+  $h = explode(' ',trim($_GET['Basionym']));
   $parameters['Basionym'] = '+'.implode(' +',$h);
 }
 
