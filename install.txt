@@ -6,6 +6,8 @@ MySQL config my.ini  on windows in ProgramData\MySQL\MYSQL server
 	sql-mode="NO_ENGINE_SUBSTITUTION"  - if strict mode the updating will stop on instead of throw a warning so problematic
 	secure-file-priv = <upload folder>  - set the folder load data commands can use
 	ft_stopword_file = ""  - the stopwords is not relevant for how I use fulltext search
+	innodb_ft_min_token_size=1  - so you can search for 1 letter in fulltext search for stuff like collector and original text
+	ft_min_word_len=1           - so you can search for 1 letter in fulltext search for stuff like collector and original text
 create users for the web server (should only be reachable from localhost) and the coordinate tool with relevant 
  
 Apache config
