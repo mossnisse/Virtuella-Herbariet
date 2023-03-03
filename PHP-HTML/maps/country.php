@@ -34,7 +34,6 @@ include("../herbes.php");
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	
 	$query = "select Province from Provinces where country = :country";
 	$Stm = $con->prepare($query);
 	$Stm->bindValue(':country', $country, PDO::PARAM_STR);
@@ -63,7 +62,6 @@ echo "
 	Provinces
 	<table>";
 	while ($row2 = $Stm->fetch(PDO::FETCH_ASSOC)) {
-		
 		echo "<tr><td><a href=\"province.php?Country=$country&Province=$row2[Province]\">$row2[Province]</a></td></tr>";
 	}
 	
@@ -77,23 +75,8 @@ echo "
             bounds.extend(new google.maps.LatLng($row[minY], $row[minX]));
 			map = new google.maps.Map(document.getElementById('map'));
 			map.fitBounds(bounds);
+			map.data.loadGeoJson('gjcountry.php?country=$country');
 		}
-		var xmlhttp;
-		xmlhttp=new XMLHttpRequest();
-		xmlhttp.onreadystatechange=function() {
-			if(xmlhttp.readyState==4)
-			{
-				var jsontext = xmlhttp.responseText;
-				if (jsontext.charCodeAt(0) === 0xFEFF) {
-					jsontext = jsontext.substr(1);
-				}
-				//console.log(jsontext);
-				var obj = JSON.parse(jsontext);
-				map.data.addGeoJson(obj);
-			}
-		};
-		xmlhttp.open(\"GET\", 'gjcountry.php?country=$country' ,true);
-		xmlhttp.send(null);
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>

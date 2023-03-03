@@ -42,9 +42,7 @@
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	//$result = $con->query($query);
 	//echo $query;
-	//$row = $result->fetch();
 	
 	$query = "select locality, ID from locality where district = :district and province = :province and country = :country;";
 	$Stm2 = $con->prepare($query);
@@ -57,9 +55,7 @@
 echo "
 	<body id= \"district\">
 	<div class = \"subMenu\">
-	
 		<h1><a href=\"province.php?Province=$prov&Country=$count\">$prov</a>: <a href=\"\..\cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$dist&Sys=Life&Province=$prov+&Herb=All\">$dist</a></h1>
-		
 		<table>
 			<tr><td>Code</td><td>$row[code]</td></tr>
 			<tr><td>Type</td><td>$row[typeEng]/$row[typeNative]</td></tr>
@@ -71,7 +67,6 @@ echo "
 	<table>";
 
 	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
-		
 		echo "<tr><td><a href =\"..\\locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
 	}
 	
@@ -84,26 +79,9 @@ echo "
 			bounds.extend(new google.maps.LatLng($row[ymax], $row[xmax]));
             bounds.extend(new google.maps.LatLng($row[ymin], $row[xmin]));
 			map = new google.maps.Map(document.getElementById('map'));
-			
-			//map = new google.maps.Map(document.getElementById('map'), { center: {lat: -34.397, lng: 150.644}, zoom: 8});
 			map.fitBounds(bounds);
+			map.data.loadGeoJson('gjdistrict.php?District=$dist&Province=$prov');
 		}
-		var xmlhttp;
-		xmlhttp=new XMLHttpRequest();
-		xmlhttp.onreadystatechange=function() {
-			if(xmlhttp.readyState==4)
-			{
-				var jsontext = xmlhttp.responseText;
-				if (jsontext.charCodeAt(0) === 0xFEFF) {
-					jsontext = jsontext.substr(1);
-				}
-				//console.log(jsontext);
-				var obj = JSON.parse(jsontext);
-				map.data.addGeoJson(obj);
-			}
-		};
-		xmlhttp.open(\"GET\", 'gjdistrict.php?District=$dist&Province=$prov' ,true);
-		xmlhttp.send(null);
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>

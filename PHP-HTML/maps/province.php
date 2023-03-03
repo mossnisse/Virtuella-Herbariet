@@ -48,7 +48,6 @@
 echo "
 	<body id= \"province\">
 	<div class = \"subMenu\">
-	
 		<h1><a href=\"country.php?Country=$count\">$count</a>: <a href=\"\..\cross_browser.php?SpatLevel=3&SysLevel=0&Sys=Life&Spat=$prov&Herb=All\">$prov</a></h1>
 		<table>
 			<tr><td>code</td><td>$row[code]</td></tr>
@@ -73,23 +72,8 @@ echo "
             bounds.extend(new google.maps.LatLng($row[minY], $row[minX]));
 			map = new google.maps.Map(document.getElementById('map'));
 			map.fitBounds(bounds);
+			map.data.loadGeoJson('gjprovins.php?Country=$count&Province=$prov');
 		}
-		var xmlhttp;
-		xmlhttp=new XMLHttpRequest();
-		xmlhttp.onreadystatechange=function() {
-			if(xmlhttp.readyState==4)
-			{
-				var jsontext = xmlhttp.responseText;
-				if (jsontext.charCodeAt(0) === 0xFEFF) {
-					jsontext = jsontext.substr(1);
-				}
-				//console.log(jsontext);
-				var obj = JSON.parse(jsontext);
-				map.data.addGeoJson(obj);
-			}
-		};
-		xmlhttp.open(\"GET\", 'gjprovins.php?Country=$count&Province=$prov' ,true);
-		xmlhttp.send(null);
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
