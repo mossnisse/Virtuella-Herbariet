@@ -41,6 +41,10 @@
 							var map=new google.maps.Map(document.getElementById(\"googleMap\"),mapProp);";
 					echo "var marker";
 					$i=1;
+                    $LatMin = +360;
+                    $LatMax = -360;
+                    $LongMax = -360;
+                    $LongMin = +360;
 					while($row = $stmt->fetch())
 					{
                         echo "
@@ -49,8 +53,27 @@
 						marker$i.setMap(map);
 						google.maps.event.addListener(marker$i, 'click', function() { new google.maps.InfoWindow({ content:\"<a href=\\\"locality.php?ID=$row[id]\\\">$row[locality]</a>\"}).open(map,marker$i);});";
                         $i++;
+                        if ($LatMin > $row['lat']) $LatMin = $row['lat'];
+                        if ($LatMax < $row['lat']) $LatMax = $row['lat'];
+                        if ($LongMin > $row['long']) $LongMin = $row['long'];
+                        if ($LongMax < $row['long']) $LongMax = $row['long'];
+                       
 					}
-					echo "
+                    // max start zoom in on map
+                    $maxZoom =0.04;
+                    if ($LongMax-$LongMin<$maxZoom) {
+                        $LongMax = $CenterLong + $maxZoom/2;
+                        $LongMin = $CenterLong - $maxZoom/2;
+                    }
+                    if ($LatMax-$LatMin<$maxZoom) {
+                        $LatMax = $CenterLat + $maxZoom/2;
+                        $LatMin = $CenterLat - $maxZoom/2;
+                    }
+                    echo "
+                        var bounds = new google.maps.LatLngBounds ();
+                        bounds.extend(new google.maps.LatLng($LatMin, $LongMin));
+                        bounds.extend(new google.maps.LatLng($LatMax, $LongMax));
+                        map.fitBounds(bounds);
 						}
 					</script>
 
