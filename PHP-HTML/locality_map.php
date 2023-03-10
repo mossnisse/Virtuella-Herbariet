@@ -32,6 +32,7 @@
 					$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
 
 					echo"
+                    <a href= \"locality_list.php?locality=$_GET[locality]&country=$_GET[country]&province=$_GET[province]&district=$_GET[district]\"> List </a>
 					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 
 					<script>
@@ -39,40 +40,25 @@
 							var mapProp= { center:new google.maps.LatLng(51.508742,-0.120850), zoom:5, };
 							var map=new google.maps.Map(document.getElementById(\"googleMap\"),mapProp);";
 					echo "var marker";
-					/*
+					$i=1;
 					while($row = $stmt->fetch())
 					{
-						if ($row['long'] !="" && $row['lat'] !="" )
-						echo "
-						new google.maps.Marker({position: new google.maps.LatLng($row[lat],$row[long])}).setMap(map);";
-						
-					}*/
-					while($row = $stmt->fetch())
-					{
-						/*echo "
-						var mapLabel = new MapLabel({
-							text: 'Test',
-							position: new google.maps.LatLng(34.515233, -100.918565),
-							map: map,
-							fontSize: 35,
-							 align: 'right'
-						});";*/
-						
-					echo "
-						marker = new google.maps.Marker({position: new google.maps.LatLng($row[lat],$row[long])});
+                        echo "
+						marker$i = new google.maps.Marker({position: new google.maps.LatLng($row[lat],$row[long])});
 
-						marker.setMap(map);
-						google.maps.event.addListener(marker, 'click', function() { new google.maps.InfoWindow({ content:\"$row[locality]\"}).open(map,marker);});";
+						marker$i.setMap(map);
+						google.maps.event.addListener(marker$i, 'click', function() { new google.maps.InfoWindow({ content:\"<a href=\\\"locality.php?ID=$row[id]\\\">$row[locality]</a>\"}).open(map,marker$i);});";
+                        $i++;
 					}
 					echo "
 						}
 					</script>
 
 						<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=myMap\"></script>";
-					}
-						catch(PDOException $e) {
-						echo "Error: " . $e->getMessage();
-					}
+				}
+					catch(PDOException $e) {
+					echo "Error: " . $e->getMessage();
+				}
 			
 			?>
 		</table>
