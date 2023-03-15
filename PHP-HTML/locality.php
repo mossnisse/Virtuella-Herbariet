@@ -1,14 +1,28 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sweden's Virtual Herbarium: Locality info</title>
     <link rel="stylesheet" href="herbes.css" type="text/css" />
-    <title> Sweden's Virtual Herbarium: Locality list </title>
     <meta name="author" content="Nils Ericson" />
     <meta name="robots" content="noindex" />
+    <meta name="keywords" content="Virtuella herbariet" />
+    <link rel="shortcut icon" href="favicon.ico" />
 </head>
-<body>
-	<h2> <span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality info</h2>
+<body id = "locality_map">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="index.html">Start page</a></li>
+            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality info</h2>
 	<table class = "outerBox"> <tr> <td>
 		<table class="SBox">
-			<?php
+<?php
 			try {
 				include("herbes.php");
 				$con = $con = getConS();
@@ -31,29 +45,35 @@
 				$stmt->execute();
 				$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
 				$row = $stmt->fetch();
-				$create_date = substr ($row['created'],0,10 );
+                if ($row['created'] == null) $create_date = '';
+                else $create_date = substr ($row['created'],0,10 );
                 if (isset($row['modified'])) {
                     $mod_date = substr ($row['modified'],0,10 );
                 } else {
                     $mod_date = '';
                 }
 				
-				echo "<tr><td>Locality: </td><td> $row[locality]</td></tr>";
-				echo "<tr><td>Alternative names: </td> <td> $row[alternative_names]</td></tr>";
-				echo "<tr><td>Country: </td><td> <a href=\"/maps/country.php?Country=$row[country]\"> $row[country] </a></td></tr>";
-				echo "<tr><td>Province: </td><td> <a href=\"/maps/province.php?Province=$row[province]&Country=$row[country]\"> $row[province] </a></td></tr>";
-				echo "<tr><td>District: </td><td> <a href=\"/maps/district.php?District=$row[district]&Province=$row[province]&Country=$row[country]\">$row[district]</a>    </td></tr>";
-				echo "<tr><td>WGS84: </td><td>$row[lat], $row[long]</td></tr>";
-				echo "<tr><td>RT90: </td><td>$row[RT90N], $row[RT90E]</td></tr>";
-				echo "<tr><td>Sweref99TM: </td><td>$row[SWTMN], $row[SWTME]</td></tr>";
-				echo "<tr><td>Source: </td> <td> $row[coordinate_source] </td></tr>";
-				echo "<tr><td>Comments: </td><td>$row[lcomments]</td></tr>";
-				echo "<tr><td>Size/Precision: </td><td>$row[Coordinateprecision] m</td></tr>";
-				echo "<tr><td>Created: </td><td>$create_date $row[createdby]</td></tr>";
-				echo "<tr><td>Modified: </td><td>$mod_date $row[modifiedby]</td></tr>";
-				echo "<tr><td><a href=\"list.php?Country=$row[country]&Province=$row[province]&District=$row[district]&Locality=$row[locality]\">Specimens</a> </td><td> OBS more specimens can come from the same place that is not registered with the locality name</td></tr>" ;
-				echo "</table>";
-				echo"
+                $urlCountry = urlencode($row['country']);
+                $urlProvince = urlencode($row['province']);
+                $urlDistrict = urlencode($row['district']);
+                $urlLocality = urlencode($row['locality']);
+                
+				echo "
+                <tr><td>Locality:</td><td>$row[locality]</td></tr>
+                <tr><td>Alternative names:</td> <td>$row[alternative_names]</td></tr>
+				<tr><td>Country:</td><td><a href=\"maps/country.php?Country=$urlCountry\">$row[country]</a></td></tr>
+				<tr><td>Province:</td><td><a href=\"maps/province.php?Province=$urlProvince&Country=$urlCountry\">$row[province]</a></td></tr>
+				<tr><td>District:</td><td><a href=\"maps/district.php?District=$urlDistrict&Province=$urlProvince&Country=$urlCountry\">$row[district]</a></td></tr>
+				<tr><td>WGS84:</td><td>$row[lat], $row[long]</td></tr>
+				<tr><td>RT90:</td><td>$row[RT90N], $row[RT90E]</td></tr>
+				<tr><td>Sweref99TM:</td><td>$row[SWTMN], $row[SWTME]</td></tr>
+				<tr><td>Source:</td><td>$row[coordinate_source]</td></tr>
+				<tr><td>Comments:</td><td>$row[lcomments]</td></tr>
+				<tr><td>Size/Precision:</td><td>$row[Coordinateprecision] m.</td></tr>
+				<tr><td>Created:</td><td>$create_date $row[createdby]</td></tr>
+				<tr><td>Modified:</td><td>$mod_date $row[modifiedby]</td></tr>
+				<tr><td><a href=\"list.php?Country=$urlCountry&Province=$urlProvince&District=$urlDistrict&Locality=$urlLocality\">Specimens</a></td><td>OBS more specimens can come from the same place that is not registered with the locality name</td></tr>
+				</table>
 					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 					<script>
 						function myMap() {
@@ -81,8 +101,8 @@
 			catch(PDOException $e) {
 				echo "Error: " . $e->getMessage();
 			}
-			?>
-	
+?>	
     </table>
+    </div>
 </body>
 </html>
