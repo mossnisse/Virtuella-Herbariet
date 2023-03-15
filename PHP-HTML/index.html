@@ -1,27 +1,28 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" href="herbes.css" type="text/css" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Sweden's Virtual Herbarium</title>
+        <link rel="stylesheet" type="text/css" href="herbes.css"/>
 		<script src="stats.js" type="text/javascript"> </script>
         <meta name="author" content="Nils Ericson" />
-	<meta name="keywords" content="Virtuella herbariet">
-        <title> Sweden's Virtual Herbarium </title>
+        <meta name="keywords" content="Virtuella herbariet" />
         <link rel="shortcut icon" href="favicon.ico" />
     </head>
     <body id = "start_page" onload="fillStats();">
         <div class = "menu1">
-                <ul>
-                    <li class = "start_page"> <a href="index.html"> Start page </a></li>
-                    <li class = "standard_search"> <a href="standard_search.html">Standard search</a> </li>
-                    <li class ="cross_browser"> <a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a> </li>
-                </ul>
-            </div>
+            <ul>
+                <li class = "start_page"><a href="index.html">Start page</a></li>
+                <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+                <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+                <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+            </ul>
+        </div>
         <div class = "subMenu">
-            <h2> <span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium </h2>
+            <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium</h2>
             <table class = "outerBox"> <tr> <td>
                 <div class = "Box">
-                    <b> This is a joint search page for Sweden's six largest herbaria. <span id="tot">??</span> million specimens and <span id="images">100,000</span> images can be searched from</b><p />
+                    <b> This is a joint search page for Sweden's six largest herbaria. <span id="tot">??</span> million specimens and <span id="images">100,000</span> images can be searched from</b><p>
                     <table>
                     <tr> <td>Göteborg <a href = "http://bioenv.gu.se/forskning/forskningsresurser/herbarium">GB</a> - Herbarium GB</td><td>(<span id="GB">??</span>% of the collection)</td> </tr>
                     <tr> <td>Lund <a href = "http://www.biomus.lu.se/en/botanical-collections">LD</a> - Botaniska museet</td><td>(<span id="LD">??</span>% of the collection)</td> </tr>
@@ -32,7 +33,7 @@
                     </table>
                     
                     <h3> Search alternatives </h3>
-                    <a href = "standard_search.html">Standard search</a> – Easy-to-use search form using preset alternatives for taxonomy and geography. <br />
+                    <a href = "standard_search.html">Search specimens</a> – Easy-to-use search form using preset alternatives for taxonomy and geography. <br />
                     <a href = "cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a> – Enables listing of specimens filed under any combination of taxonomy and geography. <br />
 					<a href = "locality_search.php">The locality database</a> - Enable searching and downloading of the locality database used for maping specimens to coordinates. <br />
 					<a href = "coord/check_coord.html">Check Coordinate</a> Converting coordinate and look up Provinces/District. <br />
@@ -48,18 +49,18 @@
                         var a = "@";
                         var c = "hotmail.com";
                         var b = "mossnisse";
-                        document.write(" " + b+a+c);
+                        document.write(" "+b+a+c);
                         //]]>
-                    </script>, and include a copy the URL of the page in concern into your message. <p />
+                    </script>, and include a copy the URL of the page in concern into your message. <p>
                     <b> The taxonomic classification </b> <br />
                     Bryophytes (families and higher) follows Bryophyte biology 2nd edition by Goffinet, B and Shaw, J.A. (2008). <br />
                     Ascomycetes uses Outline of Ascomycota – 2007 by Lumbsch et al. (2007). Myconet 13. <br />
                     Lycophytes and ferns (families and orders) follows A linear sequence of extant families and genera of lycophytes and ferns by Christenhusz, M.J.M., Zhang, X-C. & Scheider, H. 2011. Phytotaxa 19:7-54. <br />
                     Angiosperms (orders) follows An update of the Angiosperm Phylogeny Group classification for the orders and families of flowering plants: APG III by THE ANGIOSPERM PHYLOGENY GROUP. (2009). Botanical Journal of the Linnean Society, 161: 105–121. <br />
                     Gymnosperms (families and orders) follows A new classification and linear sequence of extant gymnosperms by Christenhusz, M.J.M., Reveal, J. L., Farjon, A., Gardner, M.F., Mill, R.R. & Chase, M.W. (2011). Phytotaxa 19: 55–70 <br />
-					Smut Fungi folows Smut Fungi of the World by Vánky. K. (2012) <p />
+					Smut Fungi folows Smut Fungi of the World by Vánky. K. (2012) <p>
                     <a href="herbaria.html">List of Nordic herbaria</a>  <br />
-                    <a href="databases.html">Some databases relevant for botanists and Herbaria</a><p />
+                    <a href="databases.html">Some databases relevant for botanists and Herbaria</a><p>
                     webmaster: Nils Ericson 
                     <script type="text/javascript">
                         //<![CDATA[
@@ -70,7 +71,8 @@
                         //]]>
                     </script>
                 </div>
-            </td> </tr> </table>
-
+                </td> </tr>
+            </table>
+        </div>
     </body>
 </html>

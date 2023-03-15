@@ -1,5 +1,25 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+   <title>Sweden's Virtual Herbarium: Specimen record</title>
+   <link rel="stylesheet" type="text/css" href="herbes.css"/>
+   <meta name="author" content="Nils Ericson" />
+   <meta name="keywords" content="Virtuella herbariet" />
+   <meta name="robots" content="noindex" />
+   <link rel="shortcut icon" href="favicon.ico" />
+</head>      
+<body id = "record">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="index.html">Start page</a></li>
+            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+        <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Specimen records</h2>
 <?php
 // Code Written By Nils Ericson 2009-11-21
 // code for Specimen page the first SQL query gets the AccessionNo for the specimen reccord and the other gets the actual datata
@@ -177,15 +197,173 @@ if ($row['Efternamn'] == "") {
 }
 $Rubrik = getRubr($con);
 //pageANav($page, $nr, "record.php?".$a2dr.$OrderAdr, 1);
+    
+    echo "
+        <h3> Specimens giving hits for: $Rubrik </h3>
+        $nr records found.
+        
+    <div class = \"menu2\">
+            <ul>
+                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">List</a></li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Export</a></li>
+            </ul>
+        </div>        
+        <table class = \"outerBox\">
+            <tr> <td>";
+            if (isset($page)) {
+                //echo "page: $page <a href=\"collect.php\"> next </a> <br />";
+                pageNav($page, $nr, "record.php?".$adr.$OrderAdr, 1, $nr);
+                echo "<br />";
+            }
+   /* if ($row['Group'] == 'Bryophytes / Mossor' and substr($AccessionNo, 0, 3) != 'UME' and $instCode=='UME') {
+        echo "
+            This specimen record is incomplete or inadequate. It has been extracted from a former locality database in which the text had been abbreviated and altered. The adjusting of entries like this is in progress, but for the time being the label of the specimen must be checked in the herbarium before the information can be cited.";
+    }*/
+
+
+    if ($instCode=="S") {
+            $link = "<a href=\"http://herbarium.nrm.se/specimens/$AccessionNo\">$AccessionNo</a>";
+    } else {
+        $link = $AccessionNo;
+    }
 
 echo "
-    <head>
-        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-        <title> Sweden's Virtual Herbarium: $AccessionNo </title>
-        <link rel=\"stylesheet\" href=\"$CSSFile\" type=\"text/css\" />
-        <meta name=\"author\" content=\"Nils Ericson\" />
-        <meta name=\"robots\" content=\"noindex\" />
+    <table id=\"left\"><tr><td>
+    <table class =\"SBox\">
+        <tr><th colspan=\"2\">$currName</th></tr>
+        <tr><td>Herbarium: $row[InstitutionCode]</td> <td>Catalogue number: $link</td></tr>
+        ";
+        
+        if ($row['Group']=='Bryophytes / Mossor')
+                echo "<tr><td colspan=\"2\">$row[Subgroup]</td></tr>";
+            else
+                echo
+                "<tr><td colspan=\"2\">$row[Group]</td></tr>";
+        
+if ($mixedNames != "")
+    echo  "
+        <tr><td>Also present in sample:</td> <td>$mixedNames (see comments)</td></tr>";
 
+echo "
+    </table>
+    
+        <table class =\"SBox\">
+            <tr><th colspan=\"2\"></th></tr>
+            <tr><td>Name on label:</td> <td>$original_name</td></tr>";
+            if($row['InstitutionCode'] == "UPS") {
+                echo "<tr> <td>Locality:</td> <td>$original_text</td> </tr>";
+            } else {
+                echo "<tr> <td>Text on label:</td> <td>$original_text</td> </tr>";
+            }
+            
+            if ($row['habitat'] != "")
+                echo "
+        <tr> <td>Habitat:</td> <td>$row[habitat]</td> </tr>";
+            if ($row['Matrix'] != "")
+                echo "
+        <tr> <td>Matrix:</td> <td>$row[Matrix]</td> </tr>";
+            if ($row['Altitude_meter'] != '')
+                echo "
+                <tr> <td>Altitude:</td> <td>$row[Altitude_meter] meter</td> </tr>";
+        if ($row['Month']<10 and $row['Month']>0)
+            $m = "0$row[Month]";
+        else
+            $m = "$row[Month]";
+        if ($row['Day']<10 and $row['Day']>0)
+            $d = "0$row[Day]";
+        else
+            $d = "$row[Day]";
+        
+echo"
+            <tr> <td>Collection date:</td> <td>$row[Year]-$m-$d</td> </tr>";
+            //if ($row['InstitutionCode'] != 'GB') {
+                echo "<tr> <td>Collector on label:</td> <td> $sign";
+                
+                /*if ($user_id !=-1) {
+                    echo " <a href=\"edit/edit_signatur.php?signatureID=$ID\">add Standardized collector</a>";
+                }*/
+                
+                echo "</td> </tr>";
+                
+            if ($row['collectornumber'] != '')
+                echo
+                "<tr> <td>Collector's number:</td> <td>$row[collectornumber]</td> </tr>";
+            //}
+            
+            if ($row['Efternamn'] != "")
+            echo
+                "<tr> <td>Standardized collector: </td> <td>$samlare</td></tr>";
+if ($exsiccata != "")
+    echo "
+            <tr> <td>Exsiccate:</td> <td>$exsiccata Nr. $row[Exs_no]</td></tr>";
+if ($notes != "")
+    echo "
+            <tr> <td>Notes:</td> <td>$notes</td></tr>";
+            
+/*if ($revisions != "")
+    echo "
+            <tr> <td> Revisions: </td> <td> $revisions </td> </tr>";*/
+if ($row['Matrix']!= "")
+    echo "
+            <tr> <td>Matrix:</td> <td>$row[Matrix]</td> </tr>";
+
+echo "
+        </table>";
+
+if ($type_status!="") {
+    echo "
+        <table class =\"SBox\">
+            <tr> <th>Type status</th> </tr>
+            <tr> <td>$type_status of $basionym $tauctor</td> </tr>
+        </table>";
+}
+ 
+  
+if ($instCode=="S") {
+    $revQuery = "SELECT revisions.revNo, revisions.species, revisions.determinator, revisions.revYear FROM revisions WHERE InstitutionCode = \"S\" and AccessionNo = \"$AccessionNo\"";
+    //echo "query: $revQuery<p>";
+    $revResult = $con->query($revQuery);
+    echo "<table class =\"SBox\">
+            <tr> <th>Revisions</th> </tr>";
+            
+    while ($revRow = $revResult->fetch())
+   // while($revRow = mysql_fetch_array($revResult))
+    {
+        echo "<tr> <td>$revRow[revNo]. $revRow[species].</td> <td>$revRow[determinator]. $revRow[revYear]</td></tr>";
+    }
+    echo "</table>";
+}
+        
+if ($comments!="")
+    echo "
+        <table class =\"SBox\">
+            <tr> <th>Comments</th> </tr>
+            <tr> <td colspan=\"2\">$comments</td> </tr>
+        </table>";
+
+$CText = $row['CSource'];
+$CValue = $row['CValue'];
+if ($row['CSource'] != "None") {
+    if ($row['CSource']=="RUBIN") {
+        if ($row['CPrec']==5000)
+            $CText="centre of 5x5 km grid square in which the specimen was collected. The square is marked on the map.";
+        if ($row['CPrec']==1000)
+            $CText="centre of 1x1 km grid square in which the specimen was collected. The square is marked on the map.";
+        if ($row['CPrec']==100)
+            $CText="centre of 100x100 m grid square in which the specimen was collected. The square is marked on the map.";
+            
+    }
+    elseif($row['CSource']=="Latitude / Longitude") $CText="coordinate given as Latitude/longitude";
+    elseif($row['CSource']=="RT90-coordinates") $CText="coordinate given in RT90 2.5 gon V";
+    elseif($row['CSource']=="Locality") {
+        $CText="Locality";
+        $CValue = "<a href=\"/locality.php?Country=$row[Country]&Province=$row[Province]&District=$row[District]&Locality=$row[Locality]\">$CValue</a>";
+    }
+    elseif($row['CSource']=="District") $CText="District (Centroid coordinate)";
+    
+    echo "
         <script src=\"http://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&sensor=false\"></script>
         
         <script>
@@ -245,232 +423,20 @@ echo "
                 }
             }
             echo "
-            
         }
         google.maps.event.addDomListener(window, 'load', initialize);
-        </script>
-    </head>";
-    if ($row['CSource'] != "None") {
-        echo "
-        <body id = \"record\">";
-    } else echo "<body id = \"record\">";
-    
-    
-    //if ($user_id != -1) echo "inloggad";
-
-    
-    echo "
-         <div class = \"menu1\">
-        <ul>
-            <li class = \"start_page\"><a href=\"index.html\"> Start page </a></li>
-            <li class = \"standard_search\"><a href=\"standard_search.html\">Standard search</a> </li>
-            <li class = \"cross_browser\"><a href =\"cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All\">Cross browser</a> </li>
-        </ul>
-    </div>
-    <div class = \"subMenu\">
-        <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Specimen records </h2>
-        <h3> Specimens giving hits for: $Rubrik </h3>
-        $nr records found.
-        
-    <div class = \"menu2\">
-            <ul>
-                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Map</a> </li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Record</a> </li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Export</a> </li>
-            </ul>
-        </div>        
-        <table class = \"outerBox\">
-            <tr> <td>";
-            if (isset($page)) {
-                //echo "page: $page <a href=\"collect.php\"> next </a> <br />";
-                pageNav($page, $nr, "record.php?".$adr.$OrderAdr, 1, $nr);
-                echo "<br />";
-            }
-   /* if ($row['Group'] == 'Bryophytes / Mossor' and substr($AccessionNo, 0, 3) != 'UME' and $instCode=='UME') {
-        echo "
-            This specimen record is incomplete or inadequate. It has been extracted from a former locality database in which the text had been abbreviated and altered. The adjusting of entries like this is in progress, but for the time being the label of the specimen must be checked in the herbarium before the information can be cited.";
-    }*/
-
-
-    if ($instCode=="S") {
-            $link = "<a href=\"http://herbarium.nrm.se/specimens/$AccessionNo\">$AccessionNo</a>";
-    } else {
-        $link = $AccessionNo;
-    }
-
-echo "
-    <table id=\"left\"> <tr> <td>
-    <table class =\"SBox\">
-        <tr> <th colspan=\"2\"> $currName </th> </tr>
-        
-        <tr> <td> Herbarium: $row[InstitutionCode] </td> <td> Catalogue number: $link </td> </tr>
-        ";
-        
-        if ($row['Group']=='Bryophytes / Mossor')
-                echo "<tr> <td colspan=\"2\"> $row[Subgroup] </td> </tr>";
-            else
-                echo
-                "<tr> <td colspan=\"2\"> $row[Group] </td> </tr>";
-        
-if ($mixedNames != "")
-    echo  "
-        <tr> <td> Also present in sample: </td> <td> $mixedNames (see comments) </td> </tr>";
-
-
-echo "
-    </table>
-    
-        <table class =\"SBox\">
-            <tr> <th colspan=\"2\">  </th> </tr>
-            <tr> <td> Name on label:  </td> <td> $original_name </td> </tr>";
-            if($row['InstitutionCode'] == "UPS") {
-                echo "<tr> <td> Locality: </td> <td> $original_text </td> </tr>";
-            } else {
-                echo "<tr> <td> Text on label: </td> <td> $original_text </td> </tr>";
-            }
-            
-            
-            if ($row['habitat'] != "")
-                echo "
-        <tr> <td> Habitat: </td> <td>$row[habitat]</td> </tr>";
-            if ($row['Matrix'] != "")
-                echo "
-        <tr> <td> Matrix: </td> <td>$row[Matrix]</td> </tr>";
-            if ($row['Altitude_meter'] != '')
-                echo "
-                <tr> <td> Altitude: </td> <td>$row[Altitude_meter] meter</td> </tr>";
-        if ($row['Month']<10 and $row['Month']>0)
-            $m = "0$row[Month]";
-        else
-            $m = "$row[Month]";
-        if ($row['Day']<10 and $row['Day']>0)
-            $d = "0$row[Day]";
-        else
-            $d = "$row[Day]";
-        
-echo"
-            <tr> <td> Collection date: </td> <td> $row[Year]-$m-$d </td> </tr>";
-            //if ($row['InstitutionCode'] != 'GB') {
-                echo "<tr> <td> Collector on label: </td> <td> $sign";
-                
-                /*if ($user_id !=-1) {
-                    echo " <a href=\"edit/edit_signatur.php?signatureID=$ID\">add Standardized collector</a>";
-                }*/
-                
-                echo "</td> </tr>";
-                
-            if ($row['collectornumber'] != '')
-                echo
-                "<tr> <td> Collector's number:</td> <td> $row[collectornumber] </td> </tr>";
-            //}
-            
-            if ($row['Efternamn'] != "")
-            echo
-                "<tr> <td> Standardized collector:  </td> <td>  $samlare </td> </tr>";
-if ($exsiccata != "")
-    echo "
-            <tr> <td> Exsiccate: </td> <td> $exsiccata Nr. $row[Exs_no] </td> </tr>";
-if ($notes != "")
-    echo "
-            <tr> <td> Notes: </td> <td> $notes </td> </tr>";
-            
-/*if ($revisions != "")
-    echo "
-            <tr> <td> Revisions: </td> <td> $revisions </td> </tr>";*/
-if ($row['Matrix']!= "")
-    echo "
-            <tr> <td> Matrix: </td> <td> $row[Matrix] </td> </tr>";
-
-echo "
-        </table>";
-
-if ($type_status!="") {
-    echo "
-        <table class =\"SBox\">
-            <tr> <th> Type status </th> </tr>
-            <tr> <td> $type_status of $basionym $tauctor </td> </tr>
-        </table>";
-}
- 
-  
-if ($instCode=="S") {
-    $revQuery = "SELECT revisions.revNo, revisions.species, revisions.determinator, revisions.revYear FROM revisions WHERE InstitutionCode = \"S\" and AccessionNo = \"$AccessionNo\"";
-    //echo "query: $revQuery<p>";
-    $revResult = $con->query($revQuery);
-    echo "<table class =\"SBox\">
-            <tr> <th> Revisions </th> </tr>";
-            
-    while ($revRow = $revResult->fetch())
-   // while($revRow = mysql_fetch_array($revResult))
-    {
-        echo "<tr> <td> $revRow[revNo]. $revRow[species]. </td> <td> $revRow[determinator]. $revRow[revYear]</td></tr>";
-    }
-    echo "</table>";
-}
-   
-  /* 
-if($row['revNo']!=null) {
-    echo "
-        <table class =\"SBox\">
-            <tr> <th> Revisions </th> </tr>
-            <tr>
-                <td> $row[revNo]. $row[species]. </td>
-                <td> $row[determinator]. $row[revYear]</td>
-            </tr>
-        </table>";
-}*/
-  
-// -------------------revisions--------------------------------
-/*$revisions ="";
-$revQuery = "select * from revisions where specimenID =$row[ID]";
-$revResult = mysql_query($revQuery, $con);
-if (!$revResult) {
-        echo mysql_error();
-}
-while($revRow = mysql_fetch_array($revResult))
-{
-    $revisions .= $revRow['revNo']. '. '.$revRow['originalText'].'<br />';
-}*/
-        
-if ($comments!="")
-    echo "
-        <table class =\"SBox\">
-            <tr> <th> Comments </th> </tr>
-            <tr> <td colspan=\"2\">  $comments </td> </tr>
-        </table>";
-
-$CText = $row['CSource'];
-$CValue = $row['CValue'];
-if ($row['CSource'] != "None") {
-    if ($row['CSource']=="RUBIN") {
-        if ($row['CPrec']==5000)
-            $CText="centre of 5x5 km grid square in which the specimen was collected. The square is marked on the map.";
-        if ($row['CPrec']==1000)
-            $CText="centre of 1x1 km grid square in which the specimen was collected. The square is marked on the map.";
-        if ($row['CPrec']==100)
-            $CText="centre of 100x100 m grid square in which the specimen was collected. The square is marked on the map.";
-            
-    }
-    elseif($row['CSource']=="Latitude / Longitude") $CText="coordinate given as Latitude/longitude";
-    elseif($row['CSource']=="RT90-coordinates") $CText="coordinate given in RT90 2.5 gon V";
-    elseif($row['CSource']=="Locality") {
-        $CText="Locality";
-        $CValue = "<a href=\"/locality.php?Country=$row[Country]&Province=$row[Province]&District=$row[District]&Locality=$row[Locality]\">$CValue</a>";
-    }
-    elseif($row['CSource']=="District") $CText="District (Centroid coordinate)";
+        </script>";
     
     echo "
         <table class =\"SBox\">
             <tr> <td>
-                <div id=\"smap\" > Loading... </div>
-                <noscript> <b> JavaScript must be enabled in order for you to use this Map. </b> </noscript>
+                <div id=\"smap\" >Loading...</div>
+                <noscript><b>JavaScript must be enabled in order for you to use this Map.</b></noscript>
             </td> </tr>
-            <tr> <td> Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m </td> </tr>
+            <tr> <td>Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m</td> </tr>
         </table>";
 }
        
-        
 echo "
     </td> </tr> </table>
     <table id=\"right\"> <tr> <td>
@@ -479,47 +445,46 @@ echo "
             ";       
             
             echo "
-            <tr> <th colspan=\"2\"> Classification </th> </tr>
-            <tr> <td> Kingdom: </td> <td> <a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=1&amp;Sys=$row[Kingdom]&amp;Spat=world&amp;Herb=All\"> $row[Kingdom] </a> </td> </tr>
-            <tr> <td> Phylum (Division): </td> <td> <a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=2&amp;Sys=$row[Phylum]&amp;Spat=world&amp;Herb=All\"> $row[Phylum] </a>  </td> </tr>
-            <tr> <td> Family: </td> <td> <a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=5&amp;Sys=$row[Family]&amp;Spat=world&amp;Herb=All\"> $row[Family] </a> </td> </tr>
-            <tr> <td> Genus: </td> <td> <a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=6&amp;Sys=$row[Genus]&amp;Spat=world&amp;Herb=All\"> $row[Genus] </a> </td> </tr>
-            <tr> <td> Species: </td> <td> <a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=7&amp;Sys=$row[Species]&amp;Genus=$row[Genus]&amp;Spat=world&amp;Herb=All\"> $row[Species] </a> </td> </tr> ";
-            if ($row['SspVarForm'] != "") echo "<tr> <td> Intraspecific taxon: </td> <td> $row[SspVarForm] </td>  </tr>";
-            if ($row['HybridName'] != "") echo "<tr> <td> Hybrid name: </td> <td> $row[HybridName]  </td> </tr>";
+            <tr> <th colspan=\"2\">Classification</th> </tr>
+            <tr> <td>Kingdom:</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=1&amp;Sys=$row[Kingdom]&amp;Spat=world&amp;Herb=All\">$row[Kingdom]</a></td> </tr>
+            <tr> <td>Phylum (Division):</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=2&amp;Sys=$row[Phylum]&amp;Spat=world&amp;Herb=All\">$row[Phylum]</a></td> </tr>
+            <tr> <td>Family:</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=5&amp;Sys=$row[Family]&amp;Spat=world&amp;Herb=All\">$row[Family]</a></td> </tr>
+            <tr> <td>Genus:</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=6&amp;Sys=$row[Genus]&amp;Spat=world&amp;Herb=All\">$row[Genus]</a></td> </tr>
+            <tr> <td>Species:</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=7&amp;Sys=$row[Species]&amp;Genus=$row[Genus]&amp;Spat=world&amp;Herb=All\">$row[Species]</a></td> </tr> ";
+            if ($row['SspVarForm'] != "") echo "<tr> <td>Intraspecific taxon:</td> <td>$row[SspVarForm]</td> </tr>";
+            if ($row['HybridName'] != "") echo "<tr> <td>Hybrid name:</td> <td>$row[HybridName]</td> </tr>";
     if ($row['Svenskt_namn'] != "")
     echo "
-        <tr> <td> Swedish name: </td> <td> $row[Svenskt_namn]  </td> </tr>";
+        <tr> <td>Swedish name:</td> <td>$row[Svenskt_namn]</td> </tr>";
         
 if ($row['Taxonid'] != "")
     echo "
-        <tr> <td> Dyntaxa nr: <a href=\"https://www.dyntaxa.se/Taxon/Info/$row[Taxonid]\" target=\"_blank\"> $row[Taxonid] </a>  </td> </tr>";
+        <tr> <td>Dyntaxa nr: <a href=\"https://www.dyntaxa.se/Taxon/Info/$row[Taxonid]\" target=\"_blank\">$row[Taxonid]</a></td> </tr>";
 
 if ($row['Syns'] != "")
     echo "
-        <tr> <td> Synonyms: </td> <td> $row[Syns]  </td> </tr>";
+        <tr> <td>Synonyms:</td> <td>$row[Syns]</td> </tr>";
 echo "
         </table>
-    
         <table class =\"SBox\">
-            <tr> <th colspan=\"2\"> Geospatial information </th> </tr>
-            <tr> <td> Continent: </td> <td> <a href=\"cross_browser.php?SpatLevel=1&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" . urlencode($row['Continent']) . "&amp;Herb=All\"> $row[Continent] </a> </td> </tr>
-            <tr> <td> Country: </td> <td> <a href=\"maps/country.php?Country=" . urlencode($row['Country']) . "\"> $row[Country] </a> </td> </tr>
-            <tr> <td> $provinceName: </td> <td> <a href=\"maps/province.php?Province=" . urlencode($province) . "&amp;Country=". urlencode($row['Country']) ."\"> $province </a> </td> </tr>
-            <tr> <td> $districtName: </td> <td> <a href=\"maps/district.php?District=" .urlencode($district) . "&amp;Province=" . urlencode($province) ." &amp;Country=". urlencode($row['Country']) ."\"> $district </a> </td> </tr>";
+            <tr> <th colspan=\"2\">Geospatial information</th> </tr>
+            <tr> <td>Continent:</td> <td> <a href=\"cross_browser.php?SpatLevel=1&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" . urlencode($row['Continent']) . "&amp;Herb=All\"> $row[Continent] </a> </td> </tr>
+            <tr> <td>Country:</td> <td> <a href=\"maps/country.php?Country=" . urlencode($row['Country']) . "\"> $row[Country] </a> </td> </tr>
+            <tr> <td>$provinceName:</td> <td> <a href=\"maps/province.php?Province=" . urlencode($province) . "&amp;Country=". urlencode($row['Country']) ."\"> $province </a> </td> </tr>
+            <tr> <td>$districtName:</td> <td> <a href=\"maps/district.php?District=" .urlencode($district) . "&amp;Province=" . urlencode($province) ."&amp;Country=". urlencode($row['Country']) ."\"> $district </a> </td> </tr>";
 
 if ($locality !="" )
     echo "
-            <tr> <td> Locality: </td> <td> <a href=\"cross_browser.php?SpatLevel=5&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" .urlencode($locality) . "&amp;District=". urlencode($district) . "&amp;Province=" . urlencode($province) ." &amp;Herb=All\">$locality </a> </td> </tr> ";
+            <tr> <td>Locality:</td> <td><a href=\"cross_browser.php?SpatLevel=5&amp;SysLevel=0&amp;Sys=Life&amp;Spat=" .urlencode($locality) . "&amp;District=". urlencode($district) . "&amp;Province=" . urlencode($province) ." &amp;Herb=All\">$locality </a> </td> </tr> ";
 if ($row['RUBIN'] != "")
     echo "
-            <tr> <td> Grid square (RUBIN): </td> <td> <a href=\"list.php?RUBIN=$row[RUBIN] \"> $rubin </a> </td> </tr>";
+            <tr> <td>Grid square (RUBIN):</td> <td> <a href=\"list.php?RUBIN=$row[RUBIN] \"> $rubin</a></td> </tr>";
 if ($row['Long_deg'] != "")
     echo "
-            <tr> <td> Latitude/longitude: </td> <td> $Latf; $Longf </td> </tr>";
+            <tr> <td>Latitude/longitude:</td> <td>$Latf; $Longf</td> </tr>";
 if ($row['RiketsN'] != "")
     echo "
-            <tr> <td> RT90 2.5 gon V: </td> <td> $row[RiketsN] N; $row[RiketsO] E </td> </tr>";
+            <tr> <td>RT90 2.5 gon V:</td> <td>$row[RiketsN] N; $row[RiketsO] E</td> </tr>";
 
         /*<tr> <td> Cultivated in: </td> <td> $cultivated </td> </tr>
         <tr> <td> Altitude: </td> <td> $row[Altitude_meter] m. </td> </tr>"; */
@@ -533,14 +498,14 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
     $thumb = "$directory$row[Image1].gif";
     echo "
         <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     if (!$row['Image2'] == "") {
             $filenamesub = "$directory$row[Image2].jpg";
             $thumb = "$directory$row[Image2].gif";
             echo "
          <table>
-                <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a> </td></tr>
             </table>";
     }
     if (!$row['Image3'] == "") {
@@ -548,7 +513,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
         $thumb = "$directory$row[Image3].gif";
         echo "
         <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     }
 } elseif ($row['InstitutionCode'] == "S" and !$row['Image1'] == "")  {
@@ -559,14 +524,14 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
     $thumb = str_replace("large","small", $filename);
     echo "
         <table>
-            <tr> <td> <a href=\" $filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td><a href=\" $filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     $filename = $row["Image2"];
     if (!$filename == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
          <table>
-                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
             </table>";
     }
    $filename = $row["Image3"];
@@ -574,7 +539,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
          <table>
-                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
             </table>";
     }
     $filename = $row["Image4"];
@@ -582,7 +547,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
          <table>
-                <tr> <td> <a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
             </table>";
     }
 } elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {   
@@ -590,7 +555,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
     $thumb = "http://herbarium.gu.se/web/images/$row[Image1]_small.jpg";
     echo "
     <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>
     ";
      if (!$row['Image2'] == "") {
@@ -598,7 +563,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image2]_small.jpg";
             echo "
          <table>
-                <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+                <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
             </table>";
     }
     if (!$row['Image3'] == "") {
@@ -606,7 +571,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
         $thumb = "http://herbarium.bioenv.gu.se/web/images/$row[Image3]_small.jpg";
         echo "
         <table>
-            <tr> <td> <a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\" </a> </td></tr>
+            <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     }
     
@@ -618,7 +583,6 @@ echo "
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);
 }
-    
     ?>
     </td> </tr> </table>
     </div>

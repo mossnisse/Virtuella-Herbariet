@@ -1,5 +1,26 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+   <title>Sweden's Virtual Herbarium: Specimen list</title>
+   <link rel="stylesheet" type="text/css" href="herbes.css"/>
+   <script src="ajaj.js" type="text/javascript"> </script>
+   <meta name="author" content="Nils Ericson" />
+   <meta name="keywords" content="Virtuella herbariet" />
+   <meta name="robots" content="noindex" />
+   <link rel="shortcut icon" href="favicon.ico" />
+</head>
+<body id="list">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="index.html">Start page</a></li>
+            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+        <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Specimen list</h2>
 <?php
 // Code Written By Nils Ericson 2010-01-04
 // search result page - presents the result from a search into a simple table
@@ -25,42 +46,41 @@ function pressentResult($Stm, $page, $nrRecords, $adress, $pageSize)
     <table class = \"Box\">
         <tr>";
     if($OrderBy == "InstitutionCode") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a></td>";
     if($OrderBy == "AccessionNo") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\"> Catalogue No. </a> </td>";
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\">Catalogue No.</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\"> Catalogue No. </a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\">Catalogue No.</a></td>";
     if($OrderBy == "Taxon") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a></td>";
     if($OrderBy == "Type") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Type&amp;nrRecords=$nrRecords\"></a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Type&amp;nrRecords=$nrRecords\"></a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=TType&amp;nrRecords=$nrRecords\"></a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=TType&amp;nrRecords=$nrRecords\"></a></td>";
     if($OrderBy == "Country") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a></td>";
     if($OrderBy == "Province") echo "    
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a></td>";
     if($OrderBy == "District") echo "    
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a></td>";
     if($OrderBy == "Date") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a> </td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a></td>";
     if($OrderBy == "Collector") echo "  
-        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a> </td>";
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a></td>";
     else echo "
-        <td class = \"sortr\"> <a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a> </td>";
-    
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a></td>";
     echo "
         </tr>";
     $i=($page-1)*$pageSize;
@@ -85,10 +105,10 @@ function pressentResult($Stm, $page, $nrRecords, $adress, $pageSize)
            
             echo "
         <tr onmouseover = \"markCells(this)\" onmouseout=\"unMarkCells(this)\">  
-            <td> $row[InstitutionCode] </td>
-            <td> <a href=\"record.php?$adress$OrderByAdr&amp;Page=$i&amp;AaccNr=$row[AccessionNo]&amp;Ainst=$row[InstitutionCode]&amp;Acoll=$row[CollectionCode]&amp;Aid=$row[ID]&amp;nrRecords=$nrRecords\">$row[AccessionNo]</a> </td>
-            <td> $ScientificName </td> <td >$Type $Image</td>
-            <td> $row[Country] </td> <td> $Province </td> <td> $District </td> <td> $row[Year] </td> <td> $collector $row[Collectornumber]</td> 
+            <td>$row[InstitutionCode]</td>
+            <td><a href=\"record.php?$adress$OrderByAdr&amp;Page=$i&amp;AaccNr=$row[AccessionNo]&amp;Ainst=$row[InstitutionCode]&amp;Acoll=$row[CollectionCode]&amp;Aid=$row[ID]&amp;nrRecords=$nrRecords\">$row[AccessionNo]</a></td>
+            <td>$ScientificName</td> <td>$Type $Image</td>
+            <td>$row[Country]</td> <td>$Province</td> <td>$District</td> <td>$row[Year]</td> <td>$collector $row[Collectornumber]</td> 
         </tr>";
         }
     echo "
@@ -96,21 +116,8 @@ function pressentResult($Stm, $page, $nrRecords, $adress, $pageSize)
     pageNav($page, $nrRecords, "list.php?".$adress.$OrderByAdr, $pageSize, $nrRecords);
 }
 
-
 if (isUpdating()) { updateText();}
 else {
-
-
-echo "
-<head>
-    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-    <link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
-    <title> Sweden's Virtual Herbarium: Specimen list </title>
-    <script src=\"ajaj.js\" type=\"text/javascript\"> </script>
-    <meta name=\"author\" content=\"Nils Ericson\" />
-    <meta name=\"robots\" content=\"noindex\" />
-</head>
-<body id=\"list\"> "; 
 
 $i =0;
 
@@ -140,34 +147,24 @@ $result = $result_o_nr[0];
 $nr = $result_o_nr[1];
 
 echo "
-    <div class = \"menu1\">
-        <ul>
-            <li class = \"start_page\"><a href=\"index.html\"> Start page </a></li>
-            <li class = \"standard_search\"><a href=\"standard_search.html\">Standard search</a> </li>
-            <li class = \"cross_browser\"><a href =\"cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All\">Cross browser</a> </li>
-        </ul>
-    </div>
-    <div class = \"subMenu\">
-        <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Specimen list </h2>
-    
         <h3> Specimens giving hits for: $Rubrik </h3>
         $nr records found.
         <div class = \"menu2\">
             <ul>
                 <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Map</a> </li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Record</a> </li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Export</a> </li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Export</a></li>
             </ul>
         </div>
 
-        <table class = \"outerBox\"> <tr> <td>
-            Click on blue numbers to reach specimen records. Click on green headlines to sort colums. <br />";
+        <table class = \"outerBox\"><tr><td>
+            Click on blue numbers to reach specimen records. Click on green headlines to sort colums.<br />";
    
 pressentResult($result, $page, $nr, $adr, $pageSize);
 
 echo "
-            </td> </tr>
+            </td></tr>
         </table>";
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);

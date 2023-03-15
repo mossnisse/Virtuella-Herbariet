@@ -1,3 +1,31 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+   <title>Sweden's Virtual Herbarium: Cross Browser</title>
+   <link rel="stylesheet" type="text/css" href="herbes.css"/>
+   <meta name="author" content="Nils Ericson" />
+   <meta name="keywords" content="Virtuella herbariet" />
+   <meta name="robots" content="noindex" />
+   <link rel="shortcut icon" href="favicon.ico" />
+</head>
+<body id ="cross_browser">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="index.html">Start page</a></li>
+            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+        <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Cross browser</h2>
+        <h3>Enables listing of specimens by combining taxonomy with geography</h3>
+        Selected set appears in bold types.<br />
+        Click on names to reach superior or inferior levels.<br />
+        Click on numbers to list specimens.<br />
+        <table class = "outerBox"> <tr> <td>
+
 <?php
 // Code Written By Nils Ericson 2009-11-21
 // crossbrowser page
@@ -172,17 +200,13 @@ if ($SpatNr ==5) {
     $lat = $row['lat'];
 }
 
-echo "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">
-    <head>
-        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-        <link rel=\"stylesheet\" href=\"$CSSFile\" type=\"text/css\" />
-        <title> Sweden's Virtual Herbarium: Cross Browser </title>
-        <meta name=\"author\" content=\"Nils Ericson\" />
-        <meta name=\"robots\" content=\"none\" />
+/*
+echo "
+   
         <script src=\"ajaj.js\" type=\"text/javascript\"> </script>
-        <script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=$GoogleMapsKey\" type=\"text/javascript\"> </script>";
-        
+        <script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=$GoogleMapsKey\" type=\"text/javascript\"> </script>";*/
+
+/* 
 if ($SpatNr ==5) {
     echo "
         <script type=\"text/javascript\">
@@ -205,26 +229,9 @@ if ($SpatNr ==5) {
             }
         //]]>
         </script>";
-}
+}*/
         
-echo "
-    </head>
-    <body id =\"cross_browser\" onload=\"setupMap()\" onunload=\"GUnload()\" >
-    <div class = \"menu1\">
-        <ul>
-            <li class = \"start_page\"><a href=\"index.html\"> Start page </a></li>
-            <li class = \"standard_search\"><a href=\"standard_search.html\">Standard search</a> </li>
-            <li class = \"cross_browser\"><a href =\"cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All\">Cross browser</a> </li>
-        </ul>
-    </div>
-    <div class = \"subMenu\">
-        <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Cross browser </h2>
-        <h3> Enables listing of specimens by combining taxonomy with geography </h3>
-        Selected set appears in bold types. <br />
-        Click on names to reach superior or inferior levels. <br />
-        Click on numbers to list specimens. <br />
-        <table class = \"outerBox\"> <tr> <td>  
-";
+
 
 //$timer = new Timer();
 
@@ -258,7 +265,7 @@ echo "
         <table class = \"Box\" id =\"spatBox\"> <tr> <td>
             $SpatUppLink
         </td> </tr> </table>
-        <p class =\"clear\" />";
+        <p class =\"clear\">";
 
 //  --------------------------------------------------------
 
@@ -313,27 +320,27 @@ echo "
 if ($SysNr !=0) {
     if ($SysNr == 7) {
         echo "
-            <tr> <th colspan=\"2\"> $SysLevel: $RSys </th> </tr>
-            <tr> <td> Intraspecific taxa </td> <td> Specimens </td> </tr>" ;
+            <tr> <th colspan=\"2\">$SysLevel: $RSys</th> </tr>
+            <tr> <td>Intraspecific taxa</td> <td>Specimens</td> </tr>" ;
     } elseif ($SysNr == 2) {
         echo "
-            <tr> <th colspan=\"2\"> Phylum (Division): $SysValue </th> </tr>
-            <tr> <td> $SysDownLevel </td> <td> Specimens </td> </tr>" ;
+            <tr> <th colspan=\"2\">Phylum (Division): $SysValue</th> </tr>
+            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
     } elseif ($SysNr == 1) {
         echo "
-            <tr> <th colspan=\"2\"> $SysLevel: $SysValue </th> </tr>
-            <tr> <td> Phylum (Division) </td> <td> Specimens </td> </tr>" ;
+            <tr> <th colspan=\"2\">$SysLevel: $SysValue</th> </tr>
+            <tr> <td>Phylum (Division)</td> <td>Specimens</td> </tr>" ;
     } else {
         echo "
-            <tr> <th colspan=\"2\"> $SysLevel: $SysValue </th> </tr>
-            <tr> <td> $SysDownLevel </td> <td> Specimens </td> </tr>" ;
+            <tr> <th colspan=\"2\">$SysLevel: $SysValue</th> </tr>
+            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
     }
 } else {
     echo "
-            <tr> <td> $SysDownLevel </td> <td> Specimens </td> </tr>" ;
+            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
 }
 
-$tr = "<tr onMouseOver = \"markCells(this)\"; onMouseOut=\"unMarkCells(this)\">";
+$tr = "<tr onmouseover = \"markCells(this)\" onmouseout=\"unMarkCells(this)\"> ";
 
 if ($SysNr == 7) {
     //while($row = $result->fetch())
@@ -349,8 +356,8 @@ if ($SysNr == 7) {
             $nr = $row['COUNT(specimens.Genus)'];
             echo    "
             $tr
-                <td> $SysDownValueR </td>
-                <td> <a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatLevel=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\"> $nr </a> </td>
+                <td>$SysDownValueR</td>
+                <td><a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatLevel=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\">$nr</a></td>
             </tr>";
         }
 } elseif ($SpatNr == 2) {
@@ -363,11 +370,12 @@ if ($SysNr == 7) {
                 $SysDownValueR = $row[$SysDownLevel];
             }
             $SysDownValue = $row[$SysDownLevel];
-            $UrlSysDownValue = urlencode($SysDownValue);
+            if ($SysDownValue != null) $UrlSysDownValue = urlencode($SysDownValue);
+            else $UrlSysDownValue = "";
             $nr = $row['COUNT(specimens.Genus)'];
             echo    "$tr
-                    <td> <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysDownNr&amp;Spat=$UrlSpatValue&amp;Sys=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\"> $SysDownValueR </a> </td>
-                    <td> <a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\"> $nr </a> </td>
+                    <td><a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysDownNr&amp;Spat=$UrlSpatValue&amp;Sys=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\">$SysDownValueR</a></td>
+                    <td><a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\">$nr</a></td>
                     </tr>
                     ";
         }
@@ -390,8 +398,8 @@ if ($SysNr == 7) {
             $nr = $row['COUNT(specimens.Genus)'];
             echo    "
                 $tr
-                    <td> <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysDownNr&amp;Spat=$UrlSpatValue&amp;Sys=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\"> $SysDownValueR </a> </td>
-                    <td> <a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatLevel=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\"> $nr </a> </td>
+                    <td><a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysDownNr&amp;Spat=$UrlSpatValue&amp;Sys=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\">$SysDownValueR</a></td>
+                    <td><a href=\"list.php?$SysDownLevel=$UrlSysDownValue&amp;$SysLevel=$UrlSysValue&amp;$SpatLevel=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\">$nr</a></td>
                 </tr>
                     ";
         }    
@@ -414,10 +422,10 @@ $con=null;
 echo "
     <table class = \"Box\" id =\"spatBox\"> ";
 if ($SpatNr != 0) {
-    echo "<tr> <th colspan=\"2\"> $SpatLevel: $SpatValue </th> </tr>";
+    echo "<tr><th colspan=\"2\">$SpatLevel: $SpatValue</th></tr>";
 }
 echo "
-    <tr> <td> $SpatDownLevel </td> <td> Specimens </td> </tr>" ;
+    <tr> <td>$SpatDownLevel</td> <td>Specimens</td></tr>" ;
 if ($SpatNr == 1) {
     while($row = $result->fetch())
     {
@@ -426,8 +434,8 @@ if ($SpatNr == 1) {
         $SpatDownValue = $row[$SpatDownLevel];
         $UrlSpatDownValue = urlencode($SpatDownValue);
         echo    "$tr
-            <td> <a href=\"cross_browser.php?SpatLevel=$SpatDownNr&amp;SysLevel=$SysNr&amp;Spat=$UrlSpatDownValue&amp;Sys=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\"> $SpatDownValue </a> </td>
-            <td> <a href=\"list.php?$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatDownLevel=$UrlSpatDownValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\"> $nr </a> </td>
+            <td><a href=\"cross_browser.php?SpatLevel=$SpatDownNr&amp;SysLevel=$SysNr&amp;Spat=$UrlSpatDownValue&amp;Sys=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\">$SpatDownValue</a></td>
+            <td><a href=\"list.php?$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatDownLevel=$UrlSpatDownValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\">$nr</a></td>
             </tr>
             ";
     }
@@ -438,8 +446,8 @@ if ($SpatNr == 1) {
         $SpatDownValue = $row[$SpatDownLevel];
         $UrlSpatDownValue = urlencode($SpatDownValue);
         echo    "$tr
-            <td> <a href=\"cross_browser.php?SpatLevel=$SpatDownNr&amp;SysLevel=$SysNr&amp;Spat=$UrlSpatDownValue&amp;Sys=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatLevel=$UrlSpatValue&amp;Herb=$Herbaria\"> $SpatDownValue </a> </td>
-            <td> <a href=\"list.php?$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatDownLevel=$UrlSpatDownValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\"> $nr </a> </td>
+            <td><a href=\"cross_browser.php?SpatLevel=$SpatDownNr&amp;SysLevel=$SysNr&amp;Spat=$UrlSpatDownValue&amp;Sys=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatLevel=$UrlSpatValue&amp;Herb=$Herbaria\">$SpatDownValue</a></td>
+            <td><a href=\"list.php?$SysLevel=$UrlSysValue&amp;$SysUppLevel=$UrlSysUppValue&amp;$SpatDownLevel=$UrlSpatDownValue&amp;$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$nr\">$nr</a></td>
             </tr>
             ";
     }
@@ -448,6 +456,7 @@ if ($SpatNr == 1) {
 }
 
 /**************** minimap for the locality ***************************/
+/*
 if ($SpatNr ==5) {
     //$query = "SELECT lat, `long` FROM locality WHERE locality = \"$SpatValue\" and district = \"$SpatUppValue\"";
     //echo "$query <p>";
@@ -462,7 +471,7 @@ if ($SpatNr ==5) {
             </td> </tr>
             <tr> <td> Location of map symbol: Lat $lat Long $long. </td> </tr>
         </table>";
-}
+}*/
 
 //echo "Tot time: ".$timer->getTime();
 //&Herbarium=this.value()+escape(q)
@@ -490,10 +499,7 @@ echo "
                     <OPTION $OS value=\"S\">S</OPTION>
                 </SELECT>
             </form>
-            </td> </tr> </table>
-        </div>
-    </body>
-</html>";
+            </td> </tr> </table>";
 
 if ($BCache == 'On') 
     cacheEnd();  // the end for the cache function
@@ -501,3 +507,6 @@ if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);
 }
 ?>
+        </div>
+    </body>
+</html>

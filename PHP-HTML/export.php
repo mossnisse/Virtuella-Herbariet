@@ -1,19 +1,27 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+   <title>Sweden's Virtual Herbarium: Export page</title>
+   <link rel="stylesheet" type="text/css" href="herbes.css"/>
+   <meta name="author" content="Nils Ericson" />
+   <meta name="keywords" content="Virtuella herbariet" />
+   <link rel="shortcut icon" href="favicon.ico" />
+</head>
+<body id= "export">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="index.html">Start page</a></li>
+            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+        <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Export specimen records</h2>
 <?php
 // sida med länkar till olika export funktioner
 include("herbes.php");
-
-echo "
-<head>
-    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-    <link rel=\"stylesheet\" href=\"$CSSFile\" type=\"text/css\" />
-    <title> Sweden's Virtual Herbarium: Export page </title>
-    <meta name=\"author\" content=\"Nils Ericson\" />
-    <meta name=\"robots\" content=\"noindex\" />
-</head>
-<body id= \"export\">";
 
 $adr = getSimpleAdr();
 $order = orderBy();
@@ -28,23 +36,14 @@ if (isset($_GET['ARecord'])) {
     $ARecord = $_GET['ARecord'];
 } else $ARecord = 1;
 echo "
-    <div class = \"menu1\">
-        <ul>
-            <li class = \"start_page\"><a href=\"index.html\"> Start page </a></li>
-            <li class = \"standard_search\"><a href=\"standard_search.html\">Standard search</a> </li>
-            <li class = \"cross_browser\"><a href =\"cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All\">Cross browser</a> </li>
-        </ul>
-    </div>
-    <div class = \"subMenu\">
-        <h2> <span class = \"first\">S</span>weden's <span class = \"first\">V</span>irtual <span class = \"first\">H</span>erbarium: Export page </h2>
-        <h3> Specimens giving hits for: $Rubrik </h3>
+        <h3>Specimens giving hits for: $Rubrik</h3>
         $nr records found.
          <div class = \"menu2\">
             <ul>
                 <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Map</a> </li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Record</a> </li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Export</a> </li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Export</a></li>
             </ul>
         </div>
         <table class = \"outerBox\"> <tr> <td>
