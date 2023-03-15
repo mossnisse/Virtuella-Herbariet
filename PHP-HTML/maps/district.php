@@ -1,17 +1,26 @@
-<html>
-	<head>
-		<title>District Information</title>
-		<style>
-      #map {
-        height: 70%;
-      }
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-	</head>
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sweden's Virtual Herbarium: District info</title>
+    <link rel="stylesheet" href="../herbes.css" type="text/css" />
+    <meta name="author" content="Nils Ericson" />
+    <meta name="keywords" content="Virtuella herbariet" />
+    <link rel="shortcut icon" href="favicon.ico" />
+</head>
+<body id = "locality_map">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="../index.html">Start page</a></li>
+            <li class = "standard_search"><a href="../standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="../cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="../locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: District info</h2>
+	<table class = "outerBox"> <tr> <td>
+		<table class="SBox"> <tr> <td>
 <?php
 	include("../herbes.php");
 	$con = getConS();
@@ -51,43 +60,51 @@
 	$Stm2->bindValue(':country', $count, PDO::PARAM_STR);
 		//echo "dist: $dist, prov: $prov <br>";
 	$Stm2->execute();
+    
+    $urlCountry = urlencode($count);
+    $urlProvince = urlencode($prov);
+    $urlDistrict = urlencode($dist);
 
 echo "
-	<body id= \"district\">
-	<div class = \"subMenu\">
-		<h1><a href=\"province.php?Province=$prov&Country=$count\">$prov</a>: <a href=\"\..\cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$dist&Sys=Life&Province=$prov+&Herb=All\">$dist</a></h1>
+		<h1><a href=\"province.php?Province=$urlProvince&Country=$urlCountry\">$prov</a>: <a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$dist</a></h1>
 		<table>
 			<tr><td>Code</td><td>$row[code]</td></tr>
 			<tr><td>Type</td><td>$row[typeEng]/$row[typeNative]</td></tr>
 			<tr><td>Alternative names</td><td>$row[alt_names]</td></tr>
-			<tr><td><a href=\"gjdistrict.php?District=$dist&Province=$prov\" download>Download GeoJson borders, WGS84, starts with BOM mark</a></td><td></td></tr>
+			<tr><td><a href=\"gjdistrict.php?District=$urlDistrict&Province=$urlProvince\" download>Download GeoJson borders in WGS84</a></td><td></td></tr>
 		</table>
-		<div id=\"map\"></div>
+		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 	Localities
 	<table>";
 
 	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
-		echo "<tr><td><a href =\"..\\locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
+		echo "
+		<tr><td><a href =\"../locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
 	}
 	
 	echo "
 	</table>
+	
     <script>
 	    var map;
 		function initMap() {
 			var bounds = new google.maps.LatLngBounds();
 			bounds.extend(new google.maps.LatLng($row[ymax], $row[xmax]));
             bounds.extend(new google.maps.LatLng($row[ymin], $row[xmin]));
-			map = new google.maps.Map(document.getElementById('map'));
+			map = new google.maps.Map(document.getElementById('googleMap'));
 			map.fitBounds(bounds);
-			map.data.loadGeoJson('gjdistrict.php?District=$dist&Province=$prov');
+			map.data.loadGeoJson('gjdistrict.php?District=$urlDistrict&Province=$urlProvince');
 		}
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
-	</script>
-</body>
-</html>";
+	</script>";
 ?>
+	</table>
+	</table>
+	</div>
+</body>
+</html>
+
 	
 	

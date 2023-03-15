@@ -1,23 +1,30 @@
-<html>
-	<head>
-		<title>Country information</title>
-		<link rel="stylesheet" href="\..\herbes.css" type="text/css" />
-		<meta name=\"author\" content=\"Nils Ericson\" />
-		<style>
-      #map {
-        height: 70%;
-      }
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-	</head>
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sweden's Virtual Herbarium: Country info</title>
+    <link rel="stylesheet" href="../herbes.css" type="text/css" />
+    <meta name="author" content="Nils Ericson" />
+    <meta name="keywords" content="Virtuella herbariet" />
+    <link rel="shortcut icon" href="favicon.ico" />
+</head>
+<body id = "locality_map">
+    <div class = "menu1">
+        <ul>
+            <li class = "start_page"><a href="../index.html">Start page</a></li>
+            <li class = "standard_search"><a href="../standard_search.html">Search specimens</a></li>
+            <li class = "cross_browser"><a href ="../cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class = "locality_search"><a href="../locality_search.php">Search localities</a></li>
+        </ul>
+    </div>
+    <div class = "subMenu">
+	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Country info</h2>
+	<table class = "outerBox"> <tr> <td>
+		<table class="SBox"> <tr> <td>
 <?php
 include("../herbes.php");
 	$con = getConS();
-	$count = "";
+	$country = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
 		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments FROM countries where ID = :ID;";
@@ -39,11 +46,9 @@ include("../herbes.php");
 	$Stm->bindValue(':country', $country, PDO::PARAM_STR);
 	$Stm->execute();
 		//$row = $Stm->fetch(PDO::FETCH_ASSOC)
-
+	$urlCountry = urlencode($country);
 echo "
-	<body id= \"country\">
-	<div class = \"subMenu\">
-		<h1><a href=\"\..\cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$country&Herb=All\">$country</a></h1>
+		<h1><a href=\"../cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$urlCountry&Herb=All\">$country</a></h1>
 		<table>
 		<tr><td>Alternative names</td><td>$row[syn]</td></tr>
 		<tr><td>Native name</td><td>$row[native]</td></tr>
@@ -58,11 +63,12 @@ echo "
 		}
 		echo "</td></tr>
 		</table>
-		<div id=\"map\"></div>
+		<div id=\"map\" style=\"width:800px;height:800px;\"></div>
 	Provinces
 	<table>";
 	while ($row2 = $Stm->fetch(PDO::FETCH_ASSOC)) {
-		echo "<tr><td><a href=\"province.php?Country=$country&Province=$row2[Province]\">$row2[Province]</a></td></tr>";
+		$urlProvince = urlencode($row2['Province']);
+		echo "<tr><td><a href=\"province.php?Country=$urlCountry&Province=$urlProvince\">$row2[Province]</a></td></tr>";
 	}
 	
 	echo "
@@ -75,13 +81,17 @@ echo "
             bounds.extend(new google.maps.LatLng($row[minY], $row[minX]));
 			map = new google.maps.Map(document.getElementById('map'));
 			map.fitBounds(bounds);
-			map.data.loadGeoJson('gjcountry.php?country=$country');
+			map.data.loadGeoJson('gjcountry.php?country=$urlCountry');
 		}
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
-	</script>
-</body>
-</html>";
+	</script>";
 ?>
+	</table>
+	</table>
+	</div>
+</body>
+</html>
+
 	
