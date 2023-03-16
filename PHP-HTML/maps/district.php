@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../herbes.css" type="text/css" />
     <meta name="author" content="Nils Ericson" />
     <meta name="keywords" content="Virtuella herbariet" />
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="../favicon.ico" />
 </head>
 <body id = "locality_map">
     <div class = "menu1">
@@ -30,7 +30,7 @@
 	$count = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
-		$query = "SELECT District, Province, Country, `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district where ID = :ID;";
+		$query = "SELECT District, Province, Country, `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative, comments FROM district where ID = :ID;";
 		$Stm = $con->prepare($query);
 		$Stm->bindValue(':ID', $ID, PDO::PARAM_INT);
 		$Stm->execute();
@@ -42,7 +42,7 @@
 		$dist = $_GET['District'];
 		$prov = $_GET['Province'];
 		$count = $_GET['Country'];
-		$query = "SELECT `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative FROM district WHERE `District` = :district AND `Province` = :province AND Country = :country;";
+		$query = "SELECT `code`, xmax, xmin, ymax, ymin, alt_names, typeEng, typeNative, comments FROM district WHERE `District` = :district AND `Province` = :province AND Country = :country;";
 		$Stm = $con->prepare($query);
 		$Stm->bindValue(':district', $dist, PDO::PARAM_STR);
 		$Stm->bindValue(':province', $prov, PDO::PARAM_STR);
@@ -66,11 +66,14 @@
     $urlDistrict = urlencode($dist);
 
 echo "
-		<h1><a href=\"province.php?Province=$urlProvince&Country=$urlCountry\">$prov</a>: <a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$dist</a></h1>
+		<h1><a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$dist</a></h1>
 		<table>
-			<tr><td>Code</td><td>$row[code]</td></tr>
-			<tr><td>Type</td><td>$row[typeEng]/$row[typeNative]</td></tr>
-			<tr><td>Alternative names</td><td>$row[alt_names]</td></tr>
+			<tr><td>Code:</td><td>$row[code]</td></tr>
+			<tr><td>Type:</td><td>$row[typeEng]/$row[typeNative]</td></tr>
+			<tr><td>Alternative names:</td><td>$row[alt_names]</td></tr>
+            <tr><td>Country:</td><td><a href=\"../maps/country.php?Country=$urlCountry\">$count</a></td></tr>
+            <tr><td>Province:</td><td><a href=\"../maps/province.php?Country=$urlCountry&Province=$urlProvince\">$prov</a></td></tr>
+            <tr><td>Comments:</td><td>$row[comments]</td></tr>
 			<tr><td><a href=\"gjdistrict.php?District=$urlDistrict&Province=$urlProvince\" download>Download GeoJson borders in WGS84</a></td><td></td></tr>
 		</table>
 		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>

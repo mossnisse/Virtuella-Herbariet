@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../herbes.css" type="text/css" />
     <meta name="author" content="Nils Ericson" />
     <meta name="keywords" content="Virtuella herbariet" />
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="shortcut icon" href="../favicon.ico" />
 </head>
 <body id = "locality_map">
     <div class = "menu1">
@@ -50,14 +50,13 @@ include("../herbes.php");
 echo "
 		<h1><a href=\"../cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$urlCountry&Herb=All\">$country</a></h1>
 		<table>
-		<tr><td>Alternative names</td><td>$row[syn]</td></tr>
-		<tr><td>Native name</td><td>$row[native]</td></tr>
-		<tr><td>Swedish name</td><td>$row[swedish]</td></tr>
-		<tr><td>Alpha-2 code</td><td>$row[code]</td></tr>
-		<tr><td>Alpha-3 code</td><td>$row[code3]</td></tr>
-		<tr><td>Provins division name</td><td>$row[provinceName]</td></tr>
-		<tr><td>District divison name</td><td>$row[districtName]</td></tr>
-		<tr><td>Comments</td><td>";
+		<tr><td>Alternative names:</td><td>$row[syn]</td></tr>
+		<tr><td>Native name:</td><td>$row[native]</td></tr>
+		<tr><td>Swedish name:</td><td>$row[swedish]</td></tr>
+		<tr><td>Alpha-2 code:</td><td>$row[code]</td></tr>
+		<tr><td>Alpha-3 code:</td><td>$row[code3]</td></tr>
+		<tr><td>Provins division type:</td><td>$row[provinceName]</td></tr>
+		<tr><td>District divison type:</td><td>$row[districtName]</td></tr>";
 		if ($row['comments']!=null) {
 			echo str_replace("\n","<br>",$row['comments']);
 		}
