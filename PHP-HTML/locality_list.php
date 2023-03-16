@@ -66,7 +66,8 @@
                     $lstmt->bindValue(':alocality2', $ALocality2);
                     $lstmt->bindValue(':alocality3', $ALocality3);
                     */
-
+                    
+                    /*
                     if($District != '%') {
                         $DLocality = $District;
                     }
@@ -81,7 +82,7 @@
                         $dstmt->bindValue(':province', $Province);
                         $dstmt->bindValue(':locality', $DLocality);
                         $dstmt->bindValue(':alocality', "%$DLocality%");
-                    }
+                    }*/
                     
                     if($Province != '%') {
                         $PLocality = $Province;
@@ -145,6 +146,7 @@
                         }
                     }
                     
+                    $dstmt = getDistrictList();
                     if (isset($dstmt)) {
                         $dstmt->execute();
                         //$stmt->debugDumpParams();
@@ -169,7 +171,6 @@
                         </tr>";
 					while($row = $lstmt->fetch())
 					{
-						//echo "<tr><td><a href=\"locality.php?locality=$row[locality]&country=$row[country]&province=$row[province]&district=$row[district]\">$row[locality]</a></td> <td> $row[country] </td> <td> $row[province] </td> <td>$row[district]</td></tr>";
 						echo "<tr><td><a href=\"locality.php?ID=$row[ID]\">$row[locality]</a></td><td>$row[country]</td><td>$row[province]</td><td>$row[district]</td></tr>\n";
 					}
 				}

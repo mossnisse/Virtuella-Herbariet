@@ -1,4 +1,21 @@
 <?php
+function listSearch($field, $data) {
+    $altonly = $data;
+    $altfirst = $data.',%';
+    $altlast = '%, '.$data;
+    $altmidle = '%, '.$data.',%';
+    $sql = "$field Like :altonly OR $field LIKE :altfirst OR $field LIKE :altlast OR $field LIKE :altmidle";
+    $bind = array(':altonly' =>  $altonly, ':altfirst' => $altfirst, ':altlast' => $altlast, ':altmidle' => $altmidle);
+    return [$sql, $bind];
+}
+
+function bindListSearch($stmt, $binds) {
+    foreach($binds as $key => $value) {
+        $stmt->bindValue($key, $value);
+        //echo "bindValue($key, \"$value\")<br>";
+    }
+}
+
 function getLocalityList() {
     $con = getConS();
 
@@ -7,11 +24,8 @@ function getLocalityList() {
     $District  = str_replace("*","%",$_GET['district']);
     $Locality  = str_replace("*","%",$_GET['locality']);
         
-    $ALocality = "%$Locality%";
-    $ALocality1 = "$Locality,%";
-    $ALocality2 = "%, $Locality";
-    $ALocality3 = "%, $Locality,%";
-    
+    $listsearch = listSearch('alternative_names', $Locality);
+   
     $orderby = 'locality';
     if (isset($_GET['orderby'])) {
         if ($_GET['orderby'] == 'country') $orderby = 'country';
@@ -20,40 +34,48 @@ function getLocalityList() {
     }
     
     // echo "Country: $Country Province: $Province District: $District Locality: $Locality ALocality: $ALocality Orderby: $orderby";
-                    
-    $lstmt =$con->prepare("SELECT locality, ID, province, district, country, lat, `long` FROM locality WHERE country Like :country AND province Like :province AND
-							district Like :district AND (locality Like :locality or alternative_names Like :locality or alternative_names Like :alocality1 or alternative_names Like :alocality2 or alternative_names Like :alocality3)
-                            ORDER BY $orderby limit 2000");
+    $query = "SELECT locality, ID, province, district, country, lat, `long` FROM locality WHERE country LIKE :country AND province LIKE :province AND
+					 district LIKE :district AND (locality LIKE :locality OR $listsearch[0]) ORDER BY $orderby LIMIT 2000";
+    //echo $query.'<p>';                
+    
+    $lstmt =$con->prepare($query);
 					
 	$lstmt->bindValue(':country', $Country);
 	$lstmt->bindValue(':province', $Province);
 	$lstmt->bindValue(':district', $District);
 	$lstmt->bindValue(':locality', $Locality);
-	$lstmt->bindValue(':alocality1', $ALocality1);
-    $lstmt->bindValue(':alocality2', $ALocality2);
-    $lstmt->bindValue(':alocality3', $ALocality3);
-    
+    bindListSearch($lstmt, $listsearch[1]);
     return $lstmt;
 }
    
 function getDistrictList() {
+    $con = getConS();
+    $Country   = str_replace("*","%",$_GET['country']);
+    $Province  = str_replace("*","%",$_GET['province']);
+    $District  = str_replace("*","%",$_GET['district']);
+    $Locality  = str_replace("*","%",$_GET['locality']);
+    
     if($District != '%') {
         $DLocality = $District;
     }
     
     if($Locality != '%') {
         $DLocality = $Locality;
-    }    
+    } 
     if(isset($DLocality) and $DLocality != '%') {
-        $dstmt =$con->prepare("SELECT ID, province, district, country FROM district WHERE country Like :country AND province Like :province AND
-										 (district Like :locality or alt_names Like :alocality) ORDER BY district");
+        $listsearch = listSearch('alt_names', $DLocality);
+        
+        $query = "SELECT ID, province, district, country FROM district WHERE country Like :country AND province Like :province AND
+										 (district Like :locality or $listsearch[0]) ORDER BY district";
+        //echo $query.'<p>';                
+        $dstmt =$con->prepare($query);
                      
         $dstmt->bindValue(':country', $Country);
         $dstmt->bindValue(':province', $Province);
         $dstmt->bindValue(':locality', $DLocality);
-        $dstmt->bindValue(':alocality', "%$DLocality%");
+        bindListSearch($dstmt, $listsearch[1]);
+        return $dstmt;
     }
-    return $dstmt;
 }
                     
 function getProvinceList() {
