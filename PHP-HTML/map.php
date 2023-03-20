@@ -110,10 +110,12 @@ $imges[6] = "icons/red-dot3.png";
 $blipps;
 
     $i=0;
+    $total=0;
     //while($row = $result->fetch())
     foreach($result as $row)
     {
         $Nr = $row['COUNT(*)'];
+        $total=$total+$Nr;
         if (isset($row['CSource']) and $row['CSource'] != "None" and $row['Lat'] != '')
         {
             $blipps[$i]['Lat'] = $row['Lat'];
@@ -208,7 +210,7 @@ $blipps;
 
 echo "
         <h3>Specimens giving hits for : $Rubrik</h3>
-        $nrRecords records found of which ".($i) ." are mapped on this page.";
+        $nrRecords records found of which ".($total) ." are mapped on this page.";
         
         //echo "nrBlipps: $nrBlipps MapPage: $MapPageSize <p>";
         if ($nrPages>1)
