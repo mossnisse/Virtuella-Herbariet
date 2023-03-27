@@ -2,7 +2,8 @@
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 header('Content-type: text/html; charset=utf-8');
-include("../herbes.php");
+set_time_limit(120);
+include "../herbes.php";
 if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
 
 $con = getConS();
