@@ -1,10 +1,10 @@
 <?php
 // Code Written By Nils Ericson 2009-11-21
 // funtions that are used on varios pages
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-include_once("ini.php");
-include_once("koordinates.php");
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+include_once "ini.php";
+include_once "koordinates.php";
 
 class Timer {
     var $tidStart;
@@ -21,55 +21,54 @@ class Timer {
     }
 }
 
-function setUpdating($upd) {
+
+function setUpdating(bool $upd): void {
     $file = fopen("online.txt","w");
     if ($upd) {
-	echo fwrite($file,'Y');
+       echo fwrite($file,'Y');
     } else {
-	echo fwrite($file,'N');
+      echo fwrite($file,'N');
     }
     fclose($file);
 }
 
-function isUpdating() {
+function isUpdating(): bool {
     $file = fopen("online.txt","r");
     $cont = fread($file, 1);
-    //echo $cont;
     fclose($file);
     if ($cont == "Y") {
-	return true;
+       return true;
     } else {
-	return false;
+       return false;
     }
 }
 
-function setUpdating2($upd) {
+function setUpdating2(bool $upd): void {
     $file = fopen("..\\online.txt","w");
     if ($upd) {
-	echo fwrite($file,'Y');
+      echo fwrite($file,'Y');
     } else {
-	echo fwrite($file,'N');
+      echo fwrite($file,'N');
     }
     fclose($file);
 }
 
-function isUpdating2() {
+function isUpdating2(): bool {
     $file = fopen("..\\online.txt","r");
     $cont = fread($file, 1);
-    //echo $cont;
     fclose($file);
     if ($cont == "Y") {
-	return true;
+       return true;
     } else {
-	return false;
+       return false;
     }
 }
 
-function updateText() {
+function updateText(): string {
     echo "<html><head></head><body><h1>Updating database... try later</h1></body></html>";
 }
 
-function curPageURL() {
+function curPageURL(): string {
  $pageURL = 'http';
  //if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
  $pageURL .= "://";
@@ -83,7 +82,7 @@ function curPageURL() {
 
 
 // ------------  functions to handle page caching -------------------
-function curPageURLCache() {
+function curPageURLCache():string {
  $pageURL = $_SERVER["REQUEST_URI"];
  $cacheDir = "C:\\Apache24\\htdocs\\cache\\";
  $pageURL = str_replace ( "/" , "" , $pageURL );
@@ -92,18 +91,18 @@ function curPageURLCache() {
  return $pageURL;
 }
 
-function cacheStart() {
+function cacheStart(): void {
     $cachefile = curPageURLCache();
     if (file_exists($cachefile)) {
-		// the page has been cached from an earlier request output the contents of the cache file
-		include($cachefile); 
-		// exit the script, so that the rest isnt executed
-		exit;
+   // the page has been cached from an earlier request output the contents of the cache file
+       include($cachefile); 
+   // exit the script, so that the rest isnt executed
+      exit;
     }
     ob_start();   // start the buffer
 }
 
-function cacheEnd() {
+function cacheEnd():void {
     $cachefile = curPageURLCache();
 /*    echo "
 	cache end $cachefile <p />";*/
@@ -119,7 +118,7 @@ function cacheEnd() {
 }
 
 // loggar åtkomster i av php sidorna i tabellen logg med ip adress och URL
-function logg($MySQLHost, $MySQLLUser, $MySQLLPass)
+function logg(string $MySQLHost, string $MySQLLUser, string $MySQLLPass) :void
 {
     //echo "logging <p />";
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
@@ -170,6 +169,7 @@ function logg($MySQLHost, $MySQLLUser, $MySQLLPass)
     } else {
     
 	try {
+  // change the way to get the connections!!
 	    $con2 = new PDO('mysql:host=localhost;dbname=samhall', 'logger', 'simpleton');
 	    $ip=$_SERVER['REMOTE_ADDR'];
 	    $vars = $_SERVER['QUERY_STRING'];
@@ -181,44 +181,24 @@ function logg($MySQLHost, $MySQLLUser, $MySQLLPass)
 	    die();
 	}
 	
-	
-	/*$con2 = mysql_connect('localhost', 'logger', 'simpleton')
-	    or die ('Unable to connect to database!'. mysql_error());
-	if (!mysql_select_db("samhall", $con2)) 
-	{
-	    echo "Error Database does not exists. <p>";
-	}
-	//mysql_set_charset('utf8');
-	$ip=$_SERVER['REMOTE_ADDR'];
-	$vars = $_SERVER['QUERY_STRING'];
-	$page = $_SERVER['SCRIPT_NAME'];
-    
-	$query = "INSERT logg (ip, page, vars, user_agent) VALUES ('$ip', '$page', '$vars', '$user_agent');";
-    
-	mysql_query($query, $con2);
-	if (mysql_errno()) { 
-	    echo "logg error: $query <p />";
-	}
-	mysql_close($con2);*/
     }
 }
 
 // Sätter färg på sånt som är markerat som kommentarer i databasen
-function CComments($text)
+function CComments($text) : string
 {
 	if ($text == null) {
-		return null;
+		return '';
 	} else {
 		$text = str_replace ( "]" , "]</span>" , $text );
 		return str_replace ( "[" , "<span class = \"comment\">[" , $text );
 	}
-    
 }
 
-function breaks($text)
+function breaks($text) : string
 {
 	if ($text == null) {
-		return null;
+		return '';
 	} else {
 		$text = str_replace ( "\n" , "\n <br />" , $text );
 		$text = str_replace ( "\v" , "\n <br />" , $text );
@@ -226,21 +206,23 @@ function breaks($text)
 	}
 }
 
+/*
 // formaterar datum
-function datum($Year, $month, $Day)
+function datum(int $Year, int $month, int $Day) : string
 {
     return "$Year-$month-$Day";
 }
+*/
 
 // formaterar vetenskapliga namn
-function scientificName ($Genus, $Species, $SspVarForm, $HybridName) {
-    if (isset($HybridName) & $HybridName !="") {
+function scientificName($Genus, $Species, $SspVarForm, $HybridName): string {
+    if (isset($HybridName) && $HybridName !="") {
         return "$Genus $HybridName";
     }
-    elseif (isset($SspVarForm) & $SspVarForm !="") {
+    elseif (isset($SspVarForm) && $SspVarForm !="") {
         return "$Genus $Species $SspVarForm";
     }
-    elseif (isset($Species) & $Species !="") {
+    elseif (isset($Species) && $Species !="") {
         return "$Genus $Species";
     } else {
         return $Genus;
@@ -248,9 +230,9 @@ function scientificName ($Genus, $Species, $SspVarForm, $HybridName) {
 }
 
 // fixar specialtecken till xml strängar
-function xmlf($str) {
+function xmlf(string $str):string {
 	if ($str == null) {
-		return null;
+		return '';
 	} else {
 		$xml_entities = array ( 
 			"&" => "&amp;",     #ampersand
@@ -267,9 +249,9 @@ function xmlf($str) {
 	}
 }
 
-function CSVf($str) {
+function CSVf(string $str): string {
 	if ($str == null) {
-		return null;
+		return '';
 	} else {
 		$str = str_replace("\\","\\\\",$str);
 		$str = str_replace("\n\r","\\n",$str);
@@ -280,8 +262,9 @@ function CSVf($str) {
 	}
 }
 
+// borde inte användas använd prepared statments används av crossbrowser.php och  record.php a
 // fixar specialtecken till SLQ strängar och så att det inte går att göra injections
-function SQLf($text) {
+function SQLf(string $text):string {
 	if ($text == null) {
    return '';
 	} else {
@@ -294,7 +277,7 @@ function SQLf($text) {
 }
 
 // kollar om term som inte är söktermer
-function notSpecial($SearchItem, $SearchValue) {
+function notSpecial(string $SearchItem, string $SearchValue): bool {
     return $SearchValue != "*" and $SearchItem != "search" and $SearchItem != "Page" and $SearchItem != "Life"
        and $SearchItem != "World" and $SearchItem != "slemocota" and $SearchItem!= "andromeda"
        and $SearchItem != "OrderBy" and $SearchItem != "nrRecords" and $SearchItem != "ARecord"
@@ -302,8 +285,8 @@ function notSpecial($SearchItem, $SearchValue) {
        and $SearchItem != "Acoll" and $SearchItem != 'Aid' and $SearchItem != "sGenus";
 }
 
-
-function existsInDyntaxa($con,  $Name) {
+/*
+function existsInDyntaxa(PDO $con, string $Name): bool {
 	$Genus = "genus = \"$Name[Genus]\"";
 	
 	$Species = '';
@@ -332,9 +315,10 @@ function existsInDyntaxa($con,  $Name) {
 		return false;
 	}
 	//$con->close();
-}
+}*/
 
-function dyntaxaID($con) {
+
+function dyntaxaID(PDO $con) {
 	if (array_key_exists('Genus', $_GET)) {
 		$Genus = $_GET['Genus'];
 	
@@ -353,13 +337,20 @@ function dyntaxaID($con) {
 			$HybridName = $_GET['HybridName'];
 		} 
 
-		$tquery = "select Taxonid from xnames where genus = \"$Genus\" and species = \"$Species\" and SspVarForm = \"$SspVarForm\" and HybridName = \"$HybridName\";";
+		//$tquery = "select Taxonid from xnames where genus = \"$Genus\" and species = \"$Species\" and SspVarForm = \"$SspVarForm\" and HybridName = \"$HybridName\";";
+  $tquery = "select Taxonid from xnames where genus = :Genus and species = :Species and SspVarForm = :SspVarForm and HybridName = :HybridName;";
 		//echo $tquery." <br />";
-		$tresult = $con->query($tquery);
+  $Stm = $con->prepare($tquery);
+  $Stm->bindValue(':Genus', $Genus, PDO::PARAM_STR);
+  $Stm->bindValue(':Species', $Species, PDO::PARAM_STR);
+  $Stm->bindValue(':SspVarForm', $SspVarForm, PDO::PARAM_STR);
+  $Stm->bindValue(':HybridName',$HybridName, PDO::PARAM_STR);
+  
+  $Stm->execute();
+  $result  = $Stm->fetch(PDO::FETCH_ASSOC);
 	
-	
-		if ($trow = $tresult->fetch()) {
-			return $trow["Taxonid"];
+		if ($result) {
+    return $result["Taxonid"];
 		} else {
 			return null;
 		}
@@ -368,8 +359,7 @@ function dyntaxaID($con) {
 	}
 }
 
-
-function wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $orderBy, $nr_records) {
+function wholeSQL(PDO $con, string $whatstat, int $page, int $pageSize, string $GroupBy, array $orderBy, int $nr_records) : array {
  $parameters;
  $WhereQueryparts;
  $tables[] = 'grr';
@@ -768,18 +758,16 @@ if (in_array('signaturer', $tables)) {
  
  //Bind all the parameters to values in an way to avoid SQL injections have to be done after prepare the query;
  
- if(empty($parameters)) {
-  
- } else {
- foreach($parameters as $key=>$value) {
-   //echo ":$key, $value<br>";
-   $Stm->bindValue(':'.$key,$value, PDO::PARAM_STR);
- }
-}
+  if(!empty($parameters)) {
+    foreach($parameters as $key=>$value) {
+     //echo ":$key, $value<br>";
+     $Stm->bindValue(':'.$key,$value, PDO::PARAM_STR);
+   }
+  }
 
 $offset = ($page-1)*$pageSize;
-$Stm->bindValue(':ofsetp',$offset, PDO::PARAM_INT);
-$Stm->bindValue(':pagesize',$pageSize, PDO::PARAM_INT);
+$Stm->bindValue(':ofsetp', $offset, PDO::PARAM_INT);
+$Stm->bindValue(':pagesize', $pageSize, PDO::PARAM_INT);
 
 $Stm->execute();
 //$result = $Stm->fetchAll(PDO::FETCH_ASSOC);
@@ -787,12 +775,12 @@ if ($nr_records < 0) {
    $nr_records = $con->query("SELECT FOUND_ROWS();")->fetchColumn();
 }
 //echo "nr reccords: $nr_records <p>";
-return [$Stm, $nr_records];
+return array($Stm, $nr_records);
 }
 
 
 // returners SQL coden m.m. för sortering av poster från URL
-function orderBy() {
+function orderBy(): array {
     if (isset($_GET['OrderBy']))
     {
         if ($_GET['OrderBy'] == "Taxon") {
@@ -830,7 +818,7 @@ function orderBy() {
 }
 
 // returnerar rubrik från URL
-function getRubr($con) {
+function getRubr(PDO $con): string {
     function getRVal($Rubrik, $RValue, $RItem) {
         if ($Rubrik !="")
             if ($RItem == "Species" || $RItem == "SspVarForm") {
@@ -875,16 +863,13 @@ function getRubr($con) {
     return $Rubrik;
 }
 
-function getSimpleAdr() {
+function getSimpleAdr(): string {
     $adr = "";
     foreach ($_GET as $SearchItem => $SearchValue)
     {
-        /*if($SearchValue != "*" and $SearchItem != "search" and $SearchItem != "Page" and
-	   $SearchItem != "Life" and $SearchItem != "World" and $SearchItem != "slemocota" and
-	   $SearchItem!= "andromeda" and $SearchItem!= "OrderBy" and $SearchItem!= "ARecord" and $SearchItem!='AaccNr' and $SearchItem != 'Aid')*/
     if(notSpecial($SearchItem, $SearchValue))
         {
-            if($adr!="") $adr .= "&amp;";
+            if($adr!="") $adr .= '&';   // "&amp;";?
             $adr .= urlencode($SearchItem) . "=" . urlencode($SearchValue);
         }
     }
@@ -892,61 +877,66 @@ function getSimpleAdr() {
     return $adr;
 }
 
-function getSimpleAdr2() {
+/*
+function getSimpleAdr2():string {
     $adr = "";
     foreach ($_GET as $SearchItem => $SearchValue)
     {
 	if(notSpecial($SearchItem, $SearchValue))
-        /*if($SearchValue != "*" and $SearchItem != "search" and $SearchItem != "Page" and $SearchItem != "Life" and $SearchItem != "World"
-	   and $SearchItem != "slemocota" and $SearchItem!= "andromeda" and $SearchItem!= "OrderBy" and $SearchItem!= "ARecord" and $SearchItem!='AaccNr' and $SearchItem != 'Aid')*/
+        //if($SearchValue != "*" and $SearchItem != "search" and $SearchItem != "Page" and $SearchItem != "Life" and $SearchItem != "World"
+	   //and $SearchItem != "slemocota" and $SearchItem!= "andromeda" and $SearchItem!= "OrderBy" and $SearchItem!= "ARecord" and $SearchItem!='AaccNr' and $SearchItem != 'Aid')
         {
-            if($adr!="") $adr .= "&amp;";
+            if($adr!="") $adr .= '&';  //"&amp;"?
             $adr .= urlencode($SearchItem) . "=" . urlencode($SearchValue);
         }
     }
     //echo "<p>$adr<p>";
     return $adr;
-}
+}*/
 
+//använd prepared statments
 // returnerar SQL coden för sidupdelning av sökresultat från URL
-function pageSQL($page, $pageSize){
+
+/*
+function pageSQL(int $page, int $pageSize):string{
     $start = ($page-1)*$pageSize;
     return "LIMIT $start, $pageSize";
-}
+}*/
 
 // skriver ut en liten text så att det går att navigera mellan flera sidor om det finns
 // flera poster än vad som får plats på en sida
-function pageNav($page, $nrRecords, $adress, $pageSize, $nrRecords2) {
+function pageNav(int $page, int $nrRecords, string $adress, int $pageSize, int $nrRecords2, String $pageName):void {
     if ($nrRecords>$pageSize) {
         $nrPages = ceil($nrRecords/$pageSize);
         $nextPage = $page+1;
         if ($page>6) {
             echo "
-            <a href=\"$adress&amp;Page=1&amp;nrRecords=$nrRecords2\">first</a>, ";
+            <a href=\"$adress&amp;$pageName=1&amp;nrRecords=$nrRecords2\">first</a>, ";
         }
         if ($page>1) {
             $prevPage = $page-1;
             echo "
-            <a href=\"$adress&amp;Page=$prevPage&amp;nrRecords=$nrRecords2\">prev</a>, ";
+            <a href=\"$adress&amp;$pageName=$prevPage&amp;nrRecords=$nrRecords2\">prev</a>, ";
         }
         //echo "page: $page of $nrPages";
         if (0 < $page-5) $i_start=$page-5; else $i_start=1;
         if ($nrPages < $i_start+10) $i_stop=$nrPages+1; else $i_stop = $i_start+10;
         for ($i=$i_start; $i<$i_stop; $i++) {
             if ($i == $page ) echo "<span class = \"curr\">$i</span>, ";
-            else echo "<a href=\"$adress&amp;Page=$i&amp;nrRecords=$nrRecords2\">$i</a>, ";
+            else echo "<a href=\"$adress&amp;$pageName=$i&amp;nrRecords=$nrRecords2\">$i</a>, ";
         }
         if ($page<$nrPages) {
             echo "
-            <a href=\"$adress&amp;Page=$nextPage&amp;nrRecords=$nrRecords2\">next</a>";
+            <a href=\"$adress&amp;$pageName=$nextPage&amp;nrRecords=$nrRecords2\">next</a>";
         }
         if ($page<$nrPages-4) {
-            echo ", <a href=\"$adress&amp;Page=$nrPages&amp;nrRecords=$nrRecords2\">last ($nrPages)</a>";
+            echo ", <a href=\"$adress&amp;$pageName=$nrPages&amp;nrRecords=$nrRecords2\">last ($nrPages)</a>";
         }
     }
 }
 
-function pageANav($page, $nrRecords, $adress, $pageSize) {
+/*
+function pageANav(int $page, int $nrRecords, string $adress, int $pageSize):string {
     if ($nrRecords>$pageSize) {
         $nrPages = ceil($nrRecords/$pageSize);
         echo "
@@ -976,11 +966,10 @@ function pageANav($page, $nrRecords, $adress, $pageSize) {
                 }
             }
         ";
-       
     }
-}
+}*/
 
-function getPageNr() {
+function getPageNr():int {
     if (isset($_GET['Page'])) {
         return $_GET['Page'];
     } else {
@@ -988,17 +977,14 @@ function getPageNr() {
     }
 }
 
-function getNrRecords ($con) {
-    /*
-    $nrRecords = mysql_query( "SELECT FOUND_ROWS();", $con);
-    list($nr) = mysql_fetch_array($nrRecords);
-    return $nr;*/
+function getNrRecords($con):int {
     $stmt = $con->query('SELECT FOUND_ROWS();');
     list($nr) = $stmt->fetch();
     return $nr;
 }
 
-function aquery($con, $query) {
+/*
+function aquery($con, string $query) {
         $start_time = microtime(true);
         $result = $con->query($query);
         $stop_time = microtime(true);
@@ -1040,6 +1026,6 @@ function aquery($con, $query) {
                 <tt>$info</tt>
         </div>";
     return $result;
-}
+}*/
 
  

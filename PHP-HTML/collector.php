@@ -24,9 +24,10 @@
 <?php
 // Code Written By Nils Ericson 2010-01-04
 // Code for the Collector's record page
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-include("herbes.php");
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+include "ini.php";
+
 $ID = $_GET['collectorID'];
 $con7 = getConS();
 $query = "SELECT Fornamn, Efternamn, Ful_Fornamn, Ful_Efternamn, birth, death, signatur FROM samlare JOIN signaturer ON samlare.ID = signaturer.samlar1_ID WHERE samlare.ID=:id";

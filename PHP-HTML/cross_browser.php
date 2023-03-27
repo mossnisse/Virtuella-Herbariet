@@ -29,10 +29,10 @@
 <?php
 // Code Written By Nils Ericson 2009-11-21
 // crossbrowser page
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
 set_time_limit(120);
-include("herbes.php");
+include "herbes.php";
 
 if (isUpdating()) { updateText();}
 else {

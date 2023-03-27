@@ -21,7 +21,7 @@
         <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Export specimen records</h2>
 <?php
 // sida med länkar till olika export funktioner
-include("herbes.php");
+include "herbes.php";
 
 $adr = getSimpleAdr();
 $order = orderBy();
@@ -30,26 +30,31 @@ $nr = $_GET['nrRecords'];
 $con = getConS();
 $Rubrik = getRubr($con);
 $pages = ceil($nr/100000);
+if (isset($_GET['ARecord']))
+   $ARecord = $_GET['ARecord'];
+else
+   $ARecord = 1;
 
+if (isset($_GET['Page']))
+    $page = $_GET['Page'];
+else
+    $page = 1;
 
-if (isset($_GET['ARecord'])) {
-    $ARecord = $_GET['ARecord'];
-} else $ARecord = 1;
 echo "
         <h3>Specimens giving hits for: $Rubrik</h3>
         $nr records found.
          <div class = \"menu2\">
             <ul>
-                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Map</a></li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Record</a></li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord\">Export</a></li>
+                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord&amp;Page=$page\">List</a></li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord&amp;Page=$page\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord&amp;Page=$page\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$ARecord&amp;Page=$page\">Export</a></li>
             </ul>
         </div>
         <table class = \"outerBox\"> <tr> <td>
     The export functions are still under development and may not work properly. Caracter encoding is UTF-8. The file will contain max 100000 posts even if the search gives more.
-    <table class = \"Box\"> <tr> <td>";
-    echo "Export result set as xml (Darwin Core) (";
+    <table class = \"Box\"> <tr> <td>
+    Export result set as xml (Darwin Core) (";
     for ($p=1; $p<$pages+1; $p++) {
         echo "<a href =\"export/dwcxml.php?$adr&amp;Page=$p&amp;nrRecords=$nr\">page$p</a>, ";
     }

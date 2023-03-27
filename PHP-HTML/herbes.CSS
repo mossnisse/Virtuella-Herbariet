@@ -72,7 +72,56 @@ padding-bottom: 4px; /*shift text down 1px for selected and active item*/
 background-color: lightgrey;
 }
 
+#list .menu1 .standard_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#map .menu1 .standard_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#record .menu1 .standard_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#export .menu1 .standard_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
 #cross_browser .menu1 .cross_browser a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#locality_search .menu1 .locality_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#locality_list .menu1 .locality_search a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: lightgrey;
+}
+
+#locality_map .menu1 .locality_search a{
 color: black !important; /*text color of selected and active item*/
 padding-top: 6px; /*shift text down 1px for selected and active item*/
 padding-bottom: 4px; /*shift text down 1px for selected and active item*/
@@ -190,13 +239,25 @@ padding-bottom: 4px; /*shift text down 1px for selected and active item*/
 background-color: white;
 }
 
+#locality_list .menu2 .list a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
+#locality_map .menu2 .map a{
+color: black !important; /*text color of selected and active item*/
+padding-top: 6px; /*shift text down 1px for selected and active item*/
+padding-bottom: 4px; /*shift text down 1px for selected and active item*/
+background-color: white;
+}
+
 @media print {
     .menu {
         display: none;
     }
 }
-
-
 
 /* a box that center the contet on the page */
 .outerBox {
