@@ -1,7 +1,6 @@
 <?php
-// halvfärdig export funktion till darwincore formaterad XML
 set_time_limit(300);
-include("../herbes.php");
+include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="DWC.xml"');
 
@@ -23,9 +22,7 @@ $svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords
 $result = $svar[0];
 //$nr = $svar['nr'];
 
-
-echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"; 
-echo "
+echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
 <ucr:UMECoreRecordSet
     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
     xsi:schemaLocation=\"http://www.UMECore/ http://herbarium.emg.umu.se/export/UMECore.xsd\"
@@ -40,9 +37,7 @@ echo "
         <dwc:nomenclatureCode>ICBN</dwc:nomenclatureCode>
         <FileCreated>".date("Y-m-d")."</FileCreated>
     </ucr:Metadata>
-    <ucr:UMECoreRecordSet>
-        
-";
+    <ucr:UMECoreRecordSet>";
 
 foreach($result as $row)
 {
@@ -50,17 +45,24 @@ foreach($result as $row)
     if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
         $saml ="";
     else
-        $saml = $row["Collector"];
+        $saml = htmlspecialchars($row["Collector"], ENT_XML1);
     
     if ($row['Country'] == "" or $row['Country'] == "[Missing]" or $row['Country'] == "[missing]" or $row['Country'] == "[unreadable]")
         $country = "Unknown";
     else
-        $country = xmlf($row['Country']);
+        $country = htmlspecialchars($row['Country'], ENT_XML1);
         
     if ($row['Locality'] == "")
         $Locality = "No locality information available";
     else
-        $Locality = xmlf($row['Locality']);
+        $Locality = htmlspecialchars($row['Locality'], ENT_XML1);
+        
+    $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
+
+    if (isset($row['Comments']))
+        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+    else
+        $comments = "";
 
     echo  "
         <ucr:UMECoreRecord>
@@ -69,23 +71,23 @@ foreach($result as $row)
                 <dcterms:modified xsi:nil=\"true\"/>
                 <dwc:catalogNumber>$row[AccessionNo]</dwc:catalogNumber>";
     if ($saml!="") echo "
-                <dwc:recordedBy>".xmlf($saml)."</dwc:recordedBy>";
+                <dwc:recordedBy>$saml</dwc:recordedBy>";
     echo "
                 <dwc:collectorNumber>$row[collectornumber]</dwc:collectorNumber>";
     if ($row['Year']!="") echo "
                 <dcterms:eventDate>$row[Year]-$row[Month]-$row[Day]</dcterms:eventDate>";
     echo "
-                <dwc:occurenceRemarks>".xmlf($row['Comments'])."</dwc:occurenceRemarks>
+                <dwc:occurenceRemarks>$comments</dwc:occurenceRemarks>
             </ucr:Occurrence>
             <ucr:Location> ";
     if ($row['Continent']!="") echo "
-                <dwc:continent>".xmlf($row['Continent'])."</dwc:continent>";
+                <dwc:continent>".htmlspecialchars($row['Continent'], ENT_XML1)."</dwc:continent>";
     echo "
                 <dwc:country>$country</dwc:country>";
     if ($row['Province']!="") echo "
-                <dwc:stateProvince>".xmlf($row['Province'])."</dwc:stateProvince>";
+                <dwc:stateProvince>".htmlspecialchars($row['Province'], ENT_XML1)."</dwc:stateProvince>";
     if ($row['District']!="") echo "        
-                <dwc:county>$row[District]</dwc:county>";
+                <dwc:county>".htmlspecialchars($row['District'], ENT_XML1)."</dwc:county>";
     echo "
                 <dwc:locality>$Locality</dwc:locality> ";
                 
@@ -96,7 +98,7 @@ foreach($result as $row)
     echo "
             </ucr:Location>
             <ucr:Taxon>
-                <dwc:scientificName>".scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"])."</dwc:scientificName>
+                <dwc:scientificName>$scientificName</dwc:scientificName>
                 <dwc:genus>$row[Genus]</dwc:genus>
                 <dwc:specificEpithet>$row[Species]</dwc:specificEpithet>
                 <dwc:intraspecificEpithet>$row[SspVarForm]</dwc:intraspecificEpithet> 

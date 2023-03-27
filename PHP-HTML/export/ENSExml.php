@@ -1,11 +1,10 @@
 <?php
-// halvfärdig export funktion till darwincore formaterad XML
 set_time_limit(300);
-include("../herbes.php");
+include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="ENSE.xml"');
 
-$pageURL = xmlf(curPageURL());
+$pageURL = htmlspecialchars(curPageURL(), ENT_XML1);
 
 $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day, specimens.Comments, specimens.Notes, 
              specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
@@ -17,16 +16,15 @@ $page = $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords=$_GET['nrRecords'];
+$nrRecords = $_GET['nrRecords'];
 
 $con = getConS();
 
 $svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
-$result = $svar['result'];
-//$nr = $svar['nr'];
+$result = $svar[0];
+$nr = $svar[1];
 
-echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"; 
-echo "
+echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
 <ense:ENSExml
     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
     xsi:schemaLocation=\"http://www.UMEENSE/ http://130.239.50.112/ENSE.xsd\"
@@ -35,34 +33,38 @@ echo "
     <ense:Metadata>
         <ense:BasisOfRecord>Preserved Specimen</ense:BasisOfRecord>
         <FileCreatedDate>".date("Y-m-d")."</FileCreatedDate>
-        <FileCreatedFromURL> $pageURL </FileCreatedFromURL>
-        <NrOfRecords> $nr </NrOfRecords>
+        <FileCreatedFromURL>$pageURL</FileCreatedFromURL>
+        <NrOfRecords>$nr</NrOfRecords>
     </ense:Metadata>
     <ense:RecordSet>
 ";
 
 foreach($result as $row)
 {
+    
     if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
         $saml ="";
     else
-        $saml = $row["Collector"];
-    
-   
-                
+        $saml = htmlspecialchars($row["Collector"], ENT_XML1);
+        
+    if (isset($row['collectornumber']))
+        $collectornr = htmlspecialchars($row['collectornumber'], ENT_XML1);
+    else 
+        $collectornr = "";  
     // gegrafi
     $continent = $row['Continent'];
     if ($continent == "Australia & Oceania")
         $continent = "Oceania";
-    
-    
+
     if ($row['Country'] == "" or $row['Country'] == "[Missing]" or $row['Country'] == "[missing]" or $row['Country'] == "[unreadable]")
         $country = "Unknown";
     else
-        $country = xmlf($row['Country']);
+        $country = htmlspecialchars($row['Country'], ENT_XML1);
         
+    // fixa Län och kommun för Sverige, Finland m.m.
+    /*
     if ($row['Country'] == "Sweden") {
-        $statePr = xmlf($row['län']);
+        $statePr = htmlspecialchars($row['län'], ENT_XML1);
         if ($row['Province'] == 'Småland (Inre)') {
             $district = 'Småland';
         }
@@ -72,22 +74,29 @@ foreach($result as $row)
         elseif ($row['Province'] == 'Göteborg') {
             $district = 'Västergötland';
         }
-        else $district = xmlf($row['Province']);
-        $parish = xmlf($row['District']);
+        else $district = htmlspecialchars($row['Province'], ENT_XML1);
+        $parish = htmlspecialchars($row['District'], ENT_XML1);
     } else {
-        $statePr = xmlf($row['Province']);
-        $district = xmlf($row['District']);
+        $statePr = htmlspecialchars($row['Province'], ENT_XML1);
+        $district = htmlspecialchars($row['District'], ENT_XML1);
         $parish = "";
-    }
+    }*/
+    
+    $district = htmlspecialchars($row['District'], ENT_XML1);
+    $province = htmlspecialchars($row['Province'], ENT_XML1);
         
     if ($row['Locality'] == "")
         $Locality = "No locality information available";
     else
-        $Locality = xmlf($row['Locality']);
+        $Locality = htmlspecialchars($row['Locality'], ENT_XML1);
         
+    if (isset($row['Comments']))
+        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+    else 
+        $comments = "";
     
     // Taxa
-    $scientificName = scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]);
+    $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
     
     $genera = $row["Genus"];
     if ($genera == "Bryophytes indet.") {
@@ -115,17 +124,21 @@ foreach($result as $row)
         $intraEp = "";
     }
     
+    if (isset($row['CValue']))
+        $CValue = htmlspecialchars($row['CValue'], ENT_XML1);
+    else
+        $CValue = "";
     // Remarks m.m.
-    
-    $Remarks = "\nTaxon on label: ".xmlf($row['Original_name'])."\nText on label: ".xmlf($row['Original_text']);
-    if ($row['Notes']!="") {
-       $Remarks.="\nNotes on specimen:".xmlf($row['Notes']);
-    }
-    if ($row['Comments']!="") {
-        $Remarks.="\nRemarks by registrator: ".xmlf($row['Comments']);
-    }
-    
-    
+    $Remarks ="";
+    if (isset($row['Original_name']) && $row['Original_name']!="")
+        $Remarks = "\nTaxon on label: ".htmlspecialchars($row['Original_name'], ENT_XML1);
+    if (isset($row['Original_text']) && $row['Original_text']!="")
+        $Remarks = "\nText on label: ".htmlspecialchars($row['Original_text'], ENT_XML1);
+    if (isset($row['Notes']) && $row['Notes']!="") 
+       $Remarks.="\nNotes on specimen: ".htmlspecialchars($row['Notes'], ENT_XML1);
+    if (isset($row['Comments']) && $row['Comments']!="") 
+        $Remarks.="\nRemarks by registrator: ".htmlspecialchars($row['Comments'], ENT_XML1);
+   
      //Date Collected
     if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
         $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
@@ -135,18 +148,19 @@ foreach($result as $row)
         $DateCollected = $row['Year'];
     else
         $Remarks.="\nDate Collected: $row[Day]/$row[Month]";
-    
+   
+   // print the record data
     echo  "
         <ense:Record>
                 <ense:InstitutionCode>$row[institutionCode]</ense:InstitutionCode>
                 <ense:CollectionCode></ense:CollectionCode>
                 <ense:GlobalUniqueIdentifier>$row[institutionCode]:$row[AccessionNo]</ense:GlobalUniqueIdentifier>
                 <ense:DateLastModified xsi:nil=\"true\"/>
-                <ense:CatalogNumber>$row[AccessionNo]</ense:CatalogNumber> ";
+                <ense:CatalogNumber>$row[AccessionNo]</ense:CatalogNumber>";
     if ($saml!="") echo "
-                <ense:Collector>$saml</ense:Collector> ";
+                <ense:Collector>$saml</ense:Collector>";
     echo "
-                <ense:CollectorNumber>".xmlf($row['collectornumber'])."</ense:CollectorNumber> ";
+                <ense:CollectorNumber>$collectornr</ense:CollectorNumber>";
     if ($row['Year']!="") echo "
                 <ense:DateCollected>$DateCollected</ense:DateCollected>";
     echo "
@@ -157,18 +171,16 @@ foreach($result as $row)
     echo "
                 <ense:Country>$country</ense:Country>";
     if ($row['Province']!="") echo "
-                <ense:StateProvince>$statePr</ense:StateProvince>";
+                <ense:StateProvince>$province</ense:StateProvince>";
     if ($row['District']!="") echo "        
-                <ense:County>$district</ense:County>";
+                <ense:County>$district</ense:County>";   // <ense:Parish>$parish</ense:Parish>
     echo "
-                <ense:Parish>$parish</ense:Parish>
-                <ense:Locality>$Locality</ense:Locality> ";
-                
-    if (!($row['Lat'] == 0 and $row['Long'] ==0))
-    echo "
+                <ense:Locality>$Locality</ense:Locality>";  
+    if (!($row['Lat'] == 0 and $row['Long'] ==0)) 
+        echo "
                 <ense:DecimalLatitude>$row[Lat]</ense:DecimalLatitude>
                 <ense:DecimalLongitude>$row[Long]</ense:DecimalLongitude>
-                <ense:VerbatimCoordinates>".xmlf($row['CValue'])."</ense:VerbatimCoordinates>
+                <ense:VerbatimCoordinates>$CValue</ense:VerbatimCoordinates>
                 <ense:VerbatimCoordinateSystem>$row[CSource]</ense:VerbatimCoordinateSystem>";
     echo "
                 <ense:ScientificName>$scientificName</ense:ScientificName>
@@ -179,13 +191,11 @@ foreach($result as $row)
                 <ense:NomenclatureCode>ICBN</ense:NomenclatureCode>
                 <ense:IdentifiedBy xsi:nil=\"true\"/>
                 <ense:DateIdentified xsi:nil=\"true\"/>
-               
-        </ense:Record> ";
+        </ense:Record>";
 }
 
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);
 ?>
-   
 </ense:RecordSet>
 </ense:ENSExml>

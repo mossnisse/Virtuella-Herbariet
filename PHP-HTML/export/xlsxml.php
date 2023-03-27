@@ -1,10 +1,10 @@
 <?php
 // halvfärdig export funktion till enkel CSV
 set_time_limit(300);
-include("../herbes.php");
+include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_export.xml"');
-$pageURL = xmlf(curPageURL());
+//$pageURL = xmlf(curPageURL());
 
 $con = getConS();
 $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.AccessionNo, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
@@ -83,14 +83,32 @@ foreach($result as $row)
     else
         $DateCollected = "";
         
-    $scientificName = xmlf(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]));
+    $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
     
-    $original_text=xmlf($row['Original_text']);
-    $original_name=xmlf($row['Original_name']);
-    $notes = xmlf($row['Notes']);
-    $collector = xmlf($row['Collector']);
-    $collecotrnr = xmlf($row['collectornumber']);
-    $comments = xmlf($row['Comments']);
+    if (isset($row['Original_text']))
+        $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
+    else
+        $original_text = "";
+    if (isset($row['Original_name']))
+        $original_name = htmlspecialchars($row['Original_name'], ENT_XML1);
+    else
+        $original_name = "";
+    if (isset($row['Notes']))
+        $notes = htmlspecialchars($row['Notes'], ENT_XML1);
+    else
+        $notes = "";
+    if (isset($row['Collector']))
+        $collector = htmlspecialchars($row['Collector'], ENT_XML1);
+    else
+        $collector = "";
+    if (isset($row['collectornumber']))
+        $collecotrnr = htmlspecialchars($row['collectornumber'], ENT_XML1);
+    else
+        $collecotrnr = "";
+    if (isset($row['Comments']))
+        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+    else
+        $comment = "";
     
     echo "
             <Row>

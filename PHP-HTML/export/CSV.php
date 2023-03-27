@@ -1,11 +1,11 @@
 <?php
 // halvfärdig export funktion till enkel CSV
 set_time_limit(300);
-include("../herbes.php");
+include "../herbes.php";
 header ("content-type: text/csv");
 header('Content-Disposition: attachment; filename="export.csv"');
 
-$pageURL = xmlf(curPageURL());
+// fix escape " 
 
 $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day, specimens.Comments, specimens.Notes, 
              specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
