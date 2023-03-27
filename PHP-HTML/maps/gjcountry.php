@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
+include "../ini.php";
 $con = getConS();
 if (array_key_exists('country', $_GET)) {
    $country = $_GET['country'];

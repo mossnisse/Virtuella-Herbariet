@@ -1,9 +1,9 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
+include "../ini.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
-if (array_key_exists('District', $_GET)) {
+if (isset($_GET['District'])) {
    $prov = $_GET['Province'];
    $dist = $_GET['District'];
    $query = "SELECT geojson FROM district where province = :prov and district = :dist;";

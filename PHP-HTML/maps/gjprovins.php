@@ -1,6 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
+include "../ini.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
 if (array_key_exists('Province', $_GET)) {

@@ -22,7 +22,7 @@
 	<table class = "outerBox"> <tr> <td>
 		<table class="SBox"> <tr> <td>
 <?php
-	include("../herbes.php");
+	include "../ini.php";
 	$con = getConS();
 	$prov = "";
 	$count = "";
