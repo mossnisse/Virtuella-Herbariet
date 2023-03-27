@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
-include("mathstuff.php");
+include "../ini.php";
+include "mathstuff.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
 $east = $_GET['East'];
@@ -29,7 +29,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 					//echo $coord[1].", ".$coord[0]."<br>\n";
 					if ($xold != -2000000) {
 						if (linesIntersect($xout, $yout, $east, $north, $xold, $yold, $coord[0], $coord[1])) {
-							$nr_intersections++;
+							++$nr_intersections;
 							//echo "intersects<br>\n";
 						}
 					}
@@ -40,7 +40,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 		}
 	
 		if ($nr_intersections%2==1) {
-			$nrHits++;
+			++$nrHits;
 			echo "
 {
 	\"ID\":  \"$row[ID]\",

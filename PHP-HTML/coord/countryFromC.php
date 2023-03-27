@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
-include("mathstuff.php");
+include "../ini.php";
+include "mathstuff.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
 $east = $_GET['East'];

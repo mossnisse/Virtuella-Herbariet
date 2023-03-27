@@ -226,7 +226,7 @@ function WGS84toDMS(WGS84) {
 	var EDir = "";
 	if (north<0) {NDir = "S"; NDeg = -NDeg;} else {NDir = "N";}
 	if (east<0) {EDir = "W"; EDeg = - EDeg;} else {EDir = "E";}
-	var DMS = NDeg+"&deg; "+NMin+"&prime; "+NSec+"&Prime; "+NDir+", "+EDeg+"&deg; "+EMin+"&prime; "+ESec+"&Prime; "+EDir; 
+	var DMS = NDeg+'° '+NMin+"′ "+NSec+"″ "+NDir+", "+EDeg+"° "+EMin+"′ "+ESec+"″ "+EDir; 
 	return DMS;
 }
 
@@ -241,13 +241,13 @@ function WGS84toDM(WGS84) {
 	var EDir = "";
 	if (north<0) {NDir = "S"; NDeg = -NDeg;} else {NDir = "N";}
 	if (east<0) {EDir = "W"; EDeg = - EDeg;} else {EDir = "E";}
-	var DM = NDeg+"&deg; "+NMin+"&prime; "+NDir+", "+EDeg+"&deg; "+EMin+"&prime; "+EDir; 
+	var DM = NDeg+'° '+NMin+"′ "+NDir+", "+EDeg+"° "+EMin+"′ "+EDir; 
 	return DM;
 }
 
 function UTMNumToAlpha(num) {
 	// 67 == C = 1  I==73 and O==79 is not used
-	num = num+66
+	num = num+66;
 	if (num>77) num = num +2;
 	else if (num>72) num = num +1;
 	return String.fromCharCode(num);
@@ -308,7 +308,7 @@ function WGS84toUTMGridZone(WGS84) {
 
 function centralMedianFromGridZone(gridZone) {
 	var zone = gridZone.substring(0,gridZone.length-1);
-	return CM = (zone*6)-183;
+	return (zone*6)-183;
 }
 
 function isGridzone() {
@@ -322,7 +322,7 @@ function WGS84toUTM(WGS84) {
 	// northing range 0 to 9300000
 	const gridZone = WGS84toUTMGridZone(WGS84);
 	const UTM_centralMeridian = centralMedianFromGridZone(gridZone);
-	var UTM_false_northing = 0   //N0  
+	var UTM_false_northing = 0;   //N0  
 	if (WGS84[0]<=0) {
 		UTM_false_northing = 10000000;       
 	} 
@@ -362,7 +362,7 @@ function UTMtoWGS84(UTM) {
 	const north = parseInt(UTM[1]);
 	const east = parseInt(UTM[2]);
 	const UTM_centralMeridian = centralMedianFromGridZone(gridZone);
-	var UTM_false_northing = 0   //N0 
+	var UTM_false_northing = 0;   //N0 
 	var latitudeBand = gridZone.substring(gridZone.length-1,gridZone.length);
 	console.log("latitudeBand: "+latitudeBand);
 	if (latitudeBand<"N") {

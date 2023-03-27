@@ -1,13 +1,13 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-include("../herbes.php");
+include "../ini.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
 $radius = 6371009;
 
 $maxDist = 10000;
-$lat = SQLf($_GET['north']);
-$long = SQLf($_GET['east']);
+$lat = $_GET['north'];
+$long = $_GET['east'];
 
 $rlat = sin($maxDist/$radius)*180/M_PI;
 $mlat = $lat*M_PI/180;
