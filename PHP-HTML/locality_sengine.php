@@ -1,22 +1,22 @@
 <?php
-function listSearch($field, $data) {
+function listSearch(string $field, string $data) : array {
     $altonly = $data;
     $altfirst = $data.',%';
     $altlast = '%, '.$data;
     $altmidle = '%, '.$data.',%';
     $sql = "$field Like :altonly OR $field LIKE :altfirst OR $field LIKE :altlast OR $field LIKE :altmidle";
     $bind = array(':altonly' =>  $altonly, ':altfirst' => $altfirst, ':altlast' => $altlast, ':altmidle' => $altmidle);
-    return [$sql, $bind];
+    return array($sql, $bind);
 }
 
-function bindListSearch($stmt, $binds) {
+function bindListSearch(PDOStatement $stmt, array $binds) : void {
     foreach($binds as $key => $value) {
         $stmt->bindValue($key, $value);
         //echo "bindValue($key, \"$value\")<br>";
     }
 }
 
-function getLocalityList() {
+function getLocalityList() : PDOStatement {
     $con = getConS();
 
     $Country   = str_replace("*","%",$_GET['country']);
@@ -28,9 +28,17 @@ function getLocalityList() {
    
     $orderby = 'locality';
     if (isset($_GET['orderby'])) {
-        if ($_GET['orderby'] == 'country') $orderby = 'country';
-        else if ($_GET['orderby'] == 'province') $orderby = 'province';
-        else if ($_GET['orderby'] == 'district') $orderby = 'district';
+    switch ($_GET['orderby']) {
+        case 'country':
+            $orderby = 'country';
+            break;
+        case 'province':
+            $orderby = 'province';
+            break;
+        case 'district':
+            $orderby = 'district';
+            break;
+    }
     }
     
     // echo "Country: $Country Province: $Province District: $District Locality: $Locality ALocality: $ALocality Orderby: $orderby";
@@ -48,7 +56,7 @@ function getLocalityList() {
     return $lstmt;
 }
    
-function getDistrictList() {
+function getDistrictList() : PDOStatement {
     $con = getConS();
     $Country   = str_replace("*","%",$_GET['country']);
     $Province  = str_replace("*","%",$_GET['province']);
@@ -62,7 +70,7 @@ function getDistrictList() {
     if($Locality != '%') {
         $DLocality = $Locality;
     } 
-    if(isset($DLocality) and $DLocality != '%') {
+    if(isset($DLocality) && $DLocality != '%') {
         $listsearch = listSearch('alt_names', $DLocality);
         
         $query = "SELECT ID, province, district, country FROM district WHERE country Like :country AND province Like :province AND
@@ -78,14 +86,14 @@ function getDistrictList() {
     }
 }
                     
-function getProvinceList() {
+function getProvinceList() : PDOStatement {
     if($Province != '%') {
         $PLocality = $Province;
     }
     if($Locality != '%') {
         $PLocality = $Locality;
     }    
-    if(isset($PLocality) and $PLocality != '%') {
+    if(isset($PLocality) && $PLocality != '%') {
         $pstmt =$con->prepare("SELECT ID, province, country FROM provinces WHERE country Like :country AND
 										 (province Like :locality or alt_names Like :locality or alt_names Like :locality2) ORDER BY Province");
                      
@@ -95,14 +103,14 @@ function getProvinceList() {
     }
 }
 
-function getCountryList() {
-    if ($Country != '%' and $Locality == '%') {
+function getCountryList() : PDOStatement {
+    if ($Country != '%' && $Locality == '%') {
         $CLocality = $Country;
     }
     if($Locality != '%') {
         $CLocality = $Locality;
     }
-    if( isset($CLocality) and $CLocality != '%') {
+    if( isset($CLocality) && $CLocality != '%') {
         $cstmt =$con->prepare("SELECT ID, english FROM countries WHERE english Like :locality or swedish Like :locality or native Like :locality or gadm_name like :locality ORDER BY english");
         $cstmt->bindValue(':locality', $CLocality);
     }

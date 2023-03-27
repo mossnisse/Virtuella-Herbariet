@@ -21,81 +21,99 @@
     <div class = "subMenu">
         <h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Specimen records</h2>
 <?php
-// Code Written By Nils Ericson 2009-11-21
-// code for Specimen page the first SQL query gets the AccessionNo for the specimen reccord and the other gets the actual datata
-// det är lite strulig kod med bläddring mellan flera sidor och flera inblandade arter i ett kollekt.
-//include("koordinates.php");
-
-//include("edit/session.php");
-include("herbes.php");
-if (isUpdating()) { updateText();}
+include "herbes.php";
+if (isUpdating()) {updateText();}
 else {
-
-//list($con2, $user_id, $username) = test_login();
 
 if (isset($_GET['AccessionNo']))
     $AccessionNo = $_GET['AccessionNo'];
+elseif (isset($_GET['Aacc']))
+    $AccessionNo = $_GET['Aacc'];
+    
+if (isset($_GET['InstitutionCode']))
+   $instCode = $_GET['InstitutionCode'];
+elseif (isset($_GET['Ainst']))
+   $instCode = $_GET['Ainst'];
 
-if (isset($_GET['ID'])) $ID = $_GET['ID'];
+if (isset($_GET['ID']))
+   $ID = $_GET['ID'];
+elseif (isset($_GET['Aid']))
+   $ID = $_GET['Aid'];
 
-if (!isset($_GET['Page'])) {
-    $_GET['Page'] = 1;
-}
+if (isset($_GET['Page']))
+   $list_page = $_GET['Page'];
+else
+   $list_page = 1;
 
-if (isset($_GET['ARecord'])) {
-    $_GET['Page'] = $_GET['ARecord'];
-}
+if (isset($_GET['ARecord']))
+   $ARecord = $_GET['ARecord'];
+else
+   $ARecord = 1;
 
-if (!isset($_GET['nrRecords'])) {
-    $_GET['nrRecords'] = 1;
-}
-/*
-if (!isset($_GET['Page'])) {
-     $_GET['Page'] = 1;
-}*/
-
+if (isset($_GET['nrRecords']))
+   $nrRecords = $_GET['nrRecords'];
+if (isset($_GET['ID']))
+   $nrRecords = 1;
+   
+if (isset($_GET['OrderBy']))
+   $orderBy = $_GET['OrderBy'];
+else
+   $orderBy = '';
+   
+$adr = getSimpleAdr();
+$order2 = orderBy();
+$OrderAdr = $order2['Adr'];
+   
 $con = getConS();
 
-if (isset($_GET['Page'])) {
-    $page = SQLf($_GET['Page']);
-    $nr =  SQLf($_GET['nrRecords']);
-    $adr = getSimpleAdr();
-    $a2dr = getSimpleAdr2();
-    $order2 = orderBy();
-    $OrderAdr = $order2['Adr'];
-    if (isset($_GET['AaccNr'])) {
-        $AccessionNo =  SQLf($_GET['AaccNr']);
-        $instCode = SQLf($_GET['Ainst']);
-        $collCode = SQLf($_GET['Acoll']);
-        $ID = $_GET['Aid'];
-        $wherestat = "WHERE specimens.AccessionNo = '$AccessionNo' and specimens.InstitutionCode = '$instCode' and CollectionCode = '$collCode'";
-        $sort = "";
-        $limit = "";
-    } else {
-        $order2['SQL'];
-        $whatstat = "specimens.ID, specimens.AccessionNo, specimens.InstitutionCode, CollectionCode";
-        $GroupBy = '';
-        $arr = wholeSQL($con, $whatstat, $page, 1, $GroupBy, $order2, $nr);
-        //$arr = $stmt->fetch(PDO::FETCH_ASSOC);
-        $row3 = $arr[0]->fetch(PDO::FETCH_ASSOC);
-        $ID = $row3['ID'];
-        $AccessionNo = SQLf($row3['AccessionNo']);
-        $instCode = SQLf($row3['InstitutionCode']);
-        $collCode = SQLf($row3['CollectionCode']);
-        //mysql_close($con);
-        $wherestat = "WHERE specimens.AccessionNo = '$AccessionNo' and specimens.InstitutionCode = '$instCode' and CollectionCode = '$collCode'";
-        $sort = "";
-        $limit = "";
-    }
-} else if (isset($GET['ID'])) {
-    $wherestat = "WHERE specimens.ID = '$ID'";
-    $_GET['Page'] = 1;
-    $nr=1;
-    $sort = "";
-    $limit = "";
+// get the accessionNo and instcode for the reccord
+if (!isset($AccessionNo) || !isset($instCode)) {
+   if (isset($ID)) { 
+      //$nrRecords = 1;
+      $query = "SELECT AccessionNo, InstitutionCode FROM specimens where ID = :ID";
+      $Stm = $con->prepare($query);
+      $Stm->bindValue(':ID', $ID, PDO::PARAM_STR);
+      $Stm->execute();
+      $Stm->setFetchMode(PDO::FETCH_ASSOC);
+      $Stm->execute();
+      $row = $Stm->fetch();
+      $AccessionNo = $row['AccessionNo'];
+      $instCode = $row['InstitutionCode'];
+   } else {
+         // use wholeSQL and limit to the right reccord in the list...
+      $arr = wholeSQL($con, "AccessionNo, InstitutionCode", $ARecord, 1, '', $order2, $nrRecords);
+      $Stm = $arr[0];
+      $nrRecords = $arr[1];
+      $row = $Stm->fetch();
+      $AccessionNo = $row['AccessionNo'];
+      $instCode = $row['InstitutionCode'];
+   }
 }
 
-$query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
+// check if several specimens with the same AccessionNo and Institution get the ID for the reccords
+$mixedNames ="";
+if (!isset($_GET['ID'])) { // unique
+   $check_nr_with_query = "SELECT specimens.ID, Genus, Species, SspVarForm, HybridName FROM specimens WHERE specimens.AccessionNo = :AccessionNo AND specimens.InstitutionCode = :InstitutionCode";
+   $Stm = $con->prepare($check_nr_with_query);
+   $Stm->bindValue(':AccessionNo', $AccessionNo, PDO::PARAM_STR);
+   $Stm->bindValue(':InstitutionCode', $instCode, PDO::PARAM_STR);
+   $Stm->execute();
+   // fixa get ID för första posten fungerar det korrekt?? kolla om rätt data?
+   $i = 0;
+   while($row = $Stm->fetch()) {
+      if ($i == 0) {
+         $ID = $row['ID'];
+      } elseif ($i==1) {
+         $mixedNames .= "<a href=\"record.php?AccessionNo=$AccessionNo&ID=$row[ID]\">$row[Genus] $row[Species] $row[SspVarForm] $row[HybridName]</a>";   
+      } else {
+         $mixedNames .= ", <a href=\"record.php?AccessionNo=$AccessionNo&ID=$row[ID]\">$row[Genus] $row[Species] $row[SspVarForm] $row[HybridName]</a>"; 
+      }
+      ++$i;
+   }
+}
+// get all the data for the reccord
+
+$record_query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
                  collector, collectornumber, specimens.`Year`, `Month`, `Day`, specimens.Continent, specimens.Country, specimens.Province, specimens.District, specimens.Locality,
                  Altitude_meter, RUBIN, RiketsN, RiketsO, Notes, Original_name, Original_text, specimens.Comments, Cultivated,
                  Exsiccata, Exs_no, Lat_deg, Lat_min, Lat_sec, Lat_dir, Long_deg, Long_min, Long_sec, Long_dir, habitat,
@@ -110,55 +128,15 @@ $query = "SELECT specimens.ID, specimens.Genus, specimens.Species, specimens.Ssp
                  LEFT JOIN samlare ON signaturer.samlar1_ID = samlare.ID)
                  LEFT JOIN countries ON countries.english = specimens.country)
                  LEFT JOIN district ON specimens.Geo_ID = district.ID)
-                 
-          $wherestat $sort $limit";
-
-//echo "<p>query 2: $query <p>";
+          WHERE specimens.ID = :ID;";
+          
+$Stm = $con->prepare($record_query);
+$Stm->bindValue(':ID',$ID, PDO::PARAM_INT);
+$Stm->execute();
+$row = $Stm->fetch();
  
 // , revisions.originalText as revisions
  //LEFT JOIN revisions ON specimens.ID = revisions.specimenID)))
- 
-$result = $con->query($query);
-if (!$result) {
-        echo mysql_error();
-    }
-//$result = aquery($query);
-//echo "nr rows".mysql_num_rows ($result );
-$mixedNames ="";
-
-while($row2 = $result->fetch())
-{
-    //$Scientificnames .= ", ".scn ($row2, $ID, $AccessionNo, $con);
-    if ($row2["ID"] == $ID) {
-        $row = $row2;
-        if ($row["SspVarForm"]!= "" and $row["SspVarForm"]!= " ")
-        {
-            $sspAukt = $row["Auktor"];
-            $query2 = "SELECT Auktor, AccessionNo FROM specimens LEFT JOIN xnames USING (Genus, Species, HybridName) WHERE AccessionNo = '$AccessionNo' AND (xnames.SspVarForm = '' OR xnames.SspVarForm IS NULL) AND Genus = '$row[Genus]' ;";
-            $result2 = $con->query($query2);
-            $row3 = $result2->fetch();
-            $sAukt = $row3["Auktor"];
-        } else {
-            $sAukt = $row["Auktor"];
-            $sspAukt ="";
-        }
-        if(substr($row['SspVarForm'],0,4)=="ssp.") {
-            $sspVarForm = "subsp. <span class=\"LatinSp\">". substr($row['SspVarForm'],4)." </span>";
-        } elseif(substr($row['SspVarForm'],0,4)=="var.") {
-            $sspVarForm = "var. <span class=\"LatinSp\">". substr($row['SspVarForm'],4)." </span>";
-        } elseif(substr($row['SspVarForm'],0,5)=="form.") {
-            $sspVarForm = "form. <span class=\"LatinSp\">". substr($row['SspVarForm'],5)." </span>";
-        } else  $sspVarForm = "";
-        $currName = "<span class=\"LatinSp\"> $row[Genus] $row[Species] </span> <span class=\"Aukt\"> $sAukt </span> $sspVarForm <span class=\"Aukt\">$sspAukt</span> <span class=\"LatinSp\">$row[HybridName]</span>";
-        
-    } else {
-        if ($mixedNames!="") {
-            $mixedNames .= ", <a href=\"record.php?AccessionNo=$AccessionNo&ID=$row2[ID]\"> $row2[Genus] $row2[Species] $row2[SspVarForm] $row2[HybridName]</a>";
-        } else {
-            $mixedNames .= "<a href=\"record.php?AccessionNo=$AccessionNo&ID=$row2[ID]\"> $row2[Genus] $row2[Species] $row2[SspVarForm] $row2[HybridName]</a>";
-        }
-    }
-}
 
 $province = $row['Province'];
 $district = $row['District'];
@@ -172,7 +150,10 @@ $notes = CComments(breaks($row['Notes']));
 $comments = breaks($row['Comments']);
 $Latf = LatLongformat($row["Lat_deg"], $row["Lat_min"], $row["Lat_sec"], $row["Lat_dir"]);
 $Longf = LatLongformat($row["Long_deg"], $row["Long_min"], $row["Long_sec"], $row["Long_dir"]);
-$rubin = RUBINf($row['RUBIN']);
+if (isset($row['RUBIN']))
+   $rubin = RUBINf($row['RUBIN']);
+else
+   $rubin = '';
 $CLat = $row['Lat'];
 $CLong = $row['Long'];
 $CSource = $row['CSource'];
@@ -197,32 +178,39 @@ if ($row['Efternamn'] == "") {
 }
 $Rubrik = getRubr($con);
 //pageANav($page, $nr, "record.php?".$a2dr.$OrderAdr, 1);
-    
-    echo "
+
+// javascript to flip pageses with arrowkeys
+$pagep1 = $ARecord+1;
+$pagem1 = $ARecord-1;
+echo "
+<script type=\"text/javascript\">
+      document.onkeydown = checkKey;
+      function checkKey(event) {
+         if (event.keyCode == 39) {
+            window.open(\"record.php?$adr$OrderAdr&nrRecords=$nrRecords&ARecord=$pagep1&Page=$list_page\",\"_self\");
+         }
+         if(event.keyCode == 37 && $pagem1 > 0) {
+            window.open(\"record.php?$adr$OrderAdr&nrRecords=$nrRecords&ARecord=$pagem1&Page=$list_page\",\"_self\");
+         }
+      }
+</script>
+
         <h3> Specimens giving hits for: $Rubrik </h3>
-        $nr records found.
+        $nrRecords records found.
         
     <div class = \"menu2\">
             <ul>
-                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Map</a></li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Record</a></li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nr&amp;ARecord=$page\">Export</a></li>
+                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord&amp;Page=$list_page\">List</a></li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord&amp;Page=$list_page\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord&amp;Page=$list_page\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecord&amp;Page=$list_page\">Export</a></li>
             </ul>
         </div>        
         <table class = \"outerBox\">
             <tr> <td>";
-            if (isset($page)) {
-                //echo "page: $page <a href=\"collect.php\"> next </a> <br />";
-                pageNav($page, $nr, "record.php?".$adr.$OrderAdr, 1, $nr);
+
+                pageNav($ARecord, $nrRecords, "record.php?".$adr.$OrderAdr, 1, $nrRecords, 'ARecord');
                 echo "<br />";
-            }
-   /* if ($row['Group'] == 'Bryophytes / Mossor' and substr($AccessionNo, 0, 3) != 'UME' and $instCode=='UME') {
-        echo "
-            This specimen record is incomplete or inadequate. It has been extracted from a former locality database in which the text had been abbreviated and altered. The adjusting of entries like this is in progress, but for the time being the label of the specimen must be checked in the herbarium before the information can be cited.";
-    }*/
-
-
     if ($instCode=="S") {
             $link = "<a href=\"http://herbarium.nrm.se/specimens/$AccessionNo\">$AccessionNo</a>";
     } else {
@@ -232,15 +220,13 @@ $Rubrik = getRubr($con);
 echo "
     <table id=\"left\"><tr><td>
     <table class =\"SBox\">
-        <tr><th colspan=\"2\">$currName</th></tr>
+        <tr><th colspan=\"2\"><span class=\"LatinSp\">$row[Genus] $row[Species] $row[SspVarForm] $row[HybridName]</span></th></tr>
         <tr><td>Herbarium: $row[InstitutionCode]</td> <td>Catalogue number: $link</td></tr>
         ";
-        
-        if ($row['Group']=='Bryophytes / Mossor')
-                echo "<tr><td colspan=\"2\">$row[Subgroup]</td></tr>";
-            else
-                echo
-                "<tr><td colspan=\"2\">$row[Group]</td></tr>";
+if ($row['Group']=='Bryophytes / Mossor')
+   echo "<tr><td colspan=\"2\">$row[Subgroup]</td></tr>";
+else
+   echo "<tr><td colspan=\"2\">$row[Group]</td></tr>";
         
 if ($mixedNames != "")
     echo  "
@@ -267,16 +253,16 @@ echo "
             if ($row['Altitude_meter'] != '')
                 echo "
                 <tr> <td>Altitude:</td> <td>$row[Altitude_meter] meter</td> </tr>";
-        if ($row['Month']<10 and $row['Month']>0)
+        if ($row['Month']<10 && $row['Month']>0)
             $m = "0$row[Month]";
         else
             $m = "$row[Month]";
-        if ($row['Day']<10 and $row['Day']>0)
+        if ($row['Day']<10 && $row['Day']>0)
             $d = "0$row[Day]";
         else
             $d = "$row[Day]";
-        
-echo"
+
+echo "
             <tr> <td>Collection date:</td> <td>$row[Year]-$m-$d</td> </tr>";
             //if ($row['InstitutionCode'] != 'GB') {
                 echo "<tr> <td>Collector on label:</td> <td> $sign";
@@ -453,6 +439,7 @@ echo "
             <tr> <td>Species:</td> <td><a href=\"cross_browser.php?SpatLevel=0&amp;SysLevel=7&amp;Sys=$row[Species]&amp;Genus=$row[Genus]&amp;Spat=world&amp;Herb=All\">$row[Species]</a></td> </tr> ";
             if ($row['SspVarForm'] != "") echo "<tr> <td>Intraspecific taxon:</td> <td>$row[SspVarForm]</td> </tr>";
             if ($row['HybridName'] != "") echo "<tr> <td>Hybrid name:</td> <td>$row[HybridName]</td> </tr>";
+            echo"<tr><td>Auctor:</td><td>$row[Auktor]</td></td>";
     if ($row['Svenskt_namn'] != "")
     echo "
         <tr> <td>Swedish name:</td> <td>$row[Svenskt_namn]</td> </tr>";
@@ -491,7 +478,7 @@ if ($row['RiketsN'] != "")
 echo "
         </table> ";
 
-if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
+if ($row['InstitutionCode'] == "LD" && !$row['Image1'] == "") {
     //$directory = "http://130.235.11.36:591/Lund/Images/";
     $directory = "http://www.botmus.lu.se/Lund/Images/";
     $filenamesub = "$directory$row[Image1].jpg";
@@ -516,7 +503,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     }
-} elseif ($row['InstitutionCode'] == "S" and !$row['Image1'] == "")  {
+} elseif ($row['InstitutionCode'] == "S" && !$row['Image1'] == "")  {
     //http://herbarium.nrm.se/img/fbo/small/S-C-001001/S-C-1124.jpg
     //$thumbdirectory = ""; //"http://herbarium.nrm.se/img/fbo/small/";
     //$largedirectory = "";
@@ -550,7 +537,7 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
                 <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
             </table>";
     }
-} elseif ($row['InstitutionCode'] == "GB" and !$row['Image1'] == "") {   
+} elseif ($row['InstitutionCode'] == "GB" && !$row['Image1'] == "") {   
     $filenamesub = "http://herbarium.gu.se/web/images/$row[Image1].jpg";
     $thumb = "http://herbarium.gu.se/web/images/$row[Image1]_small.jpg";
     echo "
@@ -574,16 +561,11 @@ if ($row['InstitutionCode'] == "LD" and !$row['Image1'] == "") {
             <tr> <td><a href=\"$filenamesub\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
         </table>";
     }
-    
 }   
-    
 echo "
     </td> </tr> </table>";
-
-if ($Logg == 'On')
-    logg($MySQLHost, $MySQLLUser, $MySQLLPass);
 }
-    ?>
+?>
     </td> </tr> </table>
     </div>
     </body>

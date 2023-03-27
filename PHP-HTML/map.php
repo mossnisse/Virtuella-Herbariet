@@ -23,9 +23,9 @@
 <?php
 // Code Written By Nils Ericson 2010-01-04
 // plots the specimen records from a search on a google map
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-include("herbes.php");
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+include "herbes.php";
 
 //$timer = new Timer();
 //cacheStart();
@@ -37,32 +37,35 @@ $con = getConS();
 $adr = getSimpleAdr();
 $Rubrik = getRubr($con);
 
-
 if (isset($_GET['ARecord']))
-    $ARecordAdr = $_GET['ARecord'];
+   $ARecordAdr = $_GET['ARecord'];
 else
-    $ARecordAdr = 1;
+   $ARecordAdr = 1;
 
 if (isset($_GET['OrderBy']))
-    $OrderAdr = "&OrderBy=$_GET[OrderBy]";
+   $OrderAdr = "&OrderBy=$_GET[OrderBy]";
 else
-    $OrderAdr = "";
+   $OrderAdr = "";
     
 if (isset($_GET['Page']))
-    $page = $_GET['Page'];
+   $list_page = $_GET['Page'];
 else
-    $page = 1;
+   $list_page = 1;
     
 if (isset($_GET['nrRecords']))
-    $nrRecords = $_GET['nrRecords'];
+   $nrRecords = $_GET['nrRecords'];
 else
-    $nrRecords = -1;
+   $nrRecords = -1;
     
 if (isset($_GET['nrBlipps'])) 
-    $nrBlipps = $_GET['nrBlipps'];
+   $nrBlipps = $_GET['nrBlipps'];
 else
-    $nrBlipps = -1;
- 
+   $nrBlipps = -1;
+    
+if(isset($_GET['MapPage']))
+   $page=$_GET['MapPage'];
+else
+   $page=1;
 
 $order['SQL'] = "ORDER BY Lat";
 $whatstat = "CSource, CValue, `Long`, `Lat`, COUNT(*)";
@@ -116,7 +119,7 @@ $blipps;
     {
         $Nr = $row['COUNT(*)'];
         $total=$total+$Nr;
-        if (isset($row['CSource']) and $row['CSource'] != "None" and $row['Lat'] != '')
+        if (isset($row['CSource']) && $row['CSource'] != "None" && $row['Lat'] != '')
         {
             $blipps[$i]['Lat'] = $row['Lat'];
             $blipps[$i]['Long'] = $row['Long'];
@@ -151,47 +154,47 @@ $blipps;
             {
                 case "District":
                     $NrDistrict+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "Locality":
                     $NrLocality+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                  case "LocalityVH":
                     $NrLocalityVH+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "RUBIN":
                     $NrRUBIN+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "Latitude / Longitude":
                     $NrLatLong+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "RT90-coordinates":
                     $NrRT90+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "Sweref99TM-coordinates":
                     $NrSweref+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "UPS Database":
                     $NrUPS+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "OHN Database":
                     $NrOHN+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
                 case "LINREG":
                     $NrLINREG+=$Nr;
-                    $i++;
+                    ++$i;
                     break;
              }
         } else {
-                    $NrNone+=$Nr;
+            $NrNone+=$Nr;
         }
     }
  
@@ -210,7 +213,7 @@ $blipps;
 
 echo "
         <h3>Specimens giving hits for : $Rubrik</h3>
-        $nrRecords records found of which ".($total) ." are mapped on this page.";
+        $nrRecords records found of which $total are mapped on this page.";
         
         //echo "nrBlipps: $nrBlipps MapPage: $MapPageSize <p>";
         if ($nrPages>1)
@@ -219,16 +222,14 @@ echo "
        echo"
         <div class = \"menu2\">
             <ul>
-                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">List</a></li>
-                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Map</a></li>
-                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Record</a></li>
-                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr\">Export</a></li>
+                <li class = \"list\"><a href=\"list.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr&amp;Page=$list_page&amp;MapPage=$page\">List</a></li>
+                <li class = \"map\"><a href=\"map.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr&amp;Page=$list_page&amp;MapPage=$page\">Map</a></li>
+                <li class = \"record\"><a href=\"record.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr&amp;Page=$list_page&amp;MapPage=$page\">Record</a></li>
+                <li class = \"export\"><a href =\"export.php?$adr$OrderAdr&amp;nrRecords=$nrRecords&amp;ARecord=$ARecordAdr&amp;Page=$list_page&amp;MapPage=$page\">Export</a></li>
             </ul>
         </div>
         <table class = \"outerBox\"> <tr> <td>";
-            
-            pageNav($page, $nrBlipps, 'map.php?'.$adr.$OrderAdr, $MapPageSize, $nrRecords);
-            
+pageNav($page, $nrBlipps, 'map.php?'.$adr.$OrderAdr, $MapPageSize, $nrRecords, 'MapPage');            
 echo "
         <script src=\"http://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&sensor=false\"></script>
         <script>
@@ -237,21 +238,17 @@ echo "
                 var bounds = new google.maps.LatLngBounds ();
                 bounds.extend(new google.maps.LatLng($LatMin, $LongMin));
                 bounds.extend(new google.maps.LatLng($LatMax, $LongMax));
-            
                 var mapProp = {
                     center:new google.maps.LatLng($CenterLat,$CenterLong),
                     mapTypeId:google.maps.MapTypeId.ROAD
                 };
-            
                 var map=new google.maps.Map(document.getElementById(\"googleMap\"),mapProp);
-                
                 map.fitBounds(bounds);";
-                
                 if (isset($blipps)) {
                     $i=0;
                     foreach ($blipps as $blipp)
                     {
-                    $i++;
+                    ++$i;
                     echo "
                     var infowindow$i = new google.maps.InfoWindow({
                         content: '$blipp[Link]'
@@ -270,9 +267,7 @@ echo "
  echo "              
             }
             google.maps.event.addDomListener(window, 'load', initialize);
-        </script>";
-            
-        echo "
+        </script>
             <div id=\"googleMap\" class = \"Box\">Loading...</div>
             <noscript><p> JavaScript must be enabled in order for you to use this Map.</p> </noscript>
             <img src=\"$imges[0]\" alt =\"$imges[0]\">1 specimen
@@ -295,7 +290,6 @@ echo "
             UPS Database. <a href=\"list.php?$adr&amp;CSource=UPS+Database\">$NrUPS</a> records<br />
             OHN Database. <a href=\"list.php?$adr&amp;CSource=OHN+Database\">$NrOHN</a> records<br />
             </td> </tr> </table>";
-
 //cacheEnd();
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);

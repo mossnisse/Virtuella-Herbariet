@@ -15,7 +15,7 @@ function ajax(url, doit)
 	    if(xmlhttp.readyState==4)
 	    {
 		//alert(xmlhttp.responseText);
-                doit(xmlhttp.responseText);
+            doit(xmlhttp.responseText);
 	    }
 	};
 	xmlhttp.open("GET", url ,true);
@@ -36,6 +36,7 @@ function fillStats()
 }
 
 function fillTot() {
+	//alert("fill tot");
 	var xmlhttp;
 	if (window.XMLHttpRequest)
 	{
@@ -51,7 +52,7 @@ function fillTot() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("tot").innerHTML = xmlhttp.responseText;
+			document.getElementById("tot").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetTot.php";
@@ -76,7 +77,7 @@ function fillGB() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("GB").innerHTML = xmlhttp.responseText;
+			document.getElementById("GB").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetGB.php";
@@ -101,7 +102,7 @@ function fillUME() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("UME").innerHTML = xmlhttp.responseText;
+			document.getElementById("UME").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetUME.php";
@@ -126,7 +127,7 @@ function fillS() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("S").innerHTML = xmlhttp.responseText;
+			document.getElementById("S").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetS.php";
@@ -151,7 +152,7 @@ function fillUPS() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("UPS").innerHTML = xmlhttp.responseText;
+			document.getElementById("UPS").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetUPS.php";
@@ -176,7 +177,7 @@ function fillOHN() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("OHN").innerHTML = xmlhttp.responseText;
+			document.getElementById("OHN").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetOHN.php";
@@ -201,7 +202,7 @@ function fillLD() {
 	    if(xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
-			document.getElementById("LD").innerHTML = xmlhttp.responseText;
+			document.getElementById("LD").textContent = xmlhttp.responseText;
 	    }
 	};
     var url = "stats/GetLD.php";

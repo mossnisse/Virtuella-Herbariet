@@ -23,8 +23,8 @@
 <?php
     //<li class = \"record\"><a href=\"locality.php?locality=$_GET[locality]&country=$_GET[country]&province=$_GET[province]&district=$_GET[district]\">Record</a></li>
    
-				include("herbes.php");
-                include("locality_sengine.php");
+				include "ini.php";
+                include "locality_sengine.php";
 				try {
 					$con = getConS();
 
@@ -37,52 +37,6 @@
                     $urlProvince = urlencode($_GET['province']);
                     $urlDistrict = urlencode($_GET['district']);
                     $urlLocality = urlencode($_GET['locality']);
-                
-                    /*
-                    $ALocality = "%$Locality%";
-					$ALocality1 = "$Locality,%";
-                    $ALocality2 = "%, $Locality";
-                    $ALocality3 = "%, $Locality,%";
-                    
-                    $orderby = 'locality';
-                    if (isset($_GET['orderby'])) {
-                        if ($_GET['orderby'] == 'country') $orderby = 'country';
-                        else if ($_GET['orderby'] == 'province') $orderby = 'province';
-                        else if ($_GET['orderby'] == 'district') $orderby = 'district';
-                    }*/
-
-                   // echo "Country: $Country Province: $Province District: $District Locality: $Locality ALocality: $ALocality Orderby: $orderby";
-                    
-                    /*
-                    $lstmt =$con->prepare("SELECT locality, ID, province, district, country FROM locality WHERE country Like :country AND province Like :province AND
-										 district Like :district AND (locality Like :locality or alternative_names Like :locality or alternative_names Like :alocality1 or alternative_names Like :alocality2 or alternative_names Like :alocality3)
-                                         ORDER BY $orderby limit 2000");
-					
-					$lstmt->bindValue(':country', $Country);
-					$lstmt->bindValue(':province', $Province);
-					$lstmt->bindValue(':district', $District);
-					$lstmt->bindValue(':locality', $Locality);
-					$lstmt->bindValue(':alocality1', $ALocality1);
-                    $lstmt->bindValue(':alocality2', $ALocality2);
-                    $lstmt->bindValue(':alocality3', $ALocality3);
-                    */
-                    
-                    /*
-                    if($District != '%') {
-                        $DLocality = $District;
-                    }
-                    if($Locality != '%') {
-                        $DLocality = $Locality;
-                    }    
-                    if(isset($DLocality) and $DLocality != '%') {
-                        $dstmt =$con->prepare("SELECT ID, province, district, country FROM district WHERE country Like :country AND province Like :province AND
-										 (district Like :locality or alt_names Like :alocality) ORDER BY district");
-                     
-                        $dstmt->bindValue(':country', $Country);
-                        $dstmt->bindValue(':province', $Province);
-                        $dstmt->bindValue(':locality', $DLocality);
-                        $dstmt->bindValue(':alocality', "%$DLocality%");
-                    }*/
                     
                     if($Province != '%') {
                         $PLocality = $Province;
@@ -90,7 +44,7 @@
                     if($Locality != '%') {
                         $PLocality = $Locality;
                     }    
-                    if(isset($PLocality) and $PLocality != '%') {
+                    if(isset($PLocality) && $PLocality != '%') {
                         $pstmt =$con->prepare("SELECT ID, province, country FROM provinces WHERE country Like :country AND
 										 (province Like :locality or alt_names Like :locality or alt_names Like :locality2) ORDER BY Province");
                      
@@ -99,19 +53,18 @@
                         $pstmt->bindValue(':locality2', "%$PLocality%");
                     }
                     
-                    if ($Country != '%' and $Locality == '%') {
+                    if ($Country != '%' && $Locality == '%') {
                         $CLocality = $Country;
                     }
                     if($Locality != '%') {
                         $CLocality = $Locality;
                     }
-                    if( isset($CLocality) and $CLocality != '%') {
+                    if( isset($CLocality) && $CLocality != '%') {
                         $cstmt =$con->prepare("SELECT ID, english FROM countries WHERE english Like :locality or swedish Like :locality or native Like :locality or gadm_name like :locality ORDER BY english");
                         $cstmt->bindValue(':locality', $CLocality);
                     }
                     
-					//echo "<a href= \"locality_map.php?locality=$_GET[locality]&country=$_GET[country]&province=$_GET[province]&district=$_GET[district]\"> Map </a>";
-                     echo "
+                    echo "
     <div class = \"menu2\">
         <ul>
             <li class = \"list\"><a href=\"locality_list.php?locality=$urlLocality&country=$urlCountry&province=$urlProvince&district=$urlDistrict\">List</a></li>
@@ -120,7 +73,6 @@
     </div>
 	<table class = \"outerBox\"><tr><td>
 		<table class=\"SBox\">";
-                    
                     
                     if (isset($cstmt)) {
                         $cstmt->execute();

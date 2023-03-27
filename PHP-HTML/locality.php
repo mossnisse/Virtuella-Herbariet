@@ -24,15 +24,15 @@
 		<table class="SBox">
 <?php
 			try {
-				include("herbes.php");
-				$con = $con = getConS();
+				include "ini.php";
+				$con = getConS();
 				$stmt = "";
 				if (isset($_GET['ID'])) {
-					$stmt = $con->prepare("SELECT * FROM Locality WHERE ID = :id");
+					$stmt = $con->prepare('SELECT * FROM Locality WHERE ID = :id');
 					$stmt->bindParam(':id', $ID);
 					$ID = $_GET['ID'];
 				} else {
-					$stmt = $con->prepare("SELECT * FROM Locality WHERE Country = :Country and Province = :Province and District = :District and Locality = :Locality");
+					$stmt = $con->prepare('SELECT * FROM Locality WHERE Country = :Country and Province = :Province and District = :District and Locality = :Locality');
 					$stmt->bindParam(':Country', $Country);
 					$stmt->bindParam(':Province', $Province);
 					$stmt->bindParam(':District', $District);

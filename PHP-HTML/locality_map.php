@@ -21,8 +21,8 @@
     <div class = "subMenu">
 	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality map</h2>
 <?php
-    include("herbes.php");
-    include("locality_sengine.php");
+    include "ini.php";
+    include "locality_sengine.php";
     
     $urlCountry = urlencode($_GET['country']);
     $urlProvince = urlencode($_GET['province']);
@@ -42,7 +42,7 @@
     $lstmt = getLocalityList();
     $lstmt->execute();
 
-    echo"
+    echo "
 					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 
 					<script>
@@ -60,10 +60,9 @@
                         $locality = str_replace('"', '\"', $row["locality"]);
                         echo "
 						marker$i = new google.maps.Marker({position: new google.maps.LatLng($row[lat],$row[long])});
-
 						marker$i.setMap(map);
 						google.maps.event.addListener(marker$i, 'click', function() { new google.maps.InfoWindow({ content:\"<a href=\\\"locality.php?ID=$row[ID]\\\">$locality</a>\"}).open(map,marker$i);});";
-                        $i++;
+                        ++$i;
                         if ($LatMin > $row['lat']) $LatMin = $row['lat'];
                         if ($LatMax < $row['lat']) $LatMax = $row['lat'];
                         if ($LongMin > $row['long']) $LongMin = $row['long'];
@@ -71,17 +70,17 @@
                        
 					}
                     // max start zoom in on map
-                    $CenterLong = ($LongMin + $LongMax)/2;
-                    $CenterLat = ($LatMin  + $LatMax)/2;
+                    $CenterLong = ($LongMin + $LongMax)/2.0;
+                    $CenterLat = ($LatMin  + $LatMax)/2.0;
                     
-                    $maxZoom =0.04;
+                    $maxZoom = 0.04;
                     if ($LongMax-$LongMin<$maxZoom) {
-                        $LongMax = $CenterLong + $maxZoom/2;
-                        $LongMin = $CenterLong - $maxZoom/2;
+                        $LongMax = $CenterLong + $maxZoom/2.0;
+                        $LongMin = $CenterLong - $maxZoom/2.0;
                     }
                     if ($LatMax-$LatMin<$maxZoom) {
-                        $LatMax = $CenterLat + $maxZoom/2;
-                        $LatMin = $CenterLat - $maxZoom/2;
+                        $LatMax = $CenterLat + $maxZoom/2.0;
+                        $LatMin = $CenterLat - $maxZoom/2.0;
                     }
                     echo "
                         var bounds = new google.maps.LatLngBounds ();
@@ -91,7 +90,7 @@
 						}
 					</script>
 					<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=myMap\"></script>";
-			?>
+?>
 		</td></tr></table>
 	</td></tr> </table>
     </div>
