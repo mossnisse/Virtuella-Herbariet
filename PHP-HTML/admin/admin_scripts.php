@@ -1,28 +1,26 @@
 <?php
-include("../herbes.php");
+include "../herbes.php";
 
-function flush_buffers(){
+function flush_buffers(): void {
     ob_end_flush();
     ob_flush();
     flush();
     ob_start();
 }
 
-function replacepage($name, $script, $description, $instcode, $charset, $lineendings, $con2) {
+function replacepage(string $name, string $script, string $description, string $instcode, string $charset, string $lineendings, PDO $con2) : void {
     echo "
-    <html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">
+    <html>
     <head>
-        <title> Virtuella herbariet update $name </title>
+        <title>Virtuella herbariet update $name</title>
         <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
     </head>
     <body>
     <div>
     <h2> Intruktioner för uppdatering av Specimen data $name</h2>
-
     <form enctype=\"multipart/form-data\" action=\"$script\" method=\"post\" accept-charset=\"utf-8\">
 
-    <h3> 1. Ersätt fil </h3>";
-    echo "
+    <h3> 1. Ersätt fil </h3>
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
     $query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
@@ -35,27 +33,25 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
     {
         echo "
         <tr>
-            <td> <input type= \"radio\" name=\"delfile_ID\" value =\"$row[ID]\"/> </td>
-            <td> $row[ID] </td>
-            <td> $row[name] </td>
-            <td> $row[nr_records] </td>
-            <td> $row[inst] </td>
-            <td> $row[coll] </td>
-            <td> $row[date] </td>
+            <td><input type= \"radio\" name=\"delfile_ID\" value =\"$row[ID]\"/></td>
+            <td>$row[ID]</td>
+            <td>$row[name]</td>
+            <td>$row[nr_records]</td>
+            <td>$row[inst]</td>
+            <td>$row[coll]</td>
+            <td>$row[date]</td>
         </tr>";
     }
     
     echo "
         <tr>
-            <td> <input type=\"radio\" name=\"delfile_ID\" value =\"-1\" checked=\"checked\" /> </td>
-            <td> None (Inserting new file in db)</td>
-            <td> 0 </td>
-            <td> </td>
+            <td><input type=\"radio\" name=\"delfile_ID\" value =\"-1\" checked=\"checked\" /></td>
+            <td>None (Inserting new file in db)</td>
+            <td>0</td>
+            <td></td>
         </tr>
-    </table>";
-    
-    echo "
-    <h3> $description <br />
+    </table>
+    <h3>$description</h3>
     
     <h3> 3. Importera .csv filen till MySQL </h3>
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"1000000000\" />
@@ -102,15 +98,14 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
             </select> </td> </tr>
             <tr> <td> Line endings: </td> <td> <select name=\"line_endings\" size=\"1\">
                 $lineendings
-                <option value=\"\\r\\n\">\\r\\n - DOS/Windows</option>
-                <option value=\"\\r\">\\r - Mac</option>
-                <option value=\"\\n\">\\n - Unix</option>
+                <option value=\"\r\n\">\\r\\n - DOS/Windows</option>
+                <option value=\"\r\">\\r - Mac</option>
+                <option value=\"\n\">\\n - Unix</option>
             </select> </td> </tr>
             
-            <tr> <td> Password: </td> <td> <input type=\"password\" name =\"mypassword\" />
-            <input type=\"hidden\" name =\"kontroll\" value = \"OK\" /> </td> </tr>
-            
-            <tr> <td> <input type=\"submit\" value=\"Upload File\" /> </td> </tr>
+            <tr> <td>Password:</td> <td><input type=\"password\" name =\"mypassword\" />
+            <input type=\"hidden\" name =\"kontroll\" value = \"OK\" /></td> </tr>
+            <tr> <td><input type=\"submit\" value=\"Upload File\" /></td> </tr>
         </table>
     </form>
     <a href=\"admin.php\">admin page</a> <br />
@@ -120,7 +115,7 @@ function replacepage($name, $script, $description, $instcode, $charset, $lineend
     </html>";
 }
 
-function instable($con, $sfileName, $instCode, $collCode) {
+function instable(PDO $con, string $sfileName, string $instCode, string $collCode) : int {
     $query = "INSERT INTO sfiles (name, inst, coll) values (:sfileName, :instCode, :collCode);";
     $stmt = $con->prepare($query);
     $stmt->BindValue(':sfileName', $sfileName, PDO::PARAM_STR);
@@ -132,7 +127,7 @@ function instable($con, $sfileName, $instCode, $collCode) {
     return $ro[0];
 }
 
-function instablenr($con, $sfileID) {
+function instablenr(PDO $con, int $sfileID) : void {
     $query = "SELECT count(*) as nr from specimens WHERE sFile_ID = :sfileID Group by sFile_ID;";
     $stmt = $con->prepare($query);
     $stmt->BindValue(':sfileID', $sfileID, PDO::PARAM_STR);
@@ -146,7 +141,7 @@ function instablenr($con, $sfileID) {
     $stmt->execute();
 }
 
-function doreplace($con, $query, $sfileName, $file_ID, $uploadfile, $char_set, $line_endings, $instCode, $collCode) {
+function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, string $uploadfile, string $char_set, string $line_endings, string $instCode, string $collCode): void {
     echo "<br /> query: $query <br />";
     $timer = new Timer();
    
@@ -165,7 +160,9 @@ function doreplace($con, $query, $sfileName, $file_ID, $uploadfile, $char_set, $
     $stmt->BindValue(':instCode', $instCode, PDO::PARAM_STR);
     echo "':instCode', $instCode<br>";
     $stmt->BindValue(':collCode', $collCode, PDO::PARAM_STR);
-    echo "':collCode', $collCode<p>";
+    echo "':collCode', $collCode<br>";
+    $stmt->BindValue(':line_endings', $line_endings, PDO::PARAM_STR);
+    echo "':line_endings', $line_endings<p>";
     
     $stmt->execute();
     warningFormat($con,$sfileName);
@@ -214,7 +211,7 @@ function doreplace($con, $query, $sfileName, $file_ID, $uploadfile, $char_set, $
     }
 }
 
-function emptycache() {
+function emptycache() : void {
     $dir = 'c:\\Apache24\\htdocs\\cache\\';
     $mydir = opendir($dir);
     while(false !== ($file = readdir($mydir))) {
@@ -232,7 +229,7 @@ function emptycache() {
     closedir($mydir);
 }
 
-function delfile($con, $delfile_ID, $sfileName) {
+function delfile(PDO $con, int $delfile_ID, string $sfileName) {
     echo "delfile ID: $delfile_ID <br>";
     if ($delfile_ID == -2) {
         $delIDQuery = "SELECT ID FROM sfiles where name = :fileName;";
@@ -280,7 +277,7 @@ function delfile($con, $delfile_ID, $sfileName) {
     }
 }
 
-function calcModified($con, $delfileDate) {
+function calcModified(PDO $con, $delfileDate): bool {
     $query = "UPDATE specimens SET lastModified = :delfileDate dff WHERE sfile = :file;"; // ej färdig
     $Stm = $con->prepare($query);
     $Stm->bindValue(':delfileDate',$file_ID, PDO::PARAM_STR);
@@ -300,13 +297,13 @@ function calcModified($con, $delfileDate) {
     }
 }
 
-function fixGeoNames($con, $file_ID) {
+function fixGeoNames(PDO $con, int $file_ID): void {
     $Stm = $con->prepare("Call fix_geonames_f(:file_ID);");
     $Stm->bindValue(':file_ID',$file_ID, PDO::PARAM_INT);
     $Stm->execute();
 }
 
-function fixIdLinks($con, $file_ID, $timer) {
+function fixIdLinks(PDO $con, int $file_ID, $timer) {
     if ($file_ID == "-1") {
         $UGenusQuery = "UPDATE specimens join xgenera using (Genus) SET Genus_ID = xgenera.ID;";
         $UnameQuery = "UPDATE specimens join xnames using (Genus, Species, sspVarForm, HybridName) SET Taxon_ID = xnames.ID, Dyntaxa_ID = xnames.taxonid;";
@@ -373,7 +370,7 @@ function fixIdLinks($con, $file_ID, $timer) {
     done fixing id links <br />";
 }
 
-function filetable($con2) {
+function filetable(PDO $con2): void {
     echo "
     <table>
         <tr> <th> </th> <th> ID </th> <th> Fil </th> <th> poster </th> <th> institution code </th> <th> collection code </th> <th> datum </th> </tr>";
@@ -405,7 +402,7 @@ function filetable($con2) {
     </table>";
 }
 
-function upploadfile($backpage) {
+function upploadfile(string $backpage) {
    if ($_POST['kontroll'] != "OK") {
         echo "lyckas inte ladda upp filen, antagligen är det för att filen du försöker ladda upp är för stor <br />
             <a href=\"$backpage\">back to admin page</a> <p />";
@@ -447,7 +444,7 @@ function upploadfile($backpage) {
     }
 }
 
-function warningFormat($con, $sfileName) {
+function warningFormat(PDO $con, string $sfileName) {
     $stmt = $con->query('SHOW WARNINGS');
     //echo "stmt" + $stmt;
     if ($stmt) { 

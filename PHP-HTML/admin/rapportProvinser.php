@@ -1,19 +1,20 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+	<title>Rapport Provinser</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="author" content="Nils Ericson" />
+</head>
+<body>
+	<H3>Provinser som saknas i tabellen</H3>
+	Visar max 1000 poster
+	<Table>
+		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>
 <?php
-include("..\herbes.php");
+include "..\ini.php";
 $fileID = $_GET['FileID'];
 
 $con = getConS();
-
-echo "<head>
-		<title>Rapport Provinser</title>
-		<meta name=\"author\" content=\"Nils Ericson\" />
-		<link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
-	 </head>
-	 <body>
-	 <H3>Provinser som saknas i tabellen</H3>
-	 Visar max 1000 poster
-	 <Table>
-		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>";
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, specimens.Province from specimens left join district on district.Country = specimens.Country and district.Province = specimens.Province
 			where sFile_ID = :fileID and district.id is null and NOT specimens.province = \"\"LIMIT 1000";;
@@ -41,10 +42,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	$datum = "$row[Year]-$row[Month]-$row[Day]";
 	echo "<tr><td><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
 }
-
-echo "</table></body>";
-
-echo
-"</table>
-</body>";
 ?>
+</table>
+</body>
+</html>

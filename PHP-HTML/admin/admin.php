@@ -1,8 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
 <head>
-    <title> Virtuella herbariet Admin page </title>
+    <title>Virtuella herbariet: Admin page</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
@@ -13,7 +12,8 @@
         <a href="replaceGB.php">updatera databasen GB...</a> <br />
         <a href="replaceS.php">updatera databasen S Kärlväxter </a> <br />
         <a href="replaceKryptoS.php">updatera databasen KryptoS...</a> <br />
-        <a href="replaceOHN.php">updatera databasen OHN...</a> </p> <br />
+        <a href="replaceOHN.php">updatera databasen OHN...</a> <br />
+        <a href="replaceUMEMatrix.php">updatera databasen UME med Matrix (Svampar)...</a> <br /> </p> 
         
         <a href="delete.php">ta bort fil från databasen...<br />
         <a href="rapportV.php">fil rapport, kontrollera data i uppladad fil...<br />

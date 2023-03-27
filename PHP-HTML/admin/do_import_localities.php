@@ -1,7 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
     <head>
-        <title> Virtuella herbariet Admin page </title>
+        <title>Virtuella herbariet: Admin page</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     </head>
     <body>
@@ -9,9 +9,9 @@
 	//ini_set('post_max_size','100M');
 	//ini_set('upload_max_filesize','100M');
 	set_time_limit(240);
-	error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    include("admin_scripts.php");
+	//error_reporting(E_ALL);
+    //ini_set('display_errors', 1);
+    include "admin_scripts.php";
 	//include("../koordinates.php");
 if ($_POST['mypassword'] == "baconas")
 {
@@ -20,7 +20,6 @@ if ($_POST['mypassword'] == "baconas")
 	if ($a) {
         $sfileName = $a[0];
         $uploadfile = $a[1];
-		
 				
 		echo "empty temp table<br />";
 				

@@ -1,5 +1,38 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+ <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="Sheet1">
+ <Table>
+ <Row>
+     <Cell><Data ss:Type="String">InstitutionCode</Data></Cell>
+     <Cell><Data ss:Type="String">AccessionNo</Data></Cell>
+     <Cell><Data ss:Type="String">ScientificName</Data></Cell>
+     <Cell><Data ss:Type="String">Dyntaxa_ID</Data></Cell>
+     <Cell><Data ss:Type="String">Collector</Data></Cell>
+     <Cell><Data ss:Type="String">Collectornumber</Data></Cell>
+     <Cell><Data ss:Type="String">DateCollected</Data></Cell>
+     <Cell><Data ss:Type="String">Notes</Data></Cell>
+     <Cell><Data ss:Type="String">Province</Data></Cell>
+     <Cell><Data ss:Type="String">District</Data></Cell>
+     <Cell><Data ss:Type="String">Locality</Data></Cell>
+     <Cell><Data ss:Type="String">DecimalLatitude</Data></Cell>
+     <Cell><Data ss:Type="String">DecimalLongitude</Data></Cell>
+     <Cell><Data ss:Type="String">CoordinateSource</Data></Cell>
+     <Cell><Data ss:Type="String">CoordinateValue</Data></Cell>
+     <Cell><Data ss:Type="String">CoordinatePrecision</Data></Cell>
+     <Cell><Data ss:Type="String">Original name</Data></Cell>
+     <Cell><Data ss:Type="String">Original text</Data></Cell>
+     <Cell><Data ss:Type="String">Dyntaxa ID</Data></Cell>
+     <Cell><Data ss:Type="String">File ID</Data></Cell>
+ </Row>
 <?php
-include("../herbes.php");
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_lifewatch.xml"');
  
@@ -13,38 +46,6 @@ $offset = $pagesize*($page-1);
 if ($date == '' or $date == null ) {
     $date = '1200-01-01';
 }
- 
-echo "<?xml version=\"1.0\"?>
- <?mso-application progid=\"Excel.Sheet\"?>
- <Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\"
- xmlns:o=\"urn:schemas-microsoft-com:office:office\"
- xmlns:x=\"urn:schemas-microsoft-com:office:excel\"
- xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\"
- xmlns:html=\"http://www.w3.org/TR/REC-html40\">
- <Worksheet ss:Name=\"Sheet1\">
- <Table>
- <Row>
-     <Cell><Data ss:Type=\"String\">InstitutionCode</Data></Cell>
-     <Cell><Data ss:Type=\"String\">AccessionNo</Data></Cell>
-     <Cell><Data ss:Type=\"String\">ScientificName</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Dyntaxa_ID</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Collector</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Collectornumber</Data></Cell>
-     <Cell><Data ss:Type=\"String\">DateCollected</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Notes</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Province</Data></Cell>
-     <Cell><Data ss:Type=\"String\">District</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Locality</Data></Cell>
-     <Cell><Data ss:Type=\"String\">DecimalLatitude</Data></Cell>
-     <Cell><Data ss:Type=\"String\">DecimalLongitude</Data></Cell>
-     <Cell><Data ss:Type=\"String\">CoordinateSource</Data></Cell>
-     <Cell><Data ss:Type=\"String\">CoordinateValue</Data></Cell>
-     <Cell><Data ss:Type=\"String\">CoordinatePrecision</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Original name</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Original text</Data></Cell>
-     <Cell><Data ss:Type=\"String\">Dyntaxa ID</Data></Cell>
-     <Cell><Data ss:Type=\"String\">File ID</Data></Cell>
- </Row>";
  
 $query = "SELECT InstitutionCode, AccessionNo, Genus, Species, SspVarForm, HybridName, Dyntaxa_ID, Year, Month, Day, collector, Collectornumber, Original_name, Original_text, Notes, Province, District, Locality , Lat, `Long`, CSource, CValue, CPrec, sFile_ID
  FROM specimens join sfiles ON sfiles.ID = specimens.sFile_ID where country = \"Sweden\" AND sfiles.date > :date limit :pagesize OFFSET :offset";
@@ -60,15 +61,16 @@ if ($stmt->execute())
    while($row = $stmt->fetch(PDO::FETCH_ASSOC))
    {
       if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="") $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-	elseif($row['Year']!="" and $row['Month']!="") $DateCollected = "$row[Year]-$row[Month]";
+   elseif($row['Year']!="" and $row['Month']!="") $DateCollected = "$row[Year]-$row[Month]";
    elseif($row['Year']!="") $DateCollected = $row['Year'];
    else $DateCollected = "";
-   $scientificName = xmlf(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]));
-   $original_text=xmlf($row['Original_text']);
-   $original_name=xmlf($row['Original_name']);
-   $notes = xmlf($row['Notes']);
-   $collector = xmlf($row['collector']);
-   $collectorNr = xmlf($row['Collectornumber']);
+  
+   $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
+   $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
+   $original_name = htmlspecialchars($row['Original_name'], ENT_XML1);
+   $notes = htmlspecialchars($row['Notes'], ENT_XML1);
+   $collector = htmlspecialchars($row['collector'], ENT_XML1);
+   $collectorNr = htmlspecialchars($row['Collectornumber'], ENT_XML1);
  
    echo "
     <Row>
@@ -97,8 +99,7 @@ if ($stmt->execute())
 } else {
    echo "error in query: $query <br>";
 }
-echo "
+?>
 </Table>
 </Worksheet>
-</Workbook>";
-?>
+</Workbook>

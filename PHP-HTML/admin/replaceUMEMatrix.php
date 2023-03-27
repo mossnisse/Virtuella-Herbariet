@@ -13,12 +13,13 @@
         `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
         `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`,
         `RiketsN`, `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`,
-        `Long_sec`, `long_dir`, `LastModified` , `LINREG`, Type status, Basionym, Type Auktor, Image1, Image2, Image3. <br />
+        `Long_sec`, `long_dir`, `Matrix` `LastModified`. <br />
          välj Teckenuppsätning i utdatafil: Unicode (UTF-8) <br />
         tryck på knappen Exportera <br />
         .csv filen får inte vara för stor ca 150M <br />";
         
     $con2 = getConS();
      
-    replacepage("LD_Image", "do_replaceImage.php", $desc, "LD", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\r\n\">\\r\\n - DOS/Windows</option>", $con2);
+    replacepage("UME", "do_replaceUMEMatrix.php", $desc, "UME", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\r\n\">\\r\\n - DOS/Windows</option>", $con2);
 ?>
+

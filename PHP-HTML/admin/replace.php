@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <?php
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
-    include("admin_scripts.php");
+    //ini_set('display_errors', 1);
+    //error_reporting(E_ALL);
+    include "admin_scripts.php";
     $desc = " <h3> 2. Exportera nytt data från FileMaker till en .csv fil </h3>
         Välj meny Poster->Visa alla  <br />
         Välj meny Arkiv->Exportera poster... <br />
@@ -20,6 +20,5 @@
         
     $con2 = getConS();
      
-    replacepage("UME", "do_replace.php", $desc, "UME", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\\r\\n\">\\r\\n - DOS/Windows</option>", $con2);
+    replacepage("UME", "do_replace.php", $desc, "UME", "<option value=\"utf8\">UTF-8 Unicode</option>", "<option value=\"\r\n\">\\r\\n - DOS/Windows</option>", $con2);
 ?>
-

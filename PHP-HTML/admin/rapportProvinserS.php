@@ -1,16 +1,11 @@
-<?php
-include("..\herbes.php");
-$fileID = $_GET['FileID'];
-
-$con = getConS();
-
-echo "<head>
-		<title>Rapport Provinser i Sverige</title>
-		<meta name=\"author\" content=\"Nils Ericson\" />
-		<link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
-	 </head>
-	 <body>
-	 
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+	<title>Rapport Provinser i Sverige</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="author" content="Nils Ericson" />
+</head>
+<body>
 	 Provinser i Sverige som används är Landskapen och Lappland är uppdelad i Lappmarker <br/>
 	 Blekinge,  Bohuslän, Dalarna, Dalsland, Gotland, Gästrikland, Halland, Hälsingland, Härjedalen, Jämtland, Lule lappmark, Lycksele lappmark, Medelpad, Norrbotten,
 	 Närke, Pite lappmark, Skåne, Småland, Södermanland', Södermanland, Torne lappmark, Uppland, Värmland, Västerbotten, Västergötland, Västmanland, Ångermanland, Åsele lappmark,
@@ -19,7 +14,12 @@ echo "<head>
 	 Visar max 1000 poster
 	 <H3>Provinser med tab eller mellanslag i början/slutet</H3>
 	 <table>
-		<TR><TH>Catalogue No.</TH><TH>Province</TH></TR>";
+		<TR><TH>Catalogue No.</TH><TH>Province</TH></TR>
+<?php
+include "..\ini.php";
+$fileID = $_GET['FileID'];
+
+$con = getConS();
 	 
 $query = "Select ID, AccessionNo, Province from specimens where specimens.sFile_ID = :fileID and (not trim(Province) = Province or not trim('\\t' from Province) = Province) LIMIT 1000;";
 $Stm = $con->prepare($query);
@@ -29,8 +29,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
 }
 
-echo
-	 "
+echo "
 	 </table>
 	 <H3>Provinser som saknas i tabellen</H3>
 	 <Table>
@@ -64,10 +63,8 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC))
 	$datum = "$row[Year]-$row[Month]-$row[Day]";
 	echo "<tr><td><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
 }
-
-echo "</table></body>";
-
-echo
-"</table>
-</body>";
 ?>
+	</table></body>
+	</table>
+</body>
+</html>

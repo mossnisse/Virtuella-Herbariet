@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
     <head>
         <title>Virtuella herbariet Admin page</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -9,7 +9,7 @@
 set_time_limit(2400);
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-include("admin_scripts.php");
+include "admin_scripts.php";
 
 if (isUpdating2()) {
     updateText();
@@ -25,34 +25,28 @@ if (isUpdating2()) {
     $instCode = $_POST['InstitutionCode'];
     $char_set = $_POST['char_set'];
     $line_endings = $_POST['line_endings'];
-    $a = upploadfile("replaceUPS.php");
+    $a = upploadfile("replaceUmeMatrix.php");
 
     if ($a) {
         $sfileName = $a[0];
         $uploadfile = $a[1];
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
-        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY :fline_endings
-        (`AccessionNo`, @Day, @Month, @Year, @Genus, @Species, @irang, @iepi, @higerTaxa, collector, Collectornumber, notes, continent, country, province, district, original_text,
-        habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, @dumy, Type_status, Basionym) 
-        SET `sFile_ID` = :fileID, institutionCode = :instCode, collectionCode = :collCode,
-            SspVarForm = concat(@irang, ' ', @iepi),
-            CSource = UPSSource(@Lat, @Long),
-            `Long` = ToNum(@Long),
-            `Lat` = ToNum(@Lat),
-            Genus = UPSGenus(@Genus,@higerTaxa),
-            HybridName = UPSHybrid(@Species),
-            Species = UPSSpecies(@Species),
+        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY :line_endings
+            (`AccessionNo`, @Day, @Month, @Year, `Genus`, `Species`, `SspVarForm`, `HybridName`, `collector`,
+            `Collectornumber`, `Comments`, `Continent`, `Country`, `Province`, `District`, `Locality`, `Cultivated`,
+            `Altitude_meter`, `Original_name`, `Original_text`, `Notes`, `Exsiccata`, `Exs_no`, `RUBIN`, `RiketsN`,
+            `RiketsO`, `Lat_deg`, `Lat_min`, `Lat_sec`, `Lat_dir`, `Long_deg`, `Long_min`, `Long_sec`, `long_dir`, `Matrix`, `LastModified`)
+            SET `sFile_ID` = :fileID, institutionCode = :instCode, collectionCode = :collCode,
             Year = ToInt(@Year),
             Month = ToInt(@Month),
             Day = ToInt(@Day);";
-
         doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);
     echo "
         <a href=\"rapport.php?FileID=$File_id\">Fel rapport och rättning</a><br />
-        <a href=\"replaceUPS.php\">back</a><br />
+        <a href=\"replaceUmeMatrix.php\">back</a><br />
         <a href=\"admin.php\">admin page</a><br />
         <a href=\"../\">start page</a>";
 }

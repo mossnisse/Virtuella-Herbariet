@@ -1,13 +1,15 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+	<title>Fil rapport</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="author" content="Nils Ericson" />
+</head>
+<body>
 <?php
-include("..\herbes.php");
 $fileID = $_GET['FileID'];
 
-echo "<head>
-		<title> Fil rapport</title>
-		<meta name=\"author\" content=\"Nils Ericson\" />
-		<link rel=\"stylesheet\" href=\"herbes.css\" type=\"text/css\" />
-	 </head>
-	 <body>
+echo "
 	 <H2>Systematik</H2>
 	 <H3>Släkten</H3>
 	 Släktestabbellen används för att slå upp organismgrupp och systematik. Arterna går inte att söka ut från systematik om de saknas i släkt tabellen.<p />
@@ -40,6 +42,7 @@ echo "<head>
             <input type=\"hidden\" name =\"kontroll\" value = \"OK\" /> </td> </tr>
             <tr> <td> <input type=\"submit\" value=\"redo idLinks\" /> </td> </tr>
         </form>
-</div>
-</body>";
+</div>";
 ?>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <?php
-include("../herbes.php");
+include "../ini.php";
 
 $con = getConS();
 $pagesize = $_GET['pagesize'];
