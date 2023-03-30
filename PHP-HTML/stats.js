@@ -33,6 +33,12 @@ function fillStats()
 	fillUPS();
 	//fillOHN();
 	fillS();
+	fillUppdated('LD');
+	fillUppdated('UME');
+	fillUppdated('UPS');
+	fillUppdated('OHN');
+	fillUppdated('GB');
+	fillUppdated('S');
 }
 
 function fillTot() {
@@ -208,5 +214,30 @@ function fillLD() {
     var url = "stats/GetLD.php";
 	xmlhttp.open("GET", url ,true);
 	xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
+	xmlhttp.send(null);
+}
+
+function fillUppdated(inst) {
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	{
+	    // code for IE7+, Firefox, Chrome, Opera, Safari
+	    xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{
+	    alert("Your browser does not support XMLHTTP!");
+	}
+	xmlhttp.onreadystatechange=function()
+	{
+	    if(xmlhttp.readyState==4)
+	    {
+			//alert(xmlhttp.responseText);
+			document.getElementById(inst+"_UPD").textContent = xmlhttp.responseText;
+	    }
+	};
+    var url = "stats/getUppdated.php?InstCode="+inst;
+	xmlhttp.open("GET", url ,true);
+	//xmlhttp.setRequestHeader("Accept-Charset","UTF-8");
 	xmlhttp.send(null);
 }
