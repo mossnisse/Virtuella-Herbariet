@@ -3,13 +3,13 @@ function convertC() {
 	coordinates = coordinates.trim();
 	const coordArray = coordinates.split("\n");
 	const outtable = document.getElementById("output_table");
-	outtable.innerHTML = "";
+	outtable.textContent = "";
 	//var row = outtable.insertRow(0);
 	var header = outtable.createTHead();
 	var row = header.insertRow(0); 
 	var cell1 = row.insertCell(0);
 	const convTo =  document.getElementById("ouptput1").value; 
-	cell1.innerHTML = convTo;
+	cell1.textContent = convTo;
 	//console.log("convert to: "+convTo);
 	for (var i=0;i<coordArray.length;i++){
 		row = outtable.insertRow(-1);
@@ -19,13 +19,14 @@ function convertC() {
 		//console.log("icoord: "+icoord);
 		var converted = convertInterpretedCoord(icoord, convTo, i);
 		//console.log("converted: "+converted);
+
 		if (typeof converted === "string") {
 			var cell = row.insertCell(0);
-			cell.innerHTML = converted;
+			cell.textContent = converted;
 		} else {
 			for (var j=0;j<converted.length;j++) {
 				var cellt = row.insertCell(j);
-				cellt.innerHTML = converted[j];
+				cellt.textContent = converted[j];
 			}
 		}
 	}
@@ -691,44 +692,44 @@ function checkC() {
 			}
 		//}
 		
-		document.getElementById("interpred").innerHTML = sys + `: ` + interpreted;
+		document.getElementById("interpred").textContent = sys + `: ` + interpreted;
 		
 		if (WGS84 !== "") {
-			document.getElementById("WGS84").innerHTML = WGS84[0].toPrecision(8)+", "+WGS84[1].toPrecision(8);
+			document.getElementById("WGS84").textContent = WGS84[0].toPrecision(8)+", "+WGS84[1].toPrecision(8);
 			var WGSDMS = WGS84toDMS(WGS84);
-			document.getElementById("WGS84DMS").innerHTML = WGSDMS;
+			document.getElementById("WGS84DMS").textContent = WGSDMS;
 			if (Sweref99TM != "outside defined area") {
-				document.getElementById("Sweref99TM").innerHTML = Sweref99TM[0]+", "+Sweref99TM[1];
+				document.getElementById("Sweref99TM").textContent = Sweref99TM[0]+", "+Sweref99TM[1];
 			} else {
-				document.getElementById("Sweref99TM").innerHTML = Sweref99TM;
+				document.getElementById("Sweref99TM").textContent = Sweref99TM;
 			}
 			if (RT90 != "outside defined area") {
-				document.getElementById("RT90").innerHTML = RT90[0]+", "+RT90[1];
+				document.getElementById("RT90").textContent = RT90[0]+", "+RT90[1];
 			} else {
-				document.getElementById("RT90").innerHTML = RT90;
+				document.getElementById("RT90").textContent = RT90;
 			}
-			document.getElementById("RUBIN").innerHTML = RUBIN;
+			document.getElementById("RUBIN").textContent = RUBIN;
 			document.getElementById("showCoordinate").disabled = false;
 			if (sys.substring(0,5) == "RUBIN") {
 				document.getElementById("showRUBIN").disabled = false;
 			}
 			var UTM = WGS84toUTM(WGS84);
-			document.getElementById("UTM").innerHTML = UTM[0]+" "+UTM[1]+", "+UTM[2];
-			document.getElementById("MGRS").innerHTML = WGS84toMGRS(WGS84);
+			document.getElementById("UTM").textContent = UTM[0]+" "+UTM[1]+", "+UTM[2];
+			document.getElementById("MGRS").textContent = WGS84toMGRS(WGS84);
 			getDistrict(WGS84);
 			getProvince(WGS84);
 			getCountry(WGS84);
 			getLocality(WGS84);
 		} else {
-			document.getElementById("WGS84").innerHTML = "";
-			document.getElementById("WGS84DMS").innerHTML = "";
-			document.getElementById("Sweref99TM").innerHTML = "";
-			document.getElementById("RT90").innerHTML = "";
-			document.getElementById("RUBIN").innerHTML ="";
-			document.getElementById("locality").innerHTML = "";
-			document.getElementById("District").innerHTML = "";
-			document.getElementById("Province").innerHTML = "";
-			document.getElementById("Country").innerHTML = "";
+			document.getElementById("WGS84").textContent = "";
+			document.getElementById("WGS84DMS").textContent = "";
+			document.getElementById("Sweref99TM").textContent = "";
+			document.getElementById("RT90").textContent = "";
+			document.getElementById("RUBIN").textContent ="";
+			document.getElementById("locality").textContent = "";
+			document.getElementById("District").textContent = "";
+			document.getElementById("Province").textContent = "";
+			document.getElementById("Country").textContent = "";
 		}
 }
 	
@@ -766,27 +767,27 @@ function ajax(url, doit)
 function getDistrictName(WGS84, i) {
 	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		//json = json.substring(1,json.length); // remove BOM mark
-		console.log(json);
 		var distr = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		row.innerHTML = "<td>"+distr.name +"</td>";
+		//let c = row.insertCell(0);
+		//c.innerText = distr.name;
+		row.cells[0].textContent = distr.name;
 	});
 	return "wait"+i;
 }
 
 
 function getDistrict(WGS84) {
-	document.getElementById("District").innerHTML = "Wait...";
+	document.getElementById("District").textContent = "Wait...";
 	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		//json = json.substring(1,json.length); // remove BOM mark
 		var distr = JSON.parse(json);
 		if (distr.name != "outside borders") {
 			document.getElementById("District").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/district.php?ID="+distr.ID+"\">"+distr.name+"</a> "+distr.typeNative+"/"+distr.typeEng;
 			document.getElementById("showDistrict").disabled = false;
 		} else {
-			document.getElementById("District").innerHTML = "outside borders";
+			
+			document.getElementById("District").textContent = "outside borders";
 		}
 		districtID=distr.ID;
 	});
@@ -795,44 +796,40 @@ function getDistrict(WGS84) {
 function getProvinceName(WGS84, i) {
 	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		console.log(json);
 		var prov = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		row.innerHTML = "<td>"+prov.name +"</td>";
+		row.cells[0].textContent = prov.name;
 	});
 	return "wait"+i;
 }
 
 function getProvince(WGS84) {
-	document.getElementById("Province").innerHTML = "Wait...";
+	document.getElementById("Province").textContent = "Wait...";
 	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
-		//json = json.substring(1,json.length); // remove BOM mark
 		var prov = JSON.parse(json);
 		if (prov.name != "outside borders") {
 			document.getElementById("Province").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/province.php?ID="+prov.ID+"\">"+prov.name+"</a> "+prov.typeNative+"/"+prov.typeEng;
 			document.getElementById("showProvince").disabled = false;
 		} else {
-			document.getElementById("Province").innerHTML = "outside borders";
+			document.getElementById("Province").textContent = "outside borders";
 		}
 		provinceID = prov.ID;
 	});
 }
 
 function getCountryName(WGS84, i) {
-	//console.log("Get Country name: "+WGS84);
 	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
 		var count = JSON.parse(json);
-		//console.log("Country: "+count.name);
 		row = document.getElementById("output_table").rows[i+1];
-		row.innerHTML = "<td>"+count.name +"</td>";
+		row.cells[0].textContent = count.name;
 	});
 	return "wait"+i;
 }
 
 function getCountry(WGS84) {
-	document.getElementById("Country").innerHTML = "Wait...";
+	document.getElementById("Country").textContent = "Wait...";
 	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
@@ -841,7 +838,7 @@ function getCountry(WGS84) {
 			document.getElementById("Country").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/country.php?ID="+count.ID+"\">"+count.name+"</a>";
 			document.getElementById("showCountry").disabled = false;
 		} else {
-			document.getElementById("Country").innerHTML = "outside borders";
+			document.getElementById("Country").textContent = "outside borders";
 		}
 		countryID = count.ID;
 	});
@@ -850,24 +847,26 @@ function getCountry(WGS84) {
 function getNearestLocalityName(WGS84, i){
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
 	ajax(url, function(json) {
-		//json = json.substring(1,json.length); // remove BOM mark
-		var loc = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		row.innerHTML = "<td>"+loc.name +"</td><td>"+loc.distance+"m</td><td>"+loc.direction+"</td>";
+		var loc = JSON.parse(json);
+		row.cells[0].textContent = loc.direction;
+		let c1 = row.insertCell(0);
+		c1.innerText = loc.distance;
+		let c2 = row.insertCell(0);
+		c2.innerText = loc.name;
 	});
 	return "wait"+i;
 }
 
 function getLocality(WGS84) {
-	document.getElementById("locality").innerHTML = "Wait...";
+	document.getElementById("locality").textContent = "Wait...";
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
 	ajax(url, function(json) {
-		//json = json.substring(1,json.length); // remove BOM mark
 		var loc = JSON.parse(json);
 		if(loc.name !== "") {
 			document.getElementById("locality").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a> "+loc.distance+"m "+loc.direction;
 		} else {
-			document.getElementById("locality").innerHTML = "No locality in the db within 10km";
+			document.getElementById("locality").textContent = "No locality in the db within 10km";
 		}
 	});	
 }
@@ -1013,10 +1012,10 @@ function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
   } else {
-    document.getElementById("coord").value.innerHTML = "Geolocation is not supported by this browser.";
+    document.getElementById("coord").value.textContent = "Geolocation is not supported by this browser.";
   }
 }
 
 function showPosition(position) {
-	 document.getElementById("coord").value.innerHTML = position.coords.latitude + ",  " + position.coords.longitude;
+	 document.getElementById("coord").value.textContent = position.coords.latitude + ",  " + position.coords.longitude;
 }
