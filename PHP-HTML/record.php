@@ -35,23 +35,23 @@ if (isset($_GET['InstitutionCode']))
 elseif (isset($_GET['Ainst']))
    $instCode = $_GET['Ainst'];
 
-if (isset($_GET['ID']))
-   $ID = $_GET['ID'];
-elseif (isset($_GET['Aid']))
-   $ID = $_GET['Aid'];
+if (isset($_GET['ID']) && $_GET['ID']!='')
+   $ID = (int) $_GET['ID'];
+elseif (isset($_GET['Aid']) && $_GET['Aid']!='')
+   $ID = (int) $_GET['Aid'];
 
-if (isset($_GET['Page']))
-   $list_page = $_GET['Page'];
+if (isset($_GET['Page']) && $_GET['Page']!='')
+   $list_page = (int) $_GET['Page'];
 else
    $list_page = 1;
 
-if (isset($_GET['ARecord']))
-   $ARecord = $_GET['ARecord'];
+if (isset($_GET['ARecord']) && $_GET['ARecord']!='')
+   $ARecord = (int) $_GET['ARecord'];
 else
    $ARecord = 1;
 
-if (isset($_GET['nrRecords']))
-   $nrRecords = $_GET['nrRecords'];
+if (isset($_GET['nrRecords']) && $_GET['nrRecords'] !='')
+   $nrRecords = (int) $_GET['nrRecords'];
 if (isset($_GET['ID']))
    $nrRecords = 1;
    
