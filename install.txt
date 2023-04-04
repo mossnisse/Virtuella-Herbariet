@@ -1,6 +1,6 @@
 install MySQL, webserver(apache) and php
 
-the port for MysQL (3306) and the webserver have to be open
+the port for MysQL (3306) and the webserver (80) https (443) have to be open
 
 MySQL config my.ini  on windows in ProgramData\MySQL\MYSQL server
 	sql-mode="NO_ENGINE_SUBSTITUTION"  - if strict mode the updating will stop on instead of throw a warning so problematic
@@ -10,8 +10,16 @@ MySQL config my.ini  on windows in ProgramData\MySQL\MYSQL server
 	ft_min_word_len=1           - so you can search for 1 letter in fulltext search for stuff like collector and original text
 create users for the web server (should only be reachable from localhost) and the coordinate tool with relevant 
  
-Apache config
-	- enable php as an module
+Apache config  conf/httpd.conf
+	# remove # to enable php as an module
+	LoadModule php_module "c:/php/php8apache2_4.dll"  
+	#custom error log format to include URl with query string in error log.
+	ErrorLogFormat "[%t] [%l] [URL %{Request_URI}e] %M [referer\ %{Referer}i]"
+	#enable SSL/https
+	LoadModule ssl_module modules/mod_ssl.so  # remove #
+	Include conf/extra/httpd-ssl.conf  # remove #
+SSL/TLS conf/extra/httpd-ssl.conf
+	# Don't know how to configure... SSL certificates
 
 php config - php.ini in the php install folder
 	post_max_size = 900M 			- updating needs to upload big files
