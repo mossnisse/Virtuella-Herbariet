@@ -19,7 +19,7 @@ function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, f
 	    if ($alphaNumerator < 0 || $alphaNumerator > $commonDenominator){
 	        return false;
 	    }
-	} else if ($commonDenominator < 0){
+	} elseif ($commonDenominator < 0){
 	    if ($alphaNumerator > 0 || $alphaNumerator < $commonDenominator){
 	        return false;
 	    }
@@ -29,7 +29,7 @@ function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, f
 	    if ($betaNumerator < 0 || $betaNumerator > $commonDenominator){
 	        return false;
 	    }
-	} else if ($commonDenominator < 0){
+	} elseif ($commonDenominator < 0){
 	    if ($betaNumerator > 0 || $betaNumerator < $commonDenominator){
 			return false;
 	    }

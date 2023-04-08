@@ -4,10 +4,9 @@ include "../ini.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
 $radius = 6371009;
-
 $maxDist = 10000;
-$lat = $_GET['north'];
-$long = $_GET['east'];
+$lat = (float) $_GET['north'];
+$long = (float) $_GET['east'];
 
 $rlat = sin($maxDist/$radius)*180/M_PI;
 $mlat = $lat*M_PI/180;
@@ -35,7 +34,7 @@ $distsqMin = 200000000000;
 $name = "";
 $id = "";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "Name: ".$row['locality']." lat= ".$row['lat']." long= ".$row['long']." <br>\r";
 	$dlat = ($lat-$row['lat'])*M_PI/180;
 	$dlong = ($long-$row['long'])*M_PI/180;
@@ -47,7 +46,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	//echo "cos mlat: ".cos($mlat)."<br>\r";
 	//echo "distsq: $distsq <br>\r";
 	if ($distsqMin>$distsq) {
-		$distsqMin=$distsq;
+		$distsqMin = $distsq;
 		$name = $row['locality'];
 		$id = $row['ID'];
 		$locLat = $row['lat'];
@@ -55,7 +54,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 
-if ($id !="") {
+if ($id != "") {
 	// simple not that exact formula for distance
 	$dist = round($radius*sqrt($distsqMin));
 	
@@ -73,41 +72,41 @@ if ($id !="") {
 	$dir = "";
 	if ($angle<11.25 || $angle>=348.75) {
 		$dir = "N";
-	} elseif($angle >= 11.25 && $angle < 33.75) {
+	} elseif ($angle >= 11.25 && $angle < 33.75) {
 		$dir = "NNE";
-	} elseif($angle >= 33.75 && $angle < 56.25) {
+	} elseif ($angle >= 33.75 && $angle < 56.25) {
 		$dir = "NE";
-	} elseif($angle >= 56.25 && $angle < 78.75) {
+	} elseif ($angle >= 56.25 && $angle < 78.75) {
 		$dir = "ENE";
-	} elseif($angle >= 78.75 && $angle < 101.25) {
+	} elseif ($angle >= 78.75 && $angle < 101.25) {
 		$dir = "E";
-	} elseif($angle >= 101.25 && $angle < 121.75) {
+	} elseif ($angle >= 101.25 && $angle < 121.75) {
 		$dir = "ESE";
-	} elseif($angle >= 121.75 && $angle < 146.25) {
+	} elseif ($angle >= 121.75 && $angle < 146.25) {
 		$dir = "SE";
-	} elseif($angle >= 146.25 && $angle < 168.75) {
+	} elseif ($angle >= 146.25 && $angle < 168.75) {
 		$dir = "SSE";
-	} elseif($angle >= 168.75 && $angle < 191.25) {
+	} elseif ($angle >= 168.75 && $angle < 191.25) {
 		$dir = "S";
-	} elseif($angle >= 191.25 && $angle < 213.75) {
+	} elseif ($angle >= 191.25 && $angle < 213.75) {
 		$dir = "SSW";
-	} elseif($angle >= 213.75 && $angle < 236.25) {
+	} elseif ($angle >= 213.75 && $angle < 236.25) {
 		$dir = "SW";
-	} elseif($angle >= 236.25 && $angle < 258.75) {
+	} elseif ($angle >= 236.25 && $angle < 258.75) {
 		$dir = "WSW";
-	} elseif($angle >= 258.75 && $angle < 281.25) {
+	} elseif ($angle >= 258.75 && $angle < 281.25) {
 		$dir = "W";
-	} elseif($angle >= 281.25 && $angle < 303.75) {
+	} elseif ($angle >= 281.25 && $angle < 303.75) {
 		$dir = "WNW";
-	} elseif($angle >= 303.75 && $angle < 326.25) {
+	} elseif ($angle >= 303.75 && $angle < 326.25) {
 		$dir = "NW";
-	} elseif($angle >= 326.25 && $angle < 348.75) {
+	} elseif ($angle >= 326.25 && $angle < 348.75) {
 		$dir = "NNW";
 	}
-
+	// json coding?
 	echo"{
 	\"id\": \"$id\",
-	\"name\": \"$name\",
+	\"name\": \"$name\",   
 	\"distance\": \"$dist\",
 	\"direction\": \"$dir\"
 }";

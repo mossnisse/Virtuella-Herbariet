@@ -4,15 +4,15 @@ include "../ini.php";
 include "mathstuff.php";
 $con = getConS();
 //mysql_set_charset('utf8',$con);
-$east = $_GET['East'];
-$north = $_GET['North'];
+$east = (float) $_GET['East'];
+$north = (float) $_GET['North'];
 $query = "SELECT ID, geojson, province, maxX, maxY, type_native, type_eng FROM provinces where maxX > :east and minX < :east and maxY > :north and minY < :north;";
 $Stm = $con->prepare($query);
-$Stm->bindValue(':east',$east, PDO::PARAM_STR);
-$Stm->bindValue(':north',$north, PDO::PARAM_STR);
+$Stm->bindValue(':east', $east, PDO::PARAM_STR);
+$Stm->bindValue(':north', $north, PDO::PARAM_STR);
 $Stm->execute();
 $nrHits =0;
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	$name = $row['province'];
 	//echo "Name: ".$name."<br>\n";
 	if (isset($row['geojson'])) {
@@ -41,6 +41,7 @@ while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	
 		if ($nr_intersections%2==1) {
 			++$nrHits;
+			//json coding?
 			echo "
 {
 	\"ID\":  \"$row[ID]\",

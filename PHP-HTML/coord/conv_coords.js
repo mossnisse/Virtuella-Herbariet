@@ -755,7 +755,7 @@ function ajax(url, doit)
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
             doit(xmlhttp.responseText);
 	    }
@@ -834,7 +834,7 @@ function getCountry(WGS84) {
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		var count = JSON.parse(json);
-		if(count.name != "outside borders") {
+		if (count.name != "outside borders") {
 			document.getElementById("Country").innerHTML = "<a href =\"http://herbarium.emg.umu.se/maps/country.php?ID="+count.ID+"\">"+count.name+"</a>";
 			document.getElementById("showCountry").disabled = false;
 		} else {
@@ -863,7 +863,7 @@ function getLocality(WGS84) {
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
 	ajax(url, function(json) {
 		var loc = JSON.parse(json);
-		if(loc.name !== "") {
+		if (loc.name !== "") {
 			document.getElementById("locality").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a> "+loc.distance+"m "+loc.direction;
 		} else {
 			document.getElementById("locality").textContent = "No locality in the db within 10km";
@@ -883,7 +883,7 @@ function initMap() {
 }
 
 function showMapf() {
-	if(!showMap) {
+	if (!showMap) {
 		showMap = true;
 		//document.getElementById("showMap").value ="hide map";
 		initMap();
@@ -913,7 +913,7 @@ function showDistrictf() {
 	var xmlhttp;
 	xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
-		if(xmlhttp.readyState==4)
+		if (xmlhttp.readyState==4)
 		{
 			var jsontext = xmlhttp.responseText;
 			if (jsontext.charCodeAt(0) === 0xFEFF) {  // remove BOM mark
@@ -924,7 +924,7 @@ function showDistrictf() {
 			map.data.addGeoJson(obj);
 		}
 	};
-	xmlhttp.open("GET", '..\\maps\\gjdistrict.php?ID='+districtID ,true);
+	xmlhttp.open("GET", '../maps/gjdistrict.php?ID='+districtID ,true);
 	//xmlhttp.open("GET", '..\\maps\\gjdistrict.php?ID='+"18123" ,true);
 	xmlhttp.send(null);
 }
@@ -934,7 +934,7 @@ function showProvincef() {
 	var xmlhttp;
 	xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
-		if(xmlhttp.readyState==4)
+		if (xmlhttp.readyState==4)
 		{
 			var jsontext = xmlhttp.responseText;
 			if (jsontext.charCodeAt(0) === 0xFEFF) {  // remove BOM mark
@@ -945,7 +945,7 @@ function showProvincef() {
 			map.data.addGeoJson(obj);
 		}
 	};
-	xmlhttp.open("GET", '..\\maps\\gjprovins.php?ID='+provinceID ,true);
+	xmlhttp.open("GET", '../maps/gjprovins.php?ID='+provinceID ,true);
 	xmlhttp.send(null);
 }
 
@@ -954,7 +954,7 @@ function showCountryf() {
 	var xmlhttp;
 	xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
-		if(xmlhttp.readyState==4)
+		if (xmlhttp.readyState==4)
 		{
 			var jsontext = xmlhttp.responseText;
 			if (jsontext.charCodeAt(0) === 0xFEFF) {  // remove BOM mark
@@ -965,7 +965,7 @@ function showCountryf() {
 			map.data.addGeoJson(obj);
 		}
 	};
-	xmlhttp.open("GET", '..\\maps\\gjcountry.php?ID='+countryID ,true);
+	xmlhttp.open("GET", '../maps/gjcountry.php?ID='+countryID ,true);
 	xmlhttp.send(null);
 }
 
