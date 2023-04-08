@@ -12,11 +12,9 @@ $Stm->bindValue(':country', $country, PDO::PARAM_STR);
 $Stm->execute();
 $row = $Stm->fetch(PDO::FETCH_ASSOC);
 
-if ($row['districtName'] != "" and $row['districtName'] != 'District')
-{
+if ($row['districtName'] != "" && $row['districtName'] != 'District')
     echo "($row[districtName])";
-} else {
+else
     echo "";
-}
 if ($BCache == 'On')  cacheEnd();  // the end for ethe cache function
 ?>

@@ -10,7 +10,7 @@ $WhatDD = "Class";
 $value = $_GET['Kingdom'];
 
 if ($value == '') {
-    $wquery = "`$what` = :value or `$what` is NULL";
+    $wquery = "`$what` = :value OR `$what` is NULL";
 } else {
     $wquery = "`$what` = :value";
 }
@@ -18,17 +18,16 @@ if ($value == '') {
 $query = "SELECT DISTINCT $whatDown FROM xgenera WHERE $wquery ORDER BY $whatDown;";
 //echo "$query <p>";
 $Stm = $con->prepare($query);
-$Stm->bindValue(':value',$value, PDO::PARAM_STR);
+$Stm->bindValue(':value', $value, PDO::PARAM_STR);
 $Stm->execute();
 
 echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
     echo "<option value=\"$row[$whatDown]\">$row[$whatDown]</option>";
 }
-
 echo "</select>";
 if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>

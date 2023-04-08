@@ -9,7 +9,7 @@ $whatDown = "Subgroup";
 $value = $_GET['Group'];
 
 if ($value == '') {
-    $wquery = "`$what` = :value or `$what` is NULL";
+    $wquery = "`$what` = :value OR `$what` is NULL";
 } else {
     $wquery = "`$what` = :value";
 }
@@ -17,13 +17,13 @@ if ($value == '') {
 $query = "SELECT DISTINCT Subgroup FROM xgenera WHERE $wquery ORDER BY $whatDown;";
 //echo "$query <p>";
 $Stm = $con->prepare($query);
-$Stm->bindValue(':value',$value, PDO::PARAM_STR);
+$Stm->bindValue(':value', $value, PDO::PARAM_STR);
 $Stm->execute();
 
 echo "<select name=\"Subgroup\" size=\"1\" id = \"$whatDown\" onchange=\"getList('Subgroup', 'Genus');\" onclick=\"star('Subgroup')\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
     echo "<option value=\"$row[Subgroup]\">$row[Subgroup]</option>";
 }

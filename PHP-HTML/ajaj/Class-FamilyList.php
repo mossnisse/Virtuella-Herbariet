@@ -25,11 +25,10 @@ $Stm->execute();
 echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown', '$whatDD');\" onclick=\"star('$whatDown')\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
-        echo "<option value=\"$row[$whatDown]\">$row[$whatDown]</option>";
+    echo "<option value=\"$row[$whatDown]\">$row[$whatDown]</option>";
 }
-    
 echo "</select>";
 if ($BCache == 'On') cacheEnd(); 
 ?>

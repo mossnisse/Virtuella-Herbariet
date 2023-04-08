@@ -13,11 +13,8 @@ $Stm->execute();
 $row = $Stm->fetch(PDO::FETCH_ASSOC);
 
 if ($row['provinceName'] != "" && $row['provinceName'] != 'Province')
-{
     echo "($row[provinceName])";
-}
 else
     echo "";
-    
 if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>

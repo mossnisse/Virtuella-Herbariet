@@ -12,17 +12,16 @@ $value = $_GET['Family'];
 $query = "SELECT DISTINCT $whatDown FROM xgenera WHERE `$what` = :value ORDER BY $whatDown";
 //echo "$query <p>";
 $Stm = $con->prepare($query);
-$Stm->bindValue(':value',$value, PDO::PARAM_STR);
+$Stm->bindValue(':value', $value, PDO::PARAM_STR);
 $Stm->execute();
 
 echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"getList('$whatDown','$WhatDD');\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
     echo "<option value=\"$row[$whatDown]\">$row[$whatDown]</option>";
 }
-
 echo "</select>";
 if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>

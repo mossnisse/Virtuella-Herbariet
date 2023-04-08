@@ -18,11 +18,10 @@ $Stm->execute();
 echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
     echo "<option value=\"$row[$whatDown]\">$row[$whatDown]</option>";
 }
 echo "</select>";
-
 if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>

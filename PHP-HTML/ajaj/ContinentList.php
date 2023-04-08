@@ -19,17 +19,16 @@ $query = "SELECT DISTINCT english FROM countries WHERE $wquery ORDER BY english;
 //echo "$query <p>";
 
 $Stm = $con->prepare($query);
-$Stm->bindValue(':value',$value, PDO::PARAM_STR);
+$Stm->bindValue(':value', $value, PDO::PARAM_STR);
 $Stm->execute();
 
 echo "<select name=\"$whatDown\" size=\"1\" id = \"$whatDown\" onchange=\"prvName(); disName(); getList('$whatDown','$WhatDD');\">
           <option value=\"*\">*</option>";
 
-while($row = $Stm->fetch(PDO::FETCH_ASSOC))
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
 {
     echo "<option value=\"$row[english]\">$row[english]</option>";
 }
-
 echo "</select>";
 if ($BCache == 'On') cacheEnd();  // the end for ethe cache function
 ?>
