@@ -11,17 +11,15 @@
 	 <table>
 		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH>Species</TH><TH>Original name</TH><TH>Country</TH></TR>
 <?php
-include "..\ini.php";
-
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 	 
 $query = "Select ID, AccessionNo, Genus, Species, Original_name, Country from specimens where specimens.sFile_ID = :fileID and (not trim(Genus) = Genus or not trim('\\t' from Genus) = Genus) LIMIT 2000;";
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
 }	 
 echo "
@@ -35,7 +33,7 @@ $query = "Select ID, AccessionNo, Genus, Species, Original_name, Country from sp
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[Original_name]</TD><TD>$row[Country]</TD></TR>";
 }
 ?>

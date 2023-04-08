@@ -29,7 +29,7 @@ function replacepage(string $name, string $script, string $description, string $
         echo "$query <p>";
         echo mysql_error();
     }
-    while($row = $result->fetch())
+    while ($row = $result->fetch())
     {
         echo "
         <tr>
@@ -42,7 +42,6 @@ function replacepage(string $name, string $script, string $description, string $
             <td>$row[date]</td>
         </tr>";
     }
-    
     echo "
         <tr>
             <td><input type=\"radio\" name=\"delfile_ID\" value =\"-1\" checked=\"checked\" /></td>
@@ -168,7 +167,7 @@ function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, str
     warningFormat($con,$sfileName);
     
     echo "<p/>";
-    if($stmt->errorCode() == 0) {
+    if ($stmt->errorCode() == 0) {
         instablenr($con, $file_ID);
         echo "<br /> query: $query <br />  $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
         echo "
@@ -214,10 +213,10 @@ function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, str
 function emptycache() : void {
     $dir = 'c:\\Apache24\\htdocs\\cache\\';
     $mydir = opendir($dir);
-    while(false !== ($file = readdir($mydir))) {
-        if($file != "." && $file != "..") {
+    while (false !== ($file = readdir($mydir))) {
+        if ($file != "." && $file != "..") {
             chmod($dir.$file, 0777);
-            if(is_dir($dir.$file)) {
+            if (is_dir($dir.$file)) {
                 chdir('.');
                 destroy($dir.$file.'/');
                 rmdir($dir.$file) or DIE("couldn't delete $dir$file<br />");
@@ -241,7 +240,7 @@ function delfile(PDO $con, int $delfile_ID, string $sfileName) {
             $delfile_ID = -1;
             echo "no old file with that name not deleting old records";
         }
-        $delfileIDA = $Stm-->fetch();
+        $delfileIDA = $Stm->fetch();
         $delfile_ID = $delfileIDA[0];
         echo "updal del id: $delfile_ID";
     } 
@@ -379,7 +378,7 @@ function filetable(PDO $con2): void {
     if (!$result) {
         echo mysql_error();
     }
-    while($row = $result->fetch())
+    while ($row = $result->fetch())
     {
         echo "
         <tr>
@@ -407,7 +406,7 @@ function upploadfile(string $backpage) {
         echo "lyckas inte ladda upp filen, antagligen är det för att filen du försöker ladda upp är för stor <br />
             <a href=\"$backpage\">back to admin page</a> <p />";
         return false;
-    } elseif ($_POST['mypassword'] != "baconas") {
+    } elseif ($_POST['mypassword'] != $APass) {
        echo "wrong password <a href=\"$backpage\">försök igen?</a> <br />";
        return false;
     }
@@ -420,7 +419,7 @@ function upploadfile(string $backpage) {
         $uploaddir = 'C:/uploads/';
         $uploadfile = $uploaddir . basename($_FILES['uploadedfile']['name']);
         $file = basename($_FILES['uploadedfile']['name']);
-        if (substr($file,-4)!=".csv" and substr($file,-4)!=".txt") {
+        if (substr($file,-4)!=".csv" && substr($file,-4)!=".txt") {
             echo "
                 it should be a .csv or .txt file <br />
                 <a href=\"$backpage\"> back to admin page </a> <p />";

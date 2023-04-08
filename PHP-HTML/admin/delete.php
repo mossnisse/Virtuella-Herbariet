@@ -18,7 +18,7 @@
             <tr> <td> <input type="submit" value="delete file" /> </td> </tr>
         </table>
     </form>
-    <a href="/../">start page</a> <br />
+    <a href="../">start page</a> <br />
     <a href="admin.php">admin page</a> <br />
 </body>
 </html>

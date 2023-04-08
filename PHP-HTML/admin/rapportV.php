@@ -9,7 +9,6 @@
     <table>
         <tr> <th>ID</th> <th>Fil </th> <th>poster</th> <th>institution code</th> <th>collection code</th> <th>datum</th> </tr>
 <?php
-//include("../herbes.php");
 include "../ini.php";
 $con = getConS();
 $query = "SELECT name, ID, date, inst, coll, nr_records FROM sfiles WHERE nr_records>0;";
@@ -17,7 +16,7 @@ $result = $con->query($query);
     if (!$result) {
         echo mysql_error();
     }
-    while($row = $result->fetch())
+    while ($row = $result->fetch())
     {
         echo "
         <tr>
@@ -32,6 +31,6 @@ $result = $con->query($query);
 ?>
     </table>
     <a href="admin.php">admin page</a><br />
-    <a href="/../">start page</a>
+    <a href="../">start page</a>
 </body>
 </html>

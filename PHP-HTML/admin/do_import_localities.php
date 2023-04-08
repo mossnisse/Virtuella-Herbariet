@@ -13,7 +13,7 @@
     //ini_set('display_errors', 1);
     include "admin_scripts.php";
 	//include("../koordinates.php");
-if ($_POST['mypassword'] == "baconas")
+if ($_POST['mypassword'] == $APass)
 {
 	$con = getConA();
 	$a = upploadfile("import_localities.php");
@@ -74,7 +74,7 @@ if ($_POST['mypassword'] == "baconas")
 			$antal = $result2['numbr'];
 				
 			//echo "number of localities $row[Locality] - $row[Province] - $row[Country] - $antal <br>";
-			if($antal==0)
+			if ($antal==0)
 			{			
 							if ($row['lat'] == '' || $row['long'] == null)
 								{

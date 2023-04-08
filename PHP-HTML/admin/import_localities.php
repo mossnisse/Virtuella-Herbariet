@@ -30,11 +30,11 @@
         Created by (Sträng)</br>
 
         <form enctype="multipart/form-data" action="do_import_localities.php" method="post" accept-charset="utf-8">
-            Choose a file to upload: <input name="uploadedfile" type="file" /> <br/>
-            Password: <input type="password" name ="mypassword" /> <br/>
+            Choose a file to upload: <input name="uploadedfile" type="file" /><br/>
+            Password: <input type="password" name ="mypassword" /><br/>
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000000" />
             <input type="hidden" name ="kontroll" value = "OK" /> 
-            <input type="submit" value="Upload File" />  <br/>
+            <input type="submit" value="Upload File" /><br/>
         </form>
         </div>
     </body>

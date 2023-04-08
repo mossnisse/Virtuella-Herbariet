@@ -11,12 +11,12 @@ include "../herbes.php";
 if (isUpdating2()) { updateText();}
 else {
 setUpdating2(true);
-if ($_POST['mypassword'] == "baconas") 
+if ($_POST['mypassword'] == $APass) 
 {
-    $delfile_ID = $_POST['delfile_ID'];
+    $delfile_ID = (int) $_POST['delfile_ID'];
     $con = getConA();
     $query = "DELETE FROM specimens WHERE sFile_ID = :delfile_ID;";
-    echo "<p> $query <p>";
+    echo "<p>$query<p>";
     $stmt = $con->prepare($query);
     $stmt->BindValue(':delfile_ID', $delfile_ID, PDO::PARAM_STR);
     $stmt->execute();
@@ -27,10 +27,11 @@ if ($_POST['mypassword'] == "baconas")
     $stmt->BindValue(':delfile_ID', $delfile_ID, PDO::PARAM_STR);
     $stmt->execute();
 
-    echo "<p> records deleted from file $delfile_ID <p>
-        <a href=\"delete.php\">back</a> <br />
-        <a href=\"admin.php\">admin page</a> <br />
-        <a href=\"../\">start page</a> <br />";
+    echo "
+    <p> records deleted from file $delfile_ID<p>
+    <a href=\"delete.php\">back</a><br />
+    <a href=\"admin.php\">admin page</a><br />
+    <a href=\"../\">start page</a><br />";
 }
 else
 {

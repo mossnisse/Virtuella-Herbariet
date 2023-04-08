@@ -11,9 +11,8 @@
 	<Table>
 		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>
 <?php
-include "..\ini.php";
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, specimens.Province from specimens left join district on district.Country = specimens.Country and district.Province = specimens.Province
@@ -21,8 +20,8 @@ $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Count
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD></TR>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD></TR>";
 }
 echo "</table>";
 ob_flush();
@@ -37,10 +36,10 @@ where not oProvince =\"\" and not oProvince = specimens.province and specimens.s
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	$species = "$row[Genus] $row[Species] $row[SspVarForm]";
 	$datum = "$row[Year]-$row[Month]-$row[Day]";
-	echo "<tr><td><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
+	echo "<tr><td><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
 }
 ?>
 </table>

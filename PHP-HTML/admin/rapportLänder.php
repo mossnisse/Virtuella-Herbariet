@@ -12,17 +12,16 @@
 	<Table>
 		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH></TR>
 <?php
-include "..\ini.php";
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, Province from specimens left join countries on specimens.country = countries.english where sFile_ID = :fileID  and countries.id is null and not specimens.Country =\"\" LIMIT 1000;";
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD></TR>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD></TR>";
 }
 ?>
 	</table>

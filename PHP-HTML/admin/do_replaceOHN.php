@@ -49,7 +49,6 @@ if (isUpdating2()) {
                 Locality = OHNLocality(@Presicion, CONVERT(@Locality USING utf8)),
                 Notes = OHNNotes(CONVERT(@Notes USING utf8))";
 
-
         doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);

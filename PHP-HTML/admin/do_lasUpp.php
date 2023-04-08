@@ -11,7 +11,7 @@ set_time_limit(60);
 //ini_set('display_errors', '1');
 include "../herbes.php";
 //include("admin_scripts.php");
-if ($_POST['mypassword'] == "baconas") {
+if ($_POST['mypassword'] == $APass) {
     setUpdating2(false);
     echo "nu ska den vara upplåst";
 } else {

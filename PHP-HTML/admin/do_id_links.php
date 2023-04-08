@@ -11,9 +11,9 @@ set_time_limit(1200);
 //ini_set('display_errors', '1');
 include "admin_scripts.php";
 //include("..\herbes.php");
-if ($_POST['mypassword'] == "baconas") {
+if ($_POST['mypassword'] == $APass) {
     $con = getConA();
-    $FileID = $_POST['FileID'];
+    $FileID = (int) $_POST['FileID'];
     $timer = new Timer();
     fixIdLinks($con, $FileID, $timer);
     echo "

@@ -11,9 +11,8 @@
 	 <Table>
 		<TR><TH>Catalogue No.</TH><TH>Continent</TH><TH>Country</TH><TH>Province</TH><TH>Lat</TH><TH>Long</TH></TR>
 <?php
-include "..\ini.php";
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 		
 $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Country, specimens.Province, Lat, `Long` from specimens left join provinces on specimens.country = provinces.country and specimens.province = provinces.province
@@ -22,8 +21,8 @@ $query = "Select specimens.ID, AccessionNo, specimens.Continent, specimens.Count
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD><TD>$row[Lat]</TD><TD>$row[Long]</TD></TR>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Continent]</TD><TD>$row[Country]</TD><TD>$row[Province]</TD><TD>$row[Lat]</TD><TD>$row[Long]</TD></TR>";
 }
 ?>
 </table>

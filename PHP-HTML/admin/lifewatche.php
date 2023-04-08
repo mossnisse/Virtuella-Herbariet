@@ -32,18 +32,19 @@
 <?php
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
+set_time_limit(240);
 include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_lifewatch.xml"');
  
 $con = getConS();
  
-$pagesize = $_GET['pagesize'];
-$page = $_GET['page'];
+$pagesize = (int) $_GET['pagesize'];
+$page = (int) $_GET['page'];
 $date = $_GET['datum'];
 $offset = $pagesize*($page-1);
  
-if ($date == '' or $date == null ) {
+if ($date == '' || $date == null ) {
     $date = '1200-01-01';
 }
  
@@ -58,21 +59,21 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
  
 if ($stmt->execute())
 {
-   while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-   {
-      if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="") $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-   elseif($row['Year']!="" and $row['Month']!="") $DateCollected = "$row[Year]-$row[Month]";
-   elseif($row['Year']!="") $DateCollected = $row['Year'];
-   else $DateCollected = "";
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+    {
+        if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="") $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
+        elseif ($row['Year']!="" && $row['Month']!="") $DateCollected = "$row[Year]-$row[Month]";
+        elseif ($row['Year']!="") $DateCollected = $row['Year'];
+        else $DateCollected = "";
   
-   $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
-   $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
-   $original_name = htmlspecialchars($row['Original_name'], ENT_XML1);
-   $notes = htmlspecialchars($row['Notes'], ENT_XML1);
-   $collector = htmlspecialchars($row['collector'], ENT_XML1);
-   $collectorNr = htmlspecialchars($row['Collectornumber'], ENT_XML1);
+        $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
+        $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
+        $original_name = htmlspecialchars($row['Original_name'], ENT_XML1);
+        $notes = htmlspecialchars($row['Notes'], ENT_XML1);
+        $collector = htmlspecialchars($row['collector'], ENT_XML1);
+        $collectorNr = htmlspecialchars($row['Collectornumber'], ENT_XML1);
  
-   echo "
+        echo "
     <Row>
      <Cell><Data ss:Type=\"String\">$row[InstitutionCode]</Data></Cell>
      <Cell><Data ss:Type=\"String\">$row[AccessionNo]</Data></Cell>
@@ -95,9 +96,7 @@ if ($stmt->execute())
      <Cell><Data ss:Type=\"String\">$row[Dyntaxa_ID]</Data></Cell>
      <Cell><Data ss:Type=\"String\">$row[sFile_ID]</Data></Cell>
     </Row>";
-   }
-} else {
-   echo "error in query: $query <br>";
+    }
 }
 ?>
 </Table>

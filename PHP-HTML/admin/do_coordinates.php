@@ -13,17 +13,17 @@ include "../herbes.php";
 $timer = new Timer();
 
 $pass = $_POST['mypassword'];
-if ($pass == 'baconas') {
-    $file = $_POST['delfile_ID'];
+if ($pass == $APass) {
+    $file = (int) $_POST['delfile_ID'];
     $con = getConA();
     CalcCoordBatchM($con, $timer, $file);
 } else {
     echo "wrong password";
 }
 echo "
-        <a href=\"do_Coordinates.php\">back</a> <br />
-        <a href=\"admin.php\">admin page</a> <br />
-        <a href=\"../\">start page</a> <br />";
+    <a href=\"do_Coordinates.php\">back</a> <br />
+    <a href=\"admin.php\">admin page</a> <br />
+    <a href=\"../\">start page</a> <br />";
 ?>
 </body>
 </html>

@@ -16,17 +16,16 @@
 	 <table>
 		<TR><TH>Catalogue No.</TH><TH>Province</TH></TR>
 <?php
-include "..\ini.php";
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 	 
 $query = "Select ID, AccessionNo, Province from specimens where specimens.sFile_ID = :fileID and (not trim(Province) = Province or not trim('\\t' from Province) = Province) LIMIT 1000;";
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
 }
 
 echo "
@@ -41,8 +40,8 @@ $query = "Select specimens.ID, AccessionNo, specimens.Province from specimens le
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
-	echo "<TR><TD><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Province]</TD></TR>";
 }
 echo "</table>";
 ob_flush();
@@ -57,11 +56,11 @@ where not oProvince =\"\" and not oProvince = specimens.province and specimens.s
 $Stm = $con->prepare($query);
 $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) 
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) 
 {
 	$species = "$row[Genus] $row[Species] $row[SspVarForm]";
 	$datum = "$row[Year]-$row[Month]-$row[Day]";
-	echo "<tr><td><A href=\"..\\record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
+	echo "<tr><td><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></td><td>$species</td><td>$row[Province] -> $row[oProvince] ($row[oDistrict] sn.) </td><td>$row[collector]</td><td>$datum</td><td>$row[Original_text]</td><td></td></tr>";
 }
 ?>
 	</table></body>

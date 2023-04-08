@@ -9,8 +9,8 @@
     <form action="do_coordinates.php" method="post" accept-charset="utf-8">
         <table>
     <?php
-        error_reporting(E_ALL);
-        ini_set('display_errors', '1');
+        //error_reporting(E_ALL);
+        //ini_set('display_errors', '1');
         include "admin_scripts.php";
         $con = getConS();
         //mysql_set_charset('utf8', $con2);

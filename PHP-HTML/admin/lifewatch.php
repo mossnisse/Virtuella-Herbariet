@@ -1,13 +1,14 @@
 <?php
+set_time_limit(240);
 include "../ini.php";
 
 $con = getConS();
-$pagesize = $_GET['pagesize'];
-$page = $_GET['page'];
+$pagesize = (int) $_GET['pagesize'];
+$page = (int) $_GET['page'];
 $date = $_GET['datum'];
 $offset = $pagesize*($page-1);
  
-if ($date == '' or $date == null ) {
+if ($date == '' || $date == null ) {
     $date = '1200-01-01';
 }
 
@@ -21,7 +22,7 @@ $stmt->bindValue(':pagesize', $pagesize, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
  
-while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
 {
     echo "$row[InstitutionCode]\t$row[AccessionNo]\t
     $row[Genus]\t$row[Species]$row[SspVarForm]\t$row[HybridName]\t$row[Dyntaxa_ID]\t

@@ -11,9 +11,8 @@
 	<Table>
 		<TR><TH>Catalogue No.</TH><TH>Genus</TH><TH>Species</TH><TH>Ssp/Var/Form</TH><TH>Hybrid name</TH><TH>Original name</TH></TR>
 <?php
-include "..\ini.php";
-$fileID = $_GET['FileID'];
-
+include "../ini.php";
+$fileID = (int) $_GET['FileID'];
 $con = getConS();
 
 $query = "Select ID, AccessionNo, Genus, Species, SspVarForm, HybridName, Original_name from specimens where specimens.sFile_ID = :fileID
@@ -27,7 +26,7 @@ $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
 $n = $Stm->rowCount();
 echo "rows: $n <br>";
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[SspVarForm]</TD><TD>$row[HybridName]</TD><TD>$row[Original_name]</TD></TR>";
 }	 
 	 
@@ -45,7 +44,7 @@ $Stm->bindValue(':fileID', $fileID, PDO::PARAM_INT);
 $Stm->execute();
 $n = $Stm->rowCount();
 echo "rows: $n <br>";
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"../record.php?ID=$row[ID]\">$row[AccessionNo]</A></TD><TD>$row[Genus]</TD><TD>$row[Species]</TD><TD>$row[SspVarForm]</TD><TD>$row[HybridName]</TD> <TD>$row[Original_name]</TD></TR>";
 }
 ?>
