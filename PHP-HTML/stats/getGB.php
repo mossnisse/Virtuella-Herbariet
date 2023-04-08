@@ -10,7 +10,7 @@ $con = getConS();
 $query = "SELECT count(*) as tot from specimens where InstitutionCode = \"GB\";";
 $result = $con->query($query);
 
-if($result ) {
+if ($result) {
 	$row = $result->fetch();
     echo  round($row['tot']/10000);
 } else {

@@ -10,7 +10,7 @@ $con = getConS();
 $query = "SELECT count(*) as tot from specimens where InstitutionCode = \"UPS\";";
 $result = $con->query($query);
 
-if($result ) {
+if ($result) {
 	$row = $result->fetch();
     echo  round($row['tot']/30700);
 } else {
