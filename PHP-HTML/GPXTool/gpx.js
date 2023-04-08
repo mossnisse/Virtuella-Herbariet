@@ -54,7 +54,7 @@ function tryLabels() {
 			labelsz();
 		}
 	} else {
-		document.getElementById('labels').innerHTML = "";
+		document.getElementById('labels').textContent = "";
 		document.getElementById('labelsz').textContent = "Labels";
 	}
 }
@@ -174,7 +174,7 @@ function artp() {
 		document.getElementById('artp').innerHTML = output;
 		document.getElementById('artpz').textContent = "Hide Artportalen mall";
 	} else {
-		document.getElementById('artp').innerHTML = "";
+		document.getElementById('artp').textContent = "";
 		document.getElementById('artpz').textContent = "Artportalen mall";
 	}
 }
