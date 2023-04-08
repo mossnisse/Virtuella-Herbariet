@@ -61,18 +61,21 @@
 		//echo "dist: $dist, prov: $prov <br>";
 	$Stm2->execute();
     
-    $urlCountry = urlencode($count);
-    $urlProvince = urlencode($prov);
-    $urlDistrict = urlencode($dist);
+    $urlCountry = htmlentities(urlencode($count));
+    $urlProvince = htmlentities(urlencode($prov));
+    $urlDistrict = htmlentities(urlencode($dist));
+    $htmlDistrict = htmlentities($dist);
+    $htmlCountry = htmlentities($count);
+    $htmlProvince = htmlentities($prov);
 
 echo "
-		<h1><a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$dist</a></h1>
+		<h1><a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$htmlDistrict</a></h1>
 		<table>
 			<tr><td>Code:</td><td>$row[code]</td></tr>
 			<tr><td>Type:</td><td>$row[typeEng]/$row[typeNative]</td></tr>
 			<tr><td>Alternative names:</td><td>$row[alt_names]</td></tr>
-            <tr><td>Country:</td><td><a href=\"../maps/country.php?Country=$urlCountry\">$count</a></td></tr>
-            <tr><td>Province:</td><td><a href=\"../maps/province.php?Country=$urlCountry&Province=$urlProvince\">$prov</a></td></tr>
+            <tr><td>Country:</td><td><a href=\"../maps/country.php?Country=$urlCountry\">$htmlCountry</a></td></tr>
+            <tr><td>Province:</td><td><a href=\"../maps/province.php?Country=$urlCountry&Province=$urlProvince\">$htmlProvince</a></td></tr>
             <tr><td>Comments:</td><td>$row[comments]</td></tr>
 			<tr><td><a href=\"gjdistrict.php?District=$urlDistrict&Province=$urlProvince\" download>Download GeoJson borders in WGS84</a></td><td></td></tr>
 		</table>
@@ -84,10 +87,8 @@ echo "
 		echo "
 		<tr><td><a href =\"../locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
 	}
-	
 	echo "
 	</table>
-	
     <script>
 	    var map;
 		function initMap() {

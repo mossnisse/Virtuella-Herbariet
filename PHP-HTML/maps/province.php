@@ -22,6 +22,8 @@
 	<table class = "outerBox"> <tr> <td>
 		<table class="SBox"> <tr> <td>
 <?php
+    //ini_set('display_errors', 1);
+    //error_reporting(E_ALL);
 	include "../ini.php";
 	$con = getConS();
 	$prov = "";
@@ -46,23 +48,25 @@
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	$query = "select District from District where country= :count and province = :prov";
+	$query = "select ID, District from District where country= :count and province = :prov";
 	$Stm2 = $con->prepare($query);
 	$Stm2->bindValue(':prov', $prov, PDO::PARAM_STR);
 	$Stm2->bindValue(':count', $count, PDO::PARAM_STR);
 		//echo "dist: $dist, prov: $prov <br>";
 	$Stm2->execute();
 	
-	$urlCountry = urlencode($count);
-    $urlProvince = urlencode($prov);
+	$urlCountry = htmlentities(urlencode($count));
+    $urlProvince = htmlentities(urlencode($prov));
+    $htmlProvince = htmlentities($prov);
+    $htmlCountry = htmlentities($count);
 
 	echo "
-		<h1><a href=\"../cross_browser.php?SpatLevel=3&SysLevel=0&Sys=Life&Spat=$urlProvince&Herb=All\">$prov</a></h1>
+		<h1><a href=\"../cross_browser.php?SpatLevel=3&SysLevel=0&Sys=Life&Spat=$urlProvince&Herb=All\">$htmlProvince</a></h1>
 		<table>
 			<tr><td>Code:</td><td>$row[code]</td></tr>
 			<tr><td>Type:</td><td>$row[type_eng]/$row[type_native]</td></tr>
 			<tr><td>Alternative names:</td><td>$row[alt_names]</td></tr>
-            <tr><td>Country:</td><td><a <a href=\"country.php?Country=$urlCountry\">$count</a></td></tr>
+            <tr><td>Country:</td><td><a <a href=\"country.php?Country=$urlCountry\">$htmlCountry</a></td></tr>
             <tr><td>Comments:</td><td><$row[comments]/td></tr>
 		</table>
 		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
@@ -71,13 +75,11 @@
 
 	//use distict id instead?
 	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
-		$urlDistrict = urlencode($row2['District']);
-		echo "<tr><td><a href=\"district.php?Province=$urlProvince&District=$urlDistrict&Country=$urlCountry\">$row2[District]</a></td></tr>";
+		//$urlDistrict = urlencode($row2['District']);
+		echo "<tr><td><a href=\"district.php?ID=$row2[ID]\">$row2[District]</a></td></tr>";
 	}
-	
 	echo "
 	</table>
-    
 	<script>
 	    var map;
 		function initMap() {

@@ -22,6 +22,8 @@
 	<table class = "outerBox"> <tr> <td>
 		<table class="SBox"> <tr> <td>
 <?php
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 include("../ini.php");
 	$con = getConS();
 	$country = "";
@@ -41,14 +43,15 @@ include("../ini.php");
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	$query = "select Province from Provinces where country = :country";
+	$query = "select ID, Province from Provinces where country = :country";
 	$Stm = $con->prepare($query);
 	$Stm->bindValue(':country', $country, PDO::PARAM_STR);
 	$Stm->execute();
 		//$row = $Stm->fetch(PDO::FETCH_ASSOC)
-	$urlCountry = urlencode($country);
+	$urlCountry = htmlentities(urlencode($country));
+    $htmlCountry = htmlentities($country);
 echo "
-		<h1><a href=\"../cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$urlCountry&Herb=All\">$country</a></h1>
+		<h1><a href=\"../cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$urlCountry&Herb=All\">$htmlCountry</a></h1>
 		<table>
 		<tr><td>Alternative names:</td><td>$row[syn]</td></tr>
 		<tr><td>Native name:</td><td>$row[native]</td></tr>
@@ -66,8 +69,8 @@ echo "
 	Provinces
 	<table>";
 	while ($row2 = $Stm->fetch(PDO::FETCH_ASSOC)) {
-		$urlProvince = urlencode($row2['Province']);
-		echo "<tr><td><a href=\"province.php?Country=$urlCountry&Province=$urlProvince\">$row2[Province]</a></td></tr>";
+		//$urlProvince = urlencode($row2['Province']);
+		echo "<tr><td><a href=\"province.php?ID=$row2[ID]\">$row2[Province]</a></td></tr>";
 	}
 	
 	echo "

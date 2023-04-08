@@ -19,8 +19,8 @@ if (isset($_GET['District'])) {
 //echo "$query <p>";
 $Stm->execute();
 $row = $Stm->fetch(PDO::FETCH_ASSOC);
-if($row) {
- echo $row['geojson'];
+if ($row) {
+    echo $row['geojson'];
 } else {
     echo "couldnt find the geojson data: "+$query;
 }

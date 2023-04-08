@@ -16,9 +16,9 @@ if (array_key_exists('country', $_GET)) {
 //echo "$query <p>";
 $Stm->execute();
 $row = $Stm->fetch(PDO::FETCH_ASSOC);
-if($row ) {
- echo $row['geojson'];
+if ($row ) {
+   echo $row['geojson'];
 } else {
-    echo "couldnt find the geojson data: "+$query;
+   echo "couldnt find the geojson data: "+$query;
 } 
 ?>
