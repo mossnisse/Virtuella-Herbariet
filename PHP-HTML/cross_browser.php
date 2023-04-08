@@ -185,7 +185,7 @@ $query = "SELECT $WhatSpatSQL, $WhatSysSQL, COUNT(specimens.Genus) FROM specimen
 //echo "sysquery: $query <p>";
 
 $Stm = $con->prepare($query);
-if (isset($bindParams )) {
+if (isset($bindParams)) {
     foreach ($bindParams as $key=>$value) {
         //echo ":$key, $value<br>";
         $Stm->bindValue(':'.$key, $value, PDO::PARAM_STR);
@@ -396,11 +396,14 @@ $query = "SELECT $WhatSpatSQL, $WhatSysSQL, COUNT(specimens.Genus) FROM specimen
             ON specimens.Genus_ID = xgenera.ID  $var GROUP BY specimens.$SpatDownLevel";
 //echo "mindre geo $query<p>";
 
+
 $Stm = $con->prepare($query);
-foreach ($bindParams as $key=>$value) {
-    //echo ":$key, $value<br>";
-    $Stm->bindValue(':'.$key, $value, PDO::PARAM_STR);
-} 
+if (isset($bindParams)) {
+    foreach ($bindParams as $key=>$value) {
+        //echo ":$key, $value<br>";
+        $Stm->bindValue(':'.$key, $value, PDO::PARAM_STR);
+    }
+}
 $Stm->execute();
 
 //------------------------- Lista med länkar till mindre geografiska enheter -------------
