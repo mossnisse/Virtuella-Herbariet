@@ -12,11 +12,11 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = $_GET['Page'];
+$page = (int) $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords = $_GET['nrRecords'];
+$nrRecords = (int) $_GET['nrRecords'];
 
 $con = getConS();
 
@@ -42,7 +42,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
 foreach($result as $row)
 {
     
-    if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
+    if ($row["Collector"]=="" || $row["Collector"]=="[missing]" || $row["Collector"]=="[Missing]" || $row["Collector"]=="[unreadable]")
         $saml ="";
     else
         $saml = htmlspecialchars($row["Collector"], ENT_XML1);
@@ -56,7 +56,7 @@ foreach($result as $row)
     if ($continent == "Australia & Oceania")
         $continent = "Oceania";
 
-    if ($row['Country'] == "" or $row['Country'] == "[Missing]" or $row['Country'] == "[missing]" or $row['Country'] == "[unreadable]")
+    if ($row['Country'] == "" || $row['Country'] == "[Missing]" || $row['Country'] == "[missing]" || $row['Country'] == "[unreadable]")
         $country = "Unknown";
     else
         $country = htmlspecialchars($row['Country'], ENT_XML1);
@@ -107,14 +107,14 @@ foreach($result as $row)
         $genera ="";
     }
         
-    if($row['SspVarForm']!="") {
-        if(substr($row['SspVarForm'],0,4)=="ssp.") {
+    if ($row['SspVarForm']!="") {
+        if (substr($row['SspVarForm'],0,4)=="ssp.") {
             $intraRank = "subspecies";
             $intraEp = substr($row['SspVarForm'],4);
         } elseif (substr($row['SspVarForm'],0,4)=="var.") {
             $intraRank = "varietas";
             $intraEp = substr($row['SspVarForm'],4);
-        } elseif(substr($row['SspVarForm'],0,5)=="form.") {
+        } elseif (substr($row['SspVarForm'],0,5)=="form.") {
             $intraRank = "forma";
             $intraEp = substr($row['SspVarForm'],5);
         } 
@@ -140,11 +140,11 @@ foreach($result as $row)
         $Remarks.="\nRemarks by registrator: ".htmlspecialchars($row['Comments'], ENT_XML1);
    
      //Date Collected
-    if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
+    if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="")
         $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-    elseif($row['Year']!="" and $row['Month']!="")
+    elseif ($row['Year']!="" && $row['Month']!="")
         $DateCollected = "$row[Year]-$row[Month]";
-    elseif($row['Year']!="")
+    elseif ($row['Year']!="")
         $DateCollected = $row['Year'];
     else
         $Remarks.="\nDate Collected: $row[Day]/$row[Month]";
@@ -176,7 +176,7 @@ foreach($result as $row)
                 <ense:County>$district</ense:County>";   // <ense:Parish>$parish</ense:Parish>
     echo "
                 <ense:Locality>$Locality</ense:Locality>";  
-    if (!($row['Lat'] == 0 and $row['Long'] ==0)) 
+    if (!($row['Lat'] == 0 && $row['Long'] ==0)) 
         echo "
                 <ense:DecimalLatitude>$row[Lat]</ense:DecimalLatitude>
                 <ense:DecimalLongitude>$row[Long]</ense:DecimalLongitude>

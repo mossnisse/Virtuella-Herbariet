@@ -13,12 +13,12 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
           specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Dyntaxa_ID, specimens.CSource, specimens.CPrec, specimens.CValue, specimens.Type_status, specimens.TAuctor, specimens.Basionym ";
           
-$page = $_GET['Page'];
+$page = (int) $_GET['Page'];
 $pageSize = 100000;
 
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords=$_GET['nrRecords'];
+$nrRecords = (int) $_GET['nrRecords'];
 
 $svar = wholeSQL($con, $whatstat, $page, $pageSize, $GroupBy, $order, $nrRecords);
 $result = $svar[0];
@@ -74,11 +74,11 @@ echo "<?xml version=\"1.0\"?>
 foreach($result as $row)
 {
      //Date Collected
-    if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
+    if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="")
         $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-    elseif($row['Year']!="" and $row['Month']!="")
+    elseif ($row['Year']!="" && $row['Month']!="")
         $DateCollected = "$row[Year]-$row[Month]";
-    elseif($row['Year']!="")
+    elseif ($row['Year']!="")
         $DateCollected = $row['Year'];
     else
         $DateCollected = "";

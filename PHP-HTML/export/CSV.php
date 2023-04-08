@@ -13,11 +13,11 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Type_status, specimens.TAuctor, specimens.Basionym, specimens.CSource, specimens.CValue, specimens.CPrec, image1, image2, image3, image4";
           
-$page = $_GET['Page'];
+$page = (int) $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords=$_GET['nrRecords'];
+$nrRecords = (int) $_GET['nrRecords'];
 
 $con = getConS();
 
@@ -29,11 +29,11 @@ echo "institutionCode\tCatalogNumber\tCollector\tcollectornumber\tDateCollected\
 foreach($result as $row)
 {
      //Date Collected
-    if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
+    if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="")
         $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-    elseif($row['Year']!="" and $row['Month']!="")
+    elseif ($row['Year']!="" && $row['Month']!="")
         $DateCollected = "$row[Year]-$row[Month]";
-    elseif($row['Year']!="")
+    elseif ($row['Year']!="")
         $DateCollected = $row['Year'];
     else
         $DateCollected = "";
@@ -43,7 +43,7 @@ foreach($result as $row)
     $ImageLinks = "";
     $ImageThumbLinks = "";
 
-    if ($row['institutionCode'] == "LD" and !$row['image1'] == "") {
+    if ($row['institutionCode'] == "LD" && !$row['image1'] == "") {
         $directory = "http://www.botmus.lu.se/Lund/Images/";
         if ($row["image1"]!="") {
             $ImageLinks = "$directory$row[image1].jpg";
@@ -62,7 +62,7 @@ foreach($result as $row)
             $ImageThumbLinks = "$ImageThumbLinks, $directory$row[image4].gif";
         }
     
-    } elseif ($row['institutionCode'] == "S" and !$row['image1'] == "")  {
+    } elseif ($row['institutionCode'] == "S" && !$row['image1'] == "")  {
         if ($row["image1"]!="") {
             $filenamesub = $row["image1"];
             $thumb = str_replace("large","small", $filename);
@@ -87,7 +87,7 @@ foreach($result as $row)
             $ImageLinks = "$ImageLinks, $filenamesub";
             $ImageThumbLinks = "$ImageThumbLinks, $thumb";
         }
-    } elseif ($row['institutionCode'] == "GB" and !$row['image1'] == "") {
+    } elseif ($row['institutionCode'] == "GB" && !$row['image1'] == "") {
         $directory = "http://herbarium.bioenv.gu.se/web/images/";
         if ($row["image1"]!="") {
             $ImageLinks = "$directory$row[image1].jpg";

@@ -5,18 +5,16 @@ include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_artp.xml"');
 
-//$pageURL = xmlf(curPageURL());
-
 $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.AccessionNo, specimens.Genus, specimens.Species, specimens.SspVarForm, specimens.HybridName,
           specimens.Collector, specimens.collectornumber, specimens.Year, specimens.Month, specimens.Day, specimens.Locality, specimens.Cultivated,
           specimens.Comments, specimens.Original_name, specimens.Original_text, specimens.Notes, specimens.RiketsN, specimens.RiketsO, specimens.RUBIN,
           specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = $_GET['Page'];
+$page = (int) $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords=$_GET['nrRecords'];
+$nrRecords = (int) $_GET['nrRecords'];
 
 $con = getConS();
 
@@ -57,11 +55,11 @@ echo "<?xml version=\"1.0\"?>
 foreach($result as $row)
 {
      //Date Collected
-    if ($row['Year']!="" and $row['Month']!="" and $row['Day']!="")
+    if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="")
         $DateCollected = "$row[Year]-$row[Month]-$row[Day]";
-    elseif($row['Year']!="" and $row['Month']!="")
+    elseif ($row['Year']!="" && $row['Month']!="")
         $DateCollected = "$row[Year]-$row[Month]";
-    elseif($row['Year']!="")
+    elseif ($row['Year']!="")
         $DateCollected = $row['Year'];
     else
         $DateCollected = "";
@@ -69,7 +67,7 @@ foreach($result as $row)
     $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1); 
     
     if (isset($row['Original_text']))
-        $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
+        $original_text = htmlspecialchars($row['Original_text']);
     else
         $original_text = "";
     if (isset($row['Original_name']))
@@ -120,13 +118,13 @@ foreach($result as $row)
     }
     
     if (isset($row['Lat'])) {
-        $Norr = strtr($row['Lat'],'.',',');
+        $Norr = strtr($row['Lat'], '.', ',');
     } else {
         $Norr ='';
     }
     
     if (isset($row['Long'])) {
-        $Ost = strtr($row['Long'],'.',',');
+        $Ost = strtr($row['Long'], '.', ',');
     } else {
         $Ost = '';
     }
@@ -140,13 +138,13 @@ foreach($result as $row)
                 <Cell><Data ss:Type=\"String\"></Data></Cell>
                 <Cell><Data ss:Type=\"String\">$DateCollected</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$DateCollected</Data></Cell>
-                <Cell><Data ss:Type=\"String\">Original name: $row[Original_name] Original_text: $orgext comments: $row[Comments]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">Original name: $original_name Original_text: $orgext comments: $comments</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$samling</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[AccessionNo]</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$notes</Data></Cell>
                 <Cell><Data ss:Type=\"String\"></Data></Cell>
                 <Cell><Data ss:Type=\"String\">$row[Cultivated]</Data></Cell>
-                <Cell><Data ss:Type=\"String\">$row[Collector]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$collector</Data></Cell>
                 <Cell><Data ss:Type=\"String\"></Data></Cell>
             </Row>";
 }

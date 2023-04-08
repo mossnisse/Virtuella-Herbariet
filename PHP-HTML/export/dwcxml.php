@@ -10,11 +10,11 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.RiketsN, specimens.RiketsO, specimens.RUBIN, specimens.Original_name, specimens.Original_text,
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
-$page = $_GET['Page'];
+$page = (int) $_GET['Page'];
 $pageSize = 100000;
 $GroupBy = "";
 $order['SQL'] = "";
-$nrRecords=$_GET['nrRecords'];
+$nrRecords = (int) $_GET['nrRecords'];
 
 $con = getConS();
 
@@ -42,12 +42,12 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
 foreach($result as $row)
 {
     
-    if ($row["Collector"]=="" or $row["Collector"]=="[missing]" or $row["Collector"]=="[Missing]" or $row["Collector"]=="[unreadable]")
+    if ($row["Collector"]=="" || $row["Collector"]=="[missing]" || $row["Collector"]=="[Missing]" || $row["Collector"]=="[unreadable]")
         $saml ="";
     else
         $saml = htmlspecialchars($row["Collector"], ENT_XML1);
     
-    if ($row['Country'] == "" or $row['Country'] == "[Missing]" or $row['Country'] == "[missing]" or $row['Country'] == "[unreadable]")
+    if ($row['Country'] == "" || $row['Country'] == "[Missing]" || $row['Country'] == "[missing]" || $row['Country'] == "[unreadable]")
         $country = "Unknown";
     else
         $country = htmlspecialchars($row['Country'], ENT_XML1);
@@ -91,7 +91,7 @@ foreach($result as $row)
     echo "
                 <dwc:locality>$Locality</dwc:locality> ";
                 
-    if (!($row['Lat'] == 0 and $row['Long'] ==0))
+    if (!($row['Lat'] == 0 && $row['Long'] ==0))
     echo "
                 <dwc:decimalLatitude>$row[Lat]</dwc:decimalLatitude>
                 <dwc:decimalLongitude>$row[Long]</dwc:decimalLongitude>";
