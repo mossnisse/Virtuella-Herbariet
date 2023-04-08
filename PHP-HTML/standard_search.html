@@ -129,13 +129,12 @@
         <option value="type?">type?</option>
         <option value="original material">original material</option>
     </select> </td> <td>Typstatus</td> </tr>
-   <tr> <td class="eng">Type of</td> <td class="fbox"> <input type="text" name="Basionym" value="*" size="32" onclick="star('Basionym')" /> </td> <td>Typens originalnamn</td> </tr>
-    
+   <tr> <td class="eng">Type of</td> <td class="fbox"> <input type="text" name="Basionym" value="*" size="32" onclick="star('Basionym')" /></td> <td>Typens originalnamn</td> </tr>
 </table>
 
 <table class="SBox">
     <tr> <th colspan="2">Swedish search fields</th> <th> Svenska sökfält </th> </tr>
-    <tr> <td class="eng">Swedish name of taxon<br /> </td> <td class="fbox"> <input type="text" name="Svenskt_namn" value="*" size="32" onclick="star('Svenskt_namn')" /> </td> <td>Svenskt växtnamn</td> </tr>
+    <tr> <td class="eng">Swedish name of taxon<br /> </td> <td class="fbox"> <input type="text" name="Svenskt_namn" value="*" size="32" onclick="star('Svenskt_namn')" /></td> <td>Svenskt växtnamn</td> </tr>
     <tr> <td class="eng">Län</td> <td class="fbox" id="Land">
     <select name="Lan" size="1" id = "Lan" onchange="getList('Lan', 'Kommun');">
         <option value="*">*</option>
@@ -161,19 +160,16 @@
         <option value="Västerbottens län">Västerbottens län</option>
         <option value="Norrbottens län">Norrbottens län</option>
     </select> </td> <td>Län</td> </tr>
-    <tr> <td class="eng">Kommun</td> <td class="fbox" id="Kommund"> <input type="text" name="Kommun" value="*" size="32" id = "Kommun" onclick="star('Kommun')" /> </td> <td>Kommun</td> </tr>
-    <tr> <td colspan="2"> <input type="submit" name= "search" value="Search" /> </td> <td> <a href="standard_search.html">Clear search fields</a> </td> </tr>
+    <tr> <td class="eng">Kommun</td> <td class="fbox" id="Kommund"><input type="text" name="Kommun" value="*" size="32" id = "Kommun" onclick="star('Kommun')" /></td> <td>Kommun</td> </tr>
+    <tr> <td colspan="2"><input type="submit" name= "search" value="Search" /></td> <td><a href="standard_search.html">Clear search fields</a></td> </tr>
 </table>
 
 <div id="moreOptions">
-
 </div>
 </form>
-
 <!-- <form action="" method="get" style="text-align: left"> -->
     <input id = "opbutton" type="button" name="button" value="show extended search" onClick="moreoptions();"/>
 <!--</form>-->
-  
     </td> </tr> </table>
 </div>
 </body>

@@ -23,23 +23,24 @@
 <?php
     include "ini.php";
     include "locality_sengine.php";
+    $con = getConS();
     
-    $urlCountry = urlencode($_GET['country']);
-    $urlProvince = urlencode($_GET['province']);
-    $urlDistrict = urlencode($_GET['district']);
-    $urlLocality = urlencode($_GET['locality']);
+    $urlCountry =  htmlentities(urlencode($_GET['country']));
+    $urlProvince = htmlentities(urlencode($_GET['province']));
+    $urlDistrict = htmlentities(urlencode($_GET['district']));
+    $urlLocality = htmlentities(urlencode($_GET['locality']));
 
     echo "
     <div class = \"menu2\">
         <ul>
-            <li class = \"list\"><a href=\"locality_list.php?locality=$urlLocality&country=$urlCountry&province=$urlProvince&district=$urlDistrict\">List</a></li>
-            <li class = \"map\"><a href=\"locality_map.php?locality=$urlLocality&country=$urlCountry&province=$urlProvince&district=$urlDistrict\">Map</a></li>
+            <li class = \"list\"><a href=\"locality_list.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">List</a></li>
+            <li class = \"map\"><a href=\"locality_map.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">Map</a></li>
         </ul>
     </div>
 	<table class = \"outerBox\"> <tr> <td>
 		<table class=\"SBox\"> <tr> <td>";
     
-    $lstmt = getLocalityList();
+    $lstmt = getLocalityList($con);
     $lstmt->execute();
 
     echo "
@@ -55,7 +56,7 @@
                     $LatMax = -360;
                     $LongMax = -360;
                     $LongMin = +360;
-					while($row = $lstmt->fetch())
+					while ($row = $lstmt->fetch())
 					{
                         $locality = str_replace('"', '\"', $row["locality"]);
                         echo "

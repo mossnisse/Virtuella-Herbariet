@@ -28,7 +28,6 @@
 include "herbes.php";
 
 //$timer = new Timer();
-//cacheStart();
 
 if (isUpdating()) { updateText();}
 else {
@@ -37,35 +36,35 @@ $con = getConS();
 $adr = getSimpleAdr();
 $Rubrik = getRubr($con);
 
-if (isset($_GET['ARecord']))
-   $ARecordAdr = $_GET['ARecord'];
+if (isset($_GET['ARecord']) && $_GET['ARecord']!='')
+   $ARecordAdr = (int) $_GET['ARecord'];
 else
    $ARecordAdr = 1;
 
 if (isset($_GET['OrderBy']))
-   $OrderAdr = "&OrderBy=$_GET[OrderBy]";
+   $OrderAdr = "&amp;OrderBy=".htmlentities(urlencode($_GET['OrderBy']));
 else
    $OrderAdr = "";
     
-if (isset($_GET['Page']))
-   $list_page = $_GET['Page'];
+if (isset($_GET['Page']) && $_GET['Page']!='')
+   $list_page = (int) $_GET['Page'];
 else
    $list_page = 1;
     
-if (isset($_GET['nrRecords']))
-   $nrRecords = $_GET['nrRecords'];
+if (isset($_GET['nrRecords']) && $_GET['nrRecords']!='')
+   $nrRecords = (int) $_GET['nrRecords'];
 else
    $nrRecords = -1;
     
-if (isset($_GET['nrBlipps'])) 
-   $nrBlipps = $_GET['nrBlipps'];
+if (isset($_GET['nrBlipps']) && $_GET['nrBlipps']!='') 
+   $nrBlipps = (int) $_GET['nrBlipps'];
 else
    $nrBlipps = -1;
     
-if(isset($_GET['MapPage']))
-   $page=$_GET['MapPage'];
+if (isset($_GET['MapPage']) && $_GET['MapPage'] !='')
+   $page= (int) $_GET['MapPage'];
 else
-   $page=1;
+   $page = 1;
 
 $order['SQL'] = "ORDER BY Lat";
 $whatstat = "CSource, CValue, `Long`, `Lat`, COUNT(*)";

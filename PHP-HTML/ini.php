@@ -9,6 +9,7 @@ $GoogleMapsKey ='Google key';
 $uploaddir = 'C:/uploads/';
 $BCache = 'On'; // values On / Off  activate Browser Caching to imrpove performance
 $Logg = 'Off'; // Values On / Off activate logging of access to the db to the table logg.
+$APass = 'testa_pass';
 
 function getConA() : PDO
 {   

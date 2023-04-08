@@ -31,9 +31,9 @@ function RT90ToWGS (float $RiketsN, float $RiketsO): array {
     $qs = asin(sin($xp)/cosh($np));
     $WGS['Lat'] = ($qs + sin($qs)*cos($qs)*(0.00673949676 -0.00005314390556 * pow(sin($qs),2)) + 5.74891275E-7 * pow(sin($qs),4)) * 180/M_PI;
     
-    if ($x%10000 == 0  and $y%10000 == 0) {
+    if ($x%10000 == 0 && $y%10000 == 0) {
         $WGS['Prec'] = 10000;
-    } elseif ($x%1000 == 0  and $y%1000 == 0) {
+    } elseif ($x%1000 == 0 && $y%1000 == 0) {
         $WGS['Prec'] = 1000;
     } else {
         $WGS['Prec'] = 100;
@@ -82,14 +82,13 @@ Function Sweref99TMToWGS(float $north, float $east): array {
      $WGS['Long'] = $lon_radian*$radToDeg; 
      $WGS['Lat'] = $lat_radian*$radToDeg;
      //echo "wgs $WGS[Lat], $WGS[Long]";
-      if ($north%10000 == 0  and $east%10000 == 0) {
+      if ($north%10000 == 0 && $east%10000 == 0) {
         $WGS['Prec'] = 10000;
-    } elseif ($north%1000 == 0  and $east%1000 == 0) {
+    } elseif ($north%1000 == 0 && $east%1000 == 0) {
         $WGS['Prec'] = 1000;
     } else {
         $WGS['Prec'] = 100;
     }
-        
     return $WGS;
 }
 
@@ -192,11 +191,11 @@ function RUBINToRT90(string $RUBIN) {
         $RT90['N'] = 6050500+intval($a)*50000+intval($c)*5000+intval($e)*1000;
         $RT90['E'] = 1200500+alphaNum3($b)*50000+alphaNum3($d)*5000+intval($g)*1000;
         $RT90['Prec'] = 1000;
-    } elseif (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
+    } elseif (ctype_digit($c) && (ctype_alpha($d) || ctype_digit($d))) {
         $RT90['N'] = 6052500+intval($a)*50000+intval($c)*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
+    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
         $RT90['N'] = 6075000+intval($a)*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
@@ -236,11 +235,11 @@ function LINREGToRT90(string $LINREG) {
         $RT90['N'] = 6050500+$a*50000+$c*5000+$e*1000;
         $RT90['E'] = 1200500+alphaNum3($b)*50000+alphaNum3($d)*5000+alphaNum3($f)*1000;
         $RT90['Prec'] = 1000;
-    } elseif (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
+    } elseif (ctype_digit($c) && (ctype_alpha($d) || ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
+    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
@@ -251,10 +250,8 @@ function LINREGToRT90(string $LINREG) {
 }
 
 // formaterar rubin koder
-function RUBINf(string $RUBIN) {
-	if ($RUBIN == null) {
-		return null;
-	} else {
+function RUBINf(string $RUBIN): string {
+	
     $RUBIN = str_replace(' ', '', $RUBIN);
     $RUBIN = str_replace("\xA0", '', $RUBIN);
     $RUBIN = str_replace("\xC2", '', $RUBIN);
@@ -283,25 +280,24 @@ function RUBINf(string $RUBIN) {
         $RT90['N'] = 6050050+$a*50000+$c*5000+$e*1000+$f*100;
         $RT90['E'] = 1200050+alphaNum3($b)*50000+alphaNum3($d)*5000+$g*1000+$h*100;
         $RT90['Prec'] = 100;
-    } elseif (ctype_digit($e) and ctype_digit($g)) {
+    } elseif (ctype_digit($e) && ctype_digit($g)) {
         $RT90['N'] = 6050500+$a*50000+$c*5000+$e*1000;
         $RT90['E'] = 1200500+alphaNum3($b)*50000+alphaNum3($d)*5000+$g*1000;
         $RT90['Prec'] = 1000;
-    } elseif (ctype_digit($c) and (ctype_alpha($d) or ctype_digit($d))) {
+    } elseif (ctype_digit($c) && (ctype_alpha($d) || ctype_digit($d))) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) and (ctype_alpha($b) or ctype_digit($b))) {
+    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
     } else {
-        return NULL;
+        return '';
     }
     if (ctype_digit($d))
             $d = numAlpha($d);
     return "$a$b$c$d $e$f$g$h";
-	}
 }
 
 // Konverterar RUBIN koordinater till WGS-84
@@ -332,21 +328,21 @@ function LatLongformat($deg, $min, $sec, $dir): string {
 }
 
 // Konverterar Minuter sekunder till decimal Longitude/Latitude
-function DecLat($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir): float {
+function DecLat(float $Lat_deg, float $Lat_min, float $Lat_sec, string $Lat_dir): float {
     if ($Lat_dir == 'S')
-        return -$Lat_deg-$Lat_min/60-$Lat_sec/3600;
+        return -$Lat_deg-$Lat_min/60.0-$Lat_sec/3600.0;
     else
-        return $Lat_deg+$Lat_min/60+$Lat_sec/3600;
+        return $Lat_deg+$Lat_min/60.0+$Lat_sec/3600.0;
 }
 
-function DecLong($Long_deg, $Long_min, $Long_sec, $Long_dir): float {
+function DecLong(float $Long_deg, float $Long_min, float $Long_sec, float $Long_dir): float {
     if ($Long_dir == 'W')
-        return -$Long_deg-$Long_min/60-$Long_sec/3600;
+        return -$Long_deg-$Long_min/60.0-$Long_sec/3600.0;
     else
-        return $Long_deg+$Long_min/60+$Long_sec/3600;
+        return $Long_deg+$Long_min/60.0+$Long_sec/3600.0;
 }
 
-function get_precision($value) {
+function get_precision($value): ?int {
     if (!is_numeric($value)) { return false; }
     $decimal = $value - floor($value); //get the decimal portion of the number
     if ($decimal == 0) { return 0; } //if it's a whole number
@@ -354,7 +350,7 @@ function get_precision($value) {
     return $precision; 
 }
 
-function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Long_min, $Long_sec, $Long_dir) {
+function latlongtoWGS84 (float $Lat_deg, float $Lat_min, float $Lat_sec, string $Lat_dir, float $Long_deg, float $Long_min, float $Long_sec, string $Long_dir): array {
 	if ($Lat_deg != null) {
 		 $Lat_deg= str_replace(',', '.', $Lat_deg);
 	}
@@ -368,9 +364,9 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
 		$Long_min= str_replace(',', '.', $Long_min);
 	}
     // fixa prec för decimaltal
-    if (isset($Long_sec) and isset($Lat_sec) and ($Lat_sec != "") and ($Long_sec != ""))
+    if (isset($Long_sec) && isset($Lat_sec) && ($Lat_sec != "") && ($Long_sec != ""))
         $WGS['Prec'] = '100';
-    elseif (isset($Long_min) and isset($Lat_min) and ($Lat_min != "") and ($Long_min != "")) {
+    elseif (isset($Long_min) && isset($Lat_min) && ($Lat_min != "") && ($Long_min != "")) {
         $lop = get_precision($Long_min);
         $lap = get_precision($Lat_min);
         if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
@@ -378,7 +374,7 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
     }
-    elseif (isset($Long_deg) and isset($Lat_deg) and ($Lat_deg != "") and ($Long_deg != "")) {
+    elseif (isset($Long_deg) && isset($Lat_deg) && ($Lat_deg != "") && ($Long_deg != "")) {
         $lop = get_precision($Long_deg);
         $lap = get_precision($Lat_deg);
         if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
@@ -392,7 +388,6 @@ function latlongtoWGS84 ($Lat_deg, $Lat_min, $Lat_sec, $Lat_dir, $Long_deg, $Lon
         $WGS['Lat'] = -floatval($Lat_deg)-floatval($Lat_min)/60-floatval($Lat_sec)/3600;
     else
        $WGS['Lat'] = floatval($Lat_deg)+floatval($Lat_min)/60+floatval($Lat_sec)/3600;
-       
     if ($Long_dir == 'W')
         $WGS['Long'] = -floatval($Long_deg)-floatval($Long_min)/60-floatval($Long_sec)/3600;
     else
@@ -481,36 +476,38 @@ function CalcCoord($row,PDO $con) {
         $WGS['Value'] = "";
         $WGS['Prec'] = "unknown";
     }
-    elseif (isset($row['Sweref99TMN']) and isset($row['Sweref99TME']) and $row['Sweref99TMN']!=0 and $row['Sweref99TME']!=0 and $row['Sweref99TMN']!="" and $row['Sweref99TME']!="") {
+    elseif (isset($row['Sweref99TMN']) && isset($row['Sweref99TME']) && $row['Sweref99TMN']!=0 && $row['Sweref99TME']!=0 && $row['Sweref99TMN']!="" && $row['Sweref99TME']!="") {
 		$WGS = Sweref99TMToWGS(floatval($row['Sweref99TMN']), floatval($row['Sweref99TME']));
         $WGS['Source'] = "Sweref99TM-coordinates";
         $WGS['Value'] = "$row[Sweref99TMN]N, $row[Sweref99TME]E";
     }
-    elseif (isset($row['RiketsN']) and isset($row['RiketsO']) and $row['RiketsN']!=0 and $row['RiketsO']!=0 and $row['RiketsN']!="" and $row['RiketsO']!="") {
+    elseif (isset($row['RiketsN']) && isset($row['RiketsO']) && $row['RiketsN']!=0 && $row['RiketsO']!=0 && $row['RiketsN']!="" && $row['RiketsO']!="") {
         $WGS = RT90ToWGS(floatval($row['RiketsN']), floatval($row['RiketsO']));
         $WGS['Source'] = "RT90-coordinates";
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
-    elseif (isset($row['Lat_deg']) and isset($row['Long_deg']) and $row['Lat_deg'] != "" and $row['Long_deg'] !="" ) {
+    elseif (isset($row['Lat_deg']) && isset($row['Long_deg']) && $row['Lat_deg'] != "" && $row['Long_deg'] !="" ) {
         $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
         $WGS['Value'] = "Longitude: $row[Long_deg]º $row[Long_min]' $row[Long_sec]'' $row[Long_dir] Latitude: $row[Lat_deg]º $row[Lat_min]' $row[Lat_sec]'' $row[Lat_dir]";
     }
-    elseif (isset($row['linereg']) and $row['linereg']!="") {
+    elseif (isset($row['linereg']) && $row['linereg']!="") {
         $WGS = LINREGToWGS($row['linereg']);
         $WGS['Source'] = "LINEREG";
         $WGS['Value'] = $row['linereg'];
     }
-    elseif (isset($row['RUBIN']) and $row['RUBIN']!="" and $row['RUBIN']!=" ") {
+    elseif (isset($row['RUBIN']) && $row['RUBIN']!="" && $row['RUBIN']!=" ") {
         $WGS = RUBINToWGS($row['RUBIN']);
         $WGS['Source'] = "RUBIN";
         $WGS['Value'] = $row['RUBIN'];
     }
     elseif (isset($row['locality_ID'])) { 
 		$WGS['Source'] = "LocalityVH";
-        $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = $row[locality_ID]";
-        $result = $con->query($querys);
-        $row2 = $result->fetch(PDO::FETCH_ASSOC);
+        $querys = "SELECT lat, `long`, locality, Coordinateprecision FROM locality WHERE ID = :localityID";
+        $stmt = $con->prepare($querys);
+        $stmt->bindParam(':localityID', $row['locality_ID']);
+        $stmt->execute();
+        $row2 = $stmt->fetch(PDO::FETCH_ASSOC);
         $WGS['Prec'] = $row2['Coordinateprecision'];
         $WGS['Lat'] = $row2['lat'];
         $WGS['Long'] = $row2['long'];
@@ -523,18 +520,18 @@ function CalcCoord($row,PDO $con) {
             $WGS['Value'] = $row2['locality'];
         }    
     }
-    elseif (isset($row['LocLong']) and $row['LocLong'] !="") {  // 
+    elseif (isset($row['LocLong']) && $row['LocLong'] !="") {  // 
         $WGS['Lat'] = $row['LocLat'];
         $WGS['Long'] = $row['LocLong'];
         $WGS['Source'] = "Locality";
         $WGS['Value'] = $row['Locality'];
         $WGS['Prec'] = $row['LocPrec'];
     }
-    elseif (isset($row['distrLong']) and $row['distrLong'] !="") {
+    elseif (isset($row['distrLong']) && $row['distrLong'] !="") {
 		//echo "calc from district $row[District] $row[ID] <br>";
         $WGS['Lat'] = $row['distrLat'];
         $WGS['Long'] = $row['distrLong'];
-		if (isset($row['typeNative']) and $row['typeNative']!="") {
+		if (isset($row['typeNative']) && $row['typeNative']!="") {
 			$WGS['Source'] = "District($row[typeNative])";
 		} else {
 			$WGS['Source'] = "District";
@@ -590,7 +587,7 @@ function CalcCoordBatchM(PDO $con, $timer, int $file_ID) {
     $updateStm->bindParam(':CPrec', $CPrec, PDO::PARAM_STR);
     $updateStm->bindParam(':specimenID', $specimenID, PDO::PARAM_INT);
 
-    While($test == $batch) {
+    While ($test == $batch) {
         echo "Batch no $counter<br />";
         echo "
         $selectQuery <br>\"counter: $counter, batch: $batch , sFileID: $file_ID\"<br /><br />";
@@ -599,8 +596,8 @@ function CalcCoordBatchM(PDO $con, $timer, int $file_ID) {
         $i=0;
         $test = 0;
         
-        while($row = $SelectStm->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['CSource']!='UPS Database' and $row['CSource']!='OHN Database') {
+        while ($row = $SelectStm->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['CSource']!='UPS Database' && $row['CSource']!='OHN Database') {
                 $koord = CalcCoord($row,$con);
                 $long = $koord['Long'];
                 $lat = $koord['Lat'];
@@ -613,7 +610,7 @@ function CalcCoordBatchM(PDO $con, $timer, int $file_ID) {
                     //echo "error $updateQuery <br> $long, $lat - $CSource - $cvalue - $CPrec - $specimenID<br>
                     //distrLong $row[distrLong] - Locality $row[Locality] - LocLat $row[LocLat] - LocalityID $row[locality_ID] <br>";
                 //}
-                if(!($i % 5000)) {
+                if (!($i % 5000)) {
                     $t = $timer->getTime();
                     echo "
                         row: $i time: ".round($t)."<br />";

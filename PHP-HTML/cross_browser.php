@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 <head>
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-   <title>Sweden's Virtual Herbarium: Cross Browser</title>
-   <link rel="stylesheet" type="text/css" href="herbes.css"/>
-   <meta name="author" content="Nils Ericson" />
-   <meta name="keywords" content="Virtuella herbariet" />
-   <meta name="robots" content="noindex" />
-   <link rel="shortcut icon" href="favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Sweden's Virtual Herbarium: Cross Browser</title>
+    <link rel="stylesheet" type="text/css" href="herbes.css"/>
+    <meta name="author" content="Nils Ericson" />
+    <meta name="keywords" content="Virtuella herbariet" />
+    <meta name="robots" content="noindex" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <script src="ajaj.js" type="text/javascript"></script>
 </head>
 <body id ="cross_browser">
     <div class = "menu1">
@@ -24,38 +25,35 @@
         Selected set appears in bold types.<br />
         Click on names to reach superior or inferior levels.<br />
         Click on numbers to list specimens.<br />
-        <table class = "outerBox"> <tr> <td>
-
+        <table class = "outerBox"><tr><td>
 <?php
 // Code Written By Nils Ericson 2009-11-21
-// crossbrowser page
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 set_time_limit(120);
 include "herbes.php";
 
-if (isUpdating()) { updateText();}
+if (isUpdating()) {updateText();}
 else {
-
-if ($BCache == 'On') 
-    cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
+if ($BCache == 'On') cacheStart();  // start cache funtion so that the page only need to bee computed the first time accesed, if updates are made the chache must be emptied
     
 $spatArr = array(-1 => "andromeda", 0 => "World", 1 => "Continent", 2 => "Country", 3 => "Province", 4 => "District", 5=> "Locality");
 $sysArr = array(-1 => "slemocota", 0 => "Life", 1 => "Kingdom", 2=>"Phylum", 3 => "Class", 4 => "Order", 5 => "Family", 6 => "Genus", 7 => "Species", 8 => "SspVarForm");
 $downArr = array("Kingdom" => "Phylum", "Phylum (Division)" => "Class", "Class" => "Order", "Order" => "Family", "Family => Genus", "Genus" => "Species", "Species" => "SspVarForm", "SspVarForm" =>"Stop",
                  "Continent" => "Country", "Country" => "Province", "Province" => "District", "District" => "Locality", "Locality" => "Stop");
 
-$SpatNr = SQLf($_GET['SpatLevel']);  // The number of the spatial Level
-$SysNr = SQLf($_GET['SysLevel']);    // The number of the systematic Level
+$SpatNr = (int) $_GET['SpatLevel'];  // The number of the spatial Level
+$SysNr = (int) $_GET['SysLevel'];    // The number of the systematic Level
 $SysDownNr = $SysNr+1;
 $SpatDownNr = $SpatNr+1;
 $SpatUppNr = $SpatNr-1;
 $SysUppNr = $SysNr-1;
-$SysValue = SQLf($_GET['Sys']);    // The Current Systematic group
-$UrlSysValue = urlencode($SysValue);
+$SysValue = $_GET['Sys'];    // The Current Systematic group
+$UrlSysValue = htmlentities(urlencode($SysValue));
+$htmlSysValue = htmlentities($SysValue);
 $SpatValue = $_GET['Spat'];  // The Current Geographical region
-$UrlSpatValue = urlencode($SpatValue);  // The Current Geographical region Url-encoded
-$SQLSpatValue = SQLf($_GET['Spat']);
+$UrlSpatValue = htmlentities(urlencode($SpatValue));  // The Current Geographical region Url-encoded
+$htmlSpatValue = htmlentities($SpatValue);
 $SysLevel = $sysArr[$SysNr];     // The Level of current systematic unit
 $SysUppLevel = $sysArr[$SysUppNr];
 $SysDownLevel = $sysArr[$SysNr+1];
@@ -63,7 +61,28 @@ $SpatLevel = $spatArr[$SpatNr];   // The Level of current gerographical region
 $SpatUppLevel = $spatArr[$SpatUppNr];
 if ($SpatNr<5) $SpatDownLevel = $spatArr[$SpatNr+1];
 $NrSpecimens = 0;
-$Herbaria = SQLf($_GET['Herb']);
+// filter herbarium parameter to only valid values with 'All' as default
+$Herbaria = 'All';
+switch ($_GET['Herb']) {
+    case 'GB':
+        $Herbaria = 'GB';
+    break;
+    case 'LD':
+        $Herbaria = 'LD';
+    break;
+    case 'UPS':
+        $Herbaria = 'UPS';
+    break;
+    case 'S':
+        $Herbaria = 'S';
+    break;
+    case 'UME':
+        $Herbaria = 'UME';
+    break;
+    case 'OHN':
+        $Herbaria = 'OHN';
+    break;
+}
 
 function getTable($field) {
     switch ($field) {
@@ -93,17 +112,21 @@ if ($SysNr == 0) {
 } elseif ($SysNr == 1) {
     $WhatSysSQL = getTable($SysDownLevel);
     if ($SysValue != "") {
-        $WhereSysSQL = getTable($SysLevel)." = '$SysValue'";
+        $WhereSysSQL = getTable($SysLevel)." = :SysValue";
+        $bindParams['SysValue'] = $SysValue;
     } else {
         $WhereSysSQL = getTable($SysLevel)." is NULL";
     }
 } elseif ($SysNr == 7) {
     $WhatSysSQL = getTable($SysDownLevel)." , ".getTable($SysUppLevel);
-    $WhereSysSQL = getTable($SysLevel)." = '$SysValue' AND specimens.Genus = '$_GET[Genus]'";
+    $WhereSysSQL = getTable($SysLevel)." = :SysValue AND specimens.Genus = :GenusValue";
+    $bindParams['SysValue'] = $SysValue;
+    $bindParams['GenusValue'] = $GenusValue;
 } else {
     $WhatSysSQL = getTable($SysDownLevel)." , ".getTable($SysUppLevel);
     if ($SysValue != "") {
-        $WhereSysSQL = getTable($SysLevel)." = '$SysValue'";
+        $WhereSysSQL = getTable($SysLevel)." = :SysValue";
+        $bindParams['SysValue'] = $SysValue;
     } else {
         $WhereSysSQL = getTable($SysLevel)." is NULL";
     }
@@ -114,29 +137,35 @@ if ($SpatNr == 0) {
     $WhereSpatSQL = "";
 } elseif ($SpatNr == 1) {
     $WhatSpatSQL = "$SpatDownLevel";
-    $WhereSpatSQL = "$SpatLevel = '$SQLSpatValue'";
+    $WhereSpatSQL = "$SpatLevel = :SQLSpatValue";
+    $bindParams['SQLSpatValue'] = $SpatValue;
 } elseif ($SpatNr == 4) {
     $WhatSpatSQL = "$SpatDownLevel, $SpatUppLevel";
-    $WhereSpatSQL = "$SpatLevel = '$SpatValue' AND Province = '$_GET[Province]'";
+    $WhereSpatSQL = "$SpatLevel = :SpatValue AND Province = :ProvinceValue";
+    $bindParams['SpatValue'] = $SpatValue;
+    $bindParams['ProvinceValue'] = $_GET['Province'];
 } elseif ($SpatNr ==5) {   // ?????????????????????????
     $WhatSpatSQL = "$SpatUppLevel";
-    $WhereSpatSQL = "$SpatLevel = '$SQLSpatValue'";
+    $WhereSpatSQL = "$SpatLevel = :SpatValue";
+    $bindParams['SpatValue'] = $SpatValue;
 } else {
     $WhatSpatSQL = "$SpatDownLevel, $SpatUppLevel";
-    $WhereSpatSQL = "$SpatLevel = '$SQLSpatValue'";
+    $WhereSpatSQL = "$SpatLevel = :SpatValue";
+    $bindParams['SpatValue'] = $SpatValue;
 }
 
 if ($Herbaria != 'All') {
-    $WhereHSQL = "InstitutionCode = '$Herbaria'";
+    $WhereHSQL = "InstitutionCode = :Herbaria";
+    $bindParams['Herbaria'] = $Herbaria;
 }
 
-if ($SpatNr != 0 and $SysNr != 0 and $Herbaria != 'All') {
+if ($SpatNr != 0 && $SysNr != 0 && $Herbaria != 'All') {
     $var = "WHERE $WhereSysSQL AND $WhereSpatSQL AND $WhereHSQL";
-} elseif ($SpatNr != 0 and $SysNr != 0) {
+} elseif ($SpatNr != 0 && $SysNr != 0) {
     $var = "WHERE $WhereSysSQL AND $WhereSpatSQL";
-} elseif ($SpatNr != 0 and $Herbaria != 'All') {
+} elseif ($SpatNr != 0 && $Herbaria != 'All') {
     $var = "WHERE $WhereSpatSQL AND $WhereHSQL";
-} elseif ($SysNr != 0 and $Herbaria != 'All') {
+} elseif ($SysNr != 0 && $Herbaria != 'All') {
     $var = "WHERE $WhereSysSQL AND $WhereHSQL";
 } elseif ($SpatNr != 0) {
      $var = "WHERE $WhereSpatSQL";
@@ -148,127 +177,85 @@ if ($SpatNr != 0 and $SysNr != 0 and $Herbaria != 'All') {
     $var="";
 }
 
+$con = getConS();
 
-$con = $con = getConS();
-
-// ---------- SQL query för att få fram en lita med antal kollekt för mindre systematiska enheter m.m. --------
+// ---------- SQL query för att få fram en lista med antal kollekt för mindre systematiska enheter m.m. --------
 $query = "SELECT $WhatSpatSQL, $WhatSysSQL, COUNT(specimens.Genus) FROM specimens LEFT JOIN xgenera
             ON specimens.Genus_ID = xgenera.ID  $var GROUP BY ".getTable($SysDownLevel);
-//echo "$query <p>";
-//$q1time = new Timer;
-$result = $con->query($query);
-//$row = $result->fetch();
-//echo "<br />Q1 Time: ". $q1time->getTime();
+//echo "sysquery: $query <p>";
 
-$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+$Stm = $con->prepare($query);
+if (isset($bindParams )) {
+    foreach ($bindParams as $key=>$value) {
+        //echo ":$key, $value<br>";
+        $Stm->bindValue(':'.$key, $value, PDO::PARAM_STR);
+    }
+}
+$Stm->execute();
+//$row = $Stm->fetch(PDO::FETCH_ASSOC);
+$rows = $Stm->fetchAll(PDO::FETCH_ASSOC);
 
 // get first row
 $row = $rows[0];
-//echo "<br />Continent: $row[Continent] <br />";
 
-//$row = $result->fetch();
-//mysql_data_seek($result,0);
-
-if ($SpatNr!=0&&$SpatNr!=1) { // get the Geographical region above the current geographical region
+if ($SpatNr != 0 && $SpatNr != 1) { // get the Geographical region above the current geographical region
     $SpatUppValue = $row[$SpatUppLevel];
-    $UrlSpatUppValue = urlencode($SpatUppValue);
+    $UrlSpatUppValue = htmlentities(urlencode($SpatUppValue));
+    $htmlSpatUppValue = htmlentities($SpatUppValue);
 } else {
-    $SpatUppValue = urlencode($SpatUppLevel);
-    $UrlSpatUppValue = urlencode($SpatUppLevel);
+    $SpatUppValue = $SpatUppLevel;
+    $UrlSpatUppValue = htmlentities(urlencode($SpatUppLevel));
+    $htmlSpatUppValue = htmlentities($SpatUppValue);
 }
-if ($SysNr!=0&&$SysNr!=1) { // get the Systematical group above the current gsystematical group
+if ($SysNr != 0 && $SysNr != 1) { // get the Systematical group above the current gsystematical group
     $SysUppValue = $row[$SysUppLevel];
-    $UrlSysUppValue = urlencode($SysUppValue);
+    $UrlSysUppValue = htmlentities(urlencode($SysUppValue));
+    $htmlSysUppValue = htmlentities($SysUppValue);
 } else {
     $SysUppValue = $SysUppLevel;
-    $UrlSysUppValue = urlencode($SysUppValue);
+    $UrlSysUppValue = htmlentities(urlencode($SysUppValue));
+    $htmlSysUppValue = htmlentities($SysUppValue);
 }
-
 
 foreach ($rows as $row)
 {
     $NrSpecimens += $row['COUNT(specimens.Genus)'];
 }
 //mysql_data_seek($result,0);
-                 
-if ($SpatNr ==5) {
-    $query = "SELECT lat, `long` FROM locality WHERE locality = \"$SpatValue\" and district = \"$SpatUppValue\"";
-    //echo "$query <p>";
-    $result2 = $con->query($query);
-    $row = $result2->fetch();
-    $long = $row['long'];
-    $lat = $row['lat'];
-}
-
-/*
-echo "
-   
-        <script src=\"ajaj.js\" type=\"text/javascript\"> </script>
-        <script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=$GoogleMapsKey\" type=\"text/javascript\"> </script>";*/
-
-/* 
-if ($SpatNr ==5) {
-    echo "
-        <script type=\"text/javascript\">
-            //<![CDATA[ 
-            function setupMap() {
-            if (GBrowserIsCompatible()) {
-                // Display the map, with some controls and set the initial location 
-                var map = new GMap2(document.getElementById(\"smap\"));
-                map.addControl(new GLargeMapControl());
-                map.addControl(new GMapTypeControl());
-                var cent = new GLatLng($lat,$long);
-                map.setCenter(cent,4);
-                map.addOverlay(new GMarker(cent));
-                map.checkResize();
-                }
-                // display a warning if the browser was not compatible
-                else {
-                    alert(\"Sorry, the Google Maps API is not compatible with this browser\");
-                }
-            }
-        //]]>
-        </script>";
-}*/
-        
-
-
-//$timer = new Timer();
 
 // --------------- Länkar upp större Spatiella och Systematisk enhet ----------------
 // piecing the html links together
 if ($SysNr == 0) {
-    $SysUppLink ="";
+    $SysUppLink = "";
 } elseif ($SysNr == 1) {
-    $SysUppLink = "<a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\"> Entire set </a>";
+    $SysUppLink = "<a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\">Entire set</a>";
 } elseif ($SysNr == 3) {
-    $SysUppLink = "Phylum (Division): <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\"> $SysUppValue </a>";
+    $SysUppLink = "Phylum (Division): <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\">$htmlSysUppValue</a>";
 } else {
-    $SysUppLink = "$SysUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\"> $SysUppValue </a>";
+    $SysUppLink = "$SysUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatNr&amp;SysLevel=$SysUppNr&amp;Sys=$UrlSysUppValue&amp;Spat=$UrlSpatValue&amp;$SpatUppLevel=$UrlSpatUppValue&amp;Herb=$Herbaria\">$htmlSysUppValue</a>";
 }
 
 if ($SpatNr == 0) {
     $SpatUppLink = "";
 } elseif ($SpatNr == 1) {
-    $SpatUppLink = "<a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\"> $SpatUppLevel </a>";
+    $SpatUppLink = "<a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\">$SpatUppLevel</a>";
 } else {
     if ($SpatUppNr==4) {
-        $SpatUppLink = "$SpatUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Province=&amp;Herb=$Herbaria\"> $SpatUppValue </a>";
+        $SpatUppLink = "$SpatUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Province=&amp;Herb=$Herbaria\">$htmlSpatUppValue</a>";
     } else
-        $SpatUppLink = "$SpatUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\"> $SpatUppValue </a>";
+        $SpatUppLink = "$SpatUppLevel: <a href=\"cross_browser.php?SpatLevel=$SpatUppNr&amp;SysLevel=$SysNr&amp;Sys=$UrlSysValue&amp;Spat=$UrlSpatUppValue&amp;$SysUppLevel=$UrlSysUppValue&amp;Herb=$Herbaria\">$htmlSpatUppValue</a>";
 }
 
 echo "
-        <table class = \"Box\" id =\"sysBox\"> <tr> <td>
+        <table class = \"Box\" id =\"sysBox\"><tr><td>
             $SysUppLink
-        </td> </tr> </table>
-        <table class = \"Box\" id =\"spatBox\"> <tr> <td>
+        </td></tr></table>
+        <table class = \"Box\" id =\"spatBox\"><tr><td>
             $SpatUppLink
-        </td> </tr> </table>
+        </td></tr></table>
         <p class =\"clear\">";
 
 //  --------------------------------------------------------
-
 if ($Herbaria != 'All') {
     $HRubr = "Herbarium $Herbaria: ";
 } else $HRubr = "";
@@ -277,67 +264,64 @@ echo "
         <div id=\"rurBox\">";
 if ($SysNr == 7) {
     if ($SysValue !="") {
-        $RSys = "$SysUppValue $SysValue";
+        $RSys = "$SysUppValue $htmlSysValue";
     } else {
        $RSys = "$SysUppValue sp."; 
     }
 } else {
-    $RSys = "$SysValue";
+    $RSys = $htmlSysValue;
 }
 
 if ($SysNr == 0 && $SpatNr == 0) {
-    echo "<h2>$HRubr Entire set: <a href=\"list.php?InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
-} elseif($SysNr == 0) {
-    echo "<h2>$HRubr $SpatValue: <a href=\"list.php?$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
-} elseif($SpatNr == 0) {
+    echo "<h2>$HRubr Entire set: <a href=\"list.php?InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
+} elseif ($SysNr == 0) {
+    echo "<h2>$HRubr $htmlSpatValue: <a href=\"list.php?$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
+} elseif ($SpatNr == 0) {
     if ($SysNr == 7) {
-        echo "<h2>$HRubr $RSys: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     } else {
-        echo "<h2>$HRubr $RSys: <a href=\"list.php?$SysLevel=$UrlSysValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys: <a href=\"list.php?$SysLevel=$UrlSysValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     }
-} elseif($SpatNr == 4) {
+} elseif ($SpatNr == 4) {
     if ($SysNr == 7) {
-        echo "<h2>$HRubr $RSys from $SpatValue: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&$SpatUppLevel=$UrlSpatUppValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys from $htmlSpatValue: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&$SpatUppLevel=$UrlSpatUppValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     } else {
-        echo "<h2>$HRubr $RSys from $SpatValue: <a href=\"list.php?$SysLevel=$UrlSysValue&$SpatUppLevel=$UrlSpatUppValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys from $htmlSpatValue: <a href=\"list.php?$SysLevel=$UrlSysValue&$SpatUppLevel=$UrlSpatUppValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     }
 } else {
     if ($SysNr == 7) {
-        echo "<h2>$HRubr $RSys from $SpatValue: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys from $htmlSpatValue: <a href=\"list.php?Genus=$UrlSysUppValue&$SysLevel=$UrlSysValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     } else {
-        echo "<h2>$HRubr $RSys from $SpatValue: <a href=\"list.php?$SysLevel=$UrlSysValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\"> $NrSpecimens</a> specimens </h2>";
+        echo "<h2>$HRubr $RSys from $htmlSpatValue: <a href=\"list.php?$SysLevel=$UrlSysValue&$SpatLevel=$UrlSpatValue&amp;InstitutionCode=$Herbaria&nrRecords=$NrSpecimens\">$NrSpecimens</a> specimens</h2>";
     }
 }
 echo "
         </div>";
 
 // ------------------ Länkar till mindre systematiska enheter
-
-
-
 echo "
         <table class = \"Box\" id =\"sysBox\">";
 if ($SysNr !=0) {
     if ($SysNr == 7) {
         echo "
-            <tr> <th colspan=\"2\">$SysLevel: $RSys</th> </tr>
-            <tr> <td>Intraspecific taxa</td> <td>Specimens</td> </tr>" ;
+            <tr><th colspan=\"2\">$SysLevel: $RSys</th></tr>
+            <tr><td>Intraspecific taxa</td> <td>Specimens</td> </tr>" ;
     } elseif ($SysNr == 2) {
         echo "
-            <tr> <th colspan=\"2\">Phylum (Division): $SysValue</th> </tr>
-            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
+            <tr><th colspan=\"2\">Phylum (Division): $htmlSysValue</th></tr>
+            <tr><td>$SysDownLevel</td> <td>Specimens</td></tr>" ;
     } elseif ($SysNr == 1) {
         echo "
-            <tr> <th colspan=\"2\">$SysLevel: $SysValue</th> </tr>
-            <tr> <td>Phylum (Division)</td> <td>Specimens</td> </tr>" ;
+            <tr><th colspan=\"2\">$SysLevel: $htmlSysValue</th></tr>
+            <tr><td>Phylum (Division)</td> <td>Specimens</td></tr>" ;
     } else {
         echo "
-            <tr> <th colspan=\"2\">$SysLevel: $SysValue</th> </tr>
-            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
+            <tr><th colspan=\"2\">$SysLevel: $htmlSysValue</th></tr>
+            <tr><td>$SysDownLevel</td> <td>Specimens</td></tr>" ;
     }
 } else {
     echo "
-            <tr> <td>$SysDownLevel</td> <td>Specimens</td> </tr>" ;
+            <tr><td>$SysDownLevel</td><td>Specimens</td></tr>" ;
 }
 
 $tr = "<tr onmouseover = \"markCells(this)\" onmouseout=\"unMarkCells(this)\"> ";
@@ -406,30 +390,30 @@ if ($SysNr == 7) {
 }
 echo "</table> ";
 
-
 // ----------- SQL query för att få fram lista med antal kollekt för mindre geografiska enheter ------------
 if ($SpatNr <5) {
 $query = "SELECT $WhatSpatSQL, $WhatSysSQL, COUNT(specimens.Genus) FROM specimens LEFT JOIN xgenera
             ON specimens.Genus_ID = xgenera.ID  $var GROUP BY specimens.$SpatDownLevel";
+//echo "mindre geo $query<p>";
 
-//echo "mindre geo $query <p>";
-//$q2time = new Timer();
-$result = $con->query($query);
-$con=null;
-//echo "<br />Q2 Time: ". $q2time->getTime();
+$Stm = $con->prepare($query);
+foreach ($bindParams as $key=>$value) {
+    //echo ":$key, $value<br>";
+    $Stm->bindValue(':'.$key, $value, PDO::PARAM_STR);
+} 
+$Stm->execute();
 
 //------------------------- Lista med länkar till mindre geografiska enheter -------------
 echo "
     <table class = \"Box\" id =\"spatBox\"> ";
 if ($SpatNr != 0) {
-    echo "<tr><th colspan=\"2\">$SpatLevel: $SpatValue</th></tr>";
+    echo "<tr><th colspan=\"2\">$SpatLevel: $htmlSpatValue</th></tr>";
 }
 echo "
-    <tr> <td>$SpatDownLevel</td> <td>Specimens</td></tr>" ;
+    <tr><td>$SpatDownLevel</td><td>Specimens</td></tr>" ;
 if ($SpatNr == 1) {
-    while($row = $result->fetch())
+    while ($row = $Stm->fetch())
     {
-        //echo "\br hej \br";
         $nr = $row['COUNT(specimens.Genus)'];
         $SpatDownValue = $row[$SpatDownLevel];
         $UrlSpatDownValue = urlencode($SpatDownValue);
@@ -440,7 +424,7 @@ if ($SpatNr == 1) {
             ";
     }
 } else {
-    while($row = $result->fetch())
+    while ($row = $Stm->fetch())
     {
         $nr = $row['COUNT(specimens.Genus)'];
         $SpatDownValue = $row[$SpatDownLevel];
@@ -452,31 +436,7 @@ if ($SpatNr == 1) {
             ";
     }
 }
-
 }
-
-/**************** minimap for the locality ***************************/
-/*
-if ($SpatNr ==5) {
-    //$query = "SELECT lat, `long` FROM locality WHERE locality = \"$SpatValue\" and district = \"$SpatUppValue\"";
-    //echo "$query <p>";
-    //$result = mysql_query($query, $con);
-    //$row = mysql_fetch_array($result);
-    //echo "lat: $row[lat] long: $row[long]";
-     echo "
-        <table class =\"SBox\">
-            <tr> <td>
-                <div id=\"smap\" > Loading... </div>
-                <noscript> <b> JavaScript must be enabled in order for you to use this Map. </b> </noscript>
-            </td> </tr>
-            <tr> <td> Location of map symbol: Lat $lat Long $long. </td> </tr>
-        </table>";
-}*/
-
-//echo "Tot time: ".$timer->getTime();
-//&Herbarium=this.value()+escape(q)
-//var k = document.getElementById("uSwedish").value;
-//var h = document.getElementById(\"Herbarium\").value;
 
 /***************** Herbaria selecter *****************************/
 if ($Herbaria == 'UME') $OUME = "selected=\"selected\""; else $OUME = "";
@@ -489,7 +449,7 @@ echo "
                 </table>
                 <form>
             Herbarium:
-                <SELECT name =\"Herbaria\" id=\"Herbarium\" onchange=\"changeHerbarium('cross_browser.php?SpatLevel=$SpatNr&SysLevel=$SysNr&Spat=$SpatValue&Sys=$SysValue&$SysLevel=$SysValue&$SpatUppLevel=$SpatUppValue');\">
+                <SELECT name =\"Herbaria\" id=\"Herbarium\" onchange=\"changeHerbarium('cross_browser.php?SpatLevel=$SpatNr&SysLevel=$SysNr&Spat=$UrlSpatValue&Sys=$UrlSysValue&$SysLevel=$UrlSysValue&$SpatUppLevel=$SpatUppValue');\">
                     <OPTION value=\"All\">All</OPTION>
                     <OPTION $OUPS value=\"UPS\">UPS</OPTION>
                     <OPTION $OLD value=\"LD\">LD</OPTION>
@@ -501,8 +461,7 @@ echo "
             </form>
             </td> </tr> </table>";
 
-if ($BCache == 'On') 
-    cacheEnd();  // the end for the cache function
+if ($BCache == 'On') cacheEnd();  // the end for the cache function
 if ($Logg == 'On')
     logg($MySQLHost, $MySQLLUser, $MySQLLPass);
 }

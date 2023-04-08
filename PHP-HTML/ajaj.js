@@ -20,7 +20,7 @@ function ajax(url, doit)
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 		//alert(xmlhttp.responseText);
                 doit(xmlhttp.responseText);
@@ -69,7 +69,7 @@ function getList(what, whatDown)
 function prvName() {
     //alert("annoy");
     var country = document.getElementById("Country").value;
-	if(country =="*") {
+	if (country =="*") {
 		//alert(country);
 		document.getElementById("prvName").textContent = "";
 		document.getElementById("sprvName").textContent = "(landskap)";
@@ -93,7 +93,7 @@ function prvName() {
 		}
 		xmlhttp.onreadystatechange=function()
 		{
-			if(xmlhttp.readyState==4)
+			if (xmlhttp.readyState==4)
 			{
 				var pn = xmlhttp.responseText;
 				//alert(pn);
@@ -116,7 +116,7 @@ function prvName() {
 function disName() {
     //alert("annoy");
     var country = document.getElementById("Country").value;
-	if(country =="*"){
+	if (country =="*"){
 		//alert(country);
 		document.getElementById("disName").textContent = "";
 		document.getElementById("sdisName").textContent = "(socken)";
@@ -139,7 +139,7 @@ function disName() {
 		}
 		xmlhttp.onreadystatechange=function()
 		{
-			if(xmlhttp.readyState==4)
+			if (xmlhttp.readyState==4)
 			{
 				var dn = xmlhttp.responseText;
 				//alert(pn);
@@ -188,7 +188,7 @@ function getSpList(what, whatDown)
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 		//alert(xmlhttp.responseText);
 		document.getElementById(whatDown+"d").innerHTML = xmlhttp.responseText;
@@ -230,7 +230,7 @@ function getHybrids(what, whatDown) {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 		//alert(xmlhttp.responseText);
 		document.getElementById(whatDown+"d").innerHTML = xmlhttp.responseText;
@@ -295,7 +295,7 @@ function moreoptions()
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 		    if (document.getElementById("opbutton").value == "show extended search") {
                         document.getElementById("opbutton").value = "hide extended search";

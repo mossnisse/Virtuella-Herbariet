@@ -9,7 +9,7 @@ header('Content-Disposition: attachment; filename="virtherb_localitydb.csv"');
 $con = getConS();
 $query = "SELECT * FROM locality";
 $result = $con->query($query);
-while($row = $result->fetch())
+while ($row = $result->fetch())
 {
     echo "$row[id],\"".CSVf($row['locality'])."\",\"".CSVf($row['district'])."\",\"".CSVf($row['province'])
 			."\",\"".CSVf($row['country'])."\",\"".CSVf($row['continent'])."\",$row[lat],$row[long],$row[RT90N],$row[RT90E],\"".CSVf($row['alternative_names'])

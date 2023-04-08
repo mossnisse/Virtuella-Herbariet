@@ -12,7 +12,7 @@ function ajax(url, doit)
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 		//alert(xmlhttp.responseText);
             doit(xmlhttp.responseText);
@@ -55,7 +55,7 @@ function fillTot() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("tot").textContent = xmlhttp.responseText;
@@ -80,7 +80,7 @@ function fillGB() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("GB").textContent = xmlhttp.responseText;
@@ -105,7 +105,7 @@ function fillUME() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("UME").textContent = xmlhttp.responseText;
@@ -130,7 +130,7 @@ function fillS() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("S").textContent = xmlhttp.responseText;
@@ -155,7 +155,7 @@ function fillUPS() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("UPS").textContent = xmlhttp.responseText;
@@ -180,7 +180,7 @@ function fillOHN() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("OHN").textContent = xmlhttp.responseText;
@@ -205,7 +205,7 @@ function fillLD() {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById("LD").textContent = xmlhttp.responseText;
@@ -230,7 +230,7 @@ function fillUppdated(inst) {
 	}
 	xmlhttp.onreadystatechange=function()
 	{
-	    if(xmlhttp.readyState==4)
+	    if (xmlhttp.readyState==4)
 	    {
 			//alert(xmlhttp.responseText);
 			document.getElementById(inst+"_UPD").textContent = xmlhttp.responseText;

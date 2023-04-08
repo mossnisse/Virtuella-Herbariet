@@ -28,7 +28,7 @@
 //error_reporting(E_ALL);
 include "ini.php";
 
-$ID = $_GET['collectorID'];
+$ID = (int) $_GET['collectorID'];
 $con7 = getConS();
 $query = "SELECT Fornamn, Efternamn, Ful_Fornamn, Ful_Efternamn, birth, death, signatur FROM samlare JOIN signaturer ON samlare.ID = signaturer.samlar1_ID WHERE samlare.ID=:id";
 //echo $query. '<p>';
@@ -47,18 +47,18 @@ $row2 = $Stm2->fetch(PDO::FETCH_ASSOC);
 
 echo "
 <h3>$row[Fornamn] $row[Efternamn]</h3>
-    <table class = \"outerBox\"> <tr> <td>
-        $row[Ful_Fornamn] $row[Ful_Efternamn] <br />
+    <table class = \"outerBox\"><tr><td>
+        $row[Ful_Fornamn] $row[Ful_Efternamn]<br />
         Born: $row[birth]";
-if($row['death'] != "") echo ", deceased $row[death]";
+if ($row['death'] != "") echo ", deceased $row[death]";
 echo "
-        <br /> <a href=\"list.php?CollectorID=$ID\">$row2[nrRec]</a> specimens
+        <br /><a href=\"list.php?CollectorID=$ID\">$row2[nrRec]</a> specimens
         <table>
-            <tr> <th>Recorded signatures:</th> </tr>
-            <tr> <td>$row[signatur]</td> </tr>";
-while($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
+            <tr><th>Recorded signatures:</th></tr>
+            <tr><td>$row[signatur]</td></tr>";
+while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
     echo "
-            <tr> <td>$row[signatur]</td> </tr>";
+            <tr><td>$row[signatur]</td></tr>";
 }
 
 if ($Logg == 'On')

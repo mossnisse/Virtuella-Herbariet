@@ -38,7 +38,7 @@ echo "<?xml version=\"1.0\"?>
 $con = getConS();
 $query = "SELECT * FROM locality";
 $result = $con->query($query);
-while($row = $result->fetch())
+while ($row = $result->fetch())
 {
     echo "
             <Row>

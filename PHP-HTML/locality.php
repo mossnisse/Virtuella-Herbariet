@@ -28,23 +28,23 @@
 				$con = getConS();
 				$stmt = "";
 				if (isset($_GET['ID'])) {
+                    $ID = (int) $_GET['ID'];
 					$stmt = $con->prepare('SELECT * FROM Locality WHERE ID = :id');
-					$stmt->bindParam(':id', $ID);
-					$ID = $_GET['ID'];
+					$stmt->bindValue(':id', $ID);
 				} else {
-					$stmt = $con->prepare('SELECT * FROM Locality WHERE Country = :Country and Province = :Province and District = :District and Locality = :Locality');
-					$stmt->bindParam(':Country', $Country);
-					$stmt->bindParam(':Province', $Province);
-					$stmt->bindParam(':District', $District);
-					$stmt->bindParam(':Locality', $Locality);
-					$Country = $_GET['Country'];
+                    $Country = $_GET['Country'];
 					$Province = $_GET['Province'];
 					$District = $_GET['District'];
 					$Locality = $_GET['Locality'];
+					$stmt = $con->prepare('SELECT * FROM Locality WHERE Country = :Country and Province = :Province and District = :District and Locality = :Locality');
+					$stmt->bindValue(':Country', $Country);
+					$stmt->bindValue(':Province', $Province);
+					$stmt->bindValue(':District', $District);
+					$stmt->bindValue(':Locality', $Locality);
 				}
 				$stmt->execute();
-				$result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-				$row = $stmt->fetch();
+				//$stmt->setFetchMode();
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($row['created'] == null) $create_date = '';
                 else $create_date = substr ($row['created'],0,10 );
                 if (isset($row['modified'])) {
@@ -53,10 +53,10 @@
                     $mod_date = '';
                 }
 				
-                $urlCountry = urlencode($row['country']);
-                $urlProvince = urlencode($row['province']);
-                $urlDistrict = urlencode($row['district']);
-                $urlLocality = urlencode($row['locality']);
+                $urlCountry = htmlentities(urlencode($row['country']));
+                $urlProvince = htmlentities(urlencode($row['province']));
+                $urlDistrict = htmlentities(urlencode($row['district']));
+                $urlLocality = htmlentities(urlencode($row['locality']));
                 
 				echo "
                 <tr><td>Locality:</td><td>$row[locality]</td></tr>

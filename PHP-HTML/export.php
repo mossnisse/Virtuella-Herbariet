@@ -26,17 +26,17 @@ include "herbes.php";
 $adr = getSimpleAdr();
 $order = orderBy();
 $OrderAdr = $order['Adr'];
-$nr = $_GET['nrRecords'];
+$nr = (int) $_GET['nrRecords'];
 $con = getConS();
 $Rubrik = getRubr($con);
 $pages = ceil($nr/100000);
-if (isset($_GET['ARecord']))
-   $ARecord = $_GET['ARecord'];
+if (isset($_GET['ARecord']) && $_GET['ARecord']!='')
+   $ARecord = (int) $_GET['ARecord'];
 else
    $ARecord = 1;
 
-if (isset($_GET['Page']))
-    $page = $_GET['Page'];
+if (isset($_GET['Page']) && $_GET['Page']!='')
+    $page = (int) $_GET['Page'];
 else
     $page = 1;
 

@@ -24,8 +24,8 @@
 <?php
 // Code Written By Nils Ericson 2010-01-04
 // search result page - presents the result from a search into a simple table
-//error_reporting(E_ALL);
-//ini_set('display_errors', '1');
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 include "herbes.php";
 
 // skriver ut en tabell med resultat för super search och simple search
@@ -34,7 +34,7 @@ function pressentResult(PDOStatement $Stm, int $page, int $nrRecords, string $ad
     if (isset($_GET['OrderBy']))
     {
         $OrderBy = $_GET['OrderBy'];
-        $OrderByAdr = "&OrderBy=$_GET[OrderBy]";
+        $OrderByAdr = "&amp;OrderBy=".htmlentities(urlencode($_GET['OrderBy']));
     }
     else {
         $OrderBy ="";
@@ -45,55 +45,55 @@ function pressentResult(PDOStatement $Stm, int $page, int $nrRecords, string $ad
     echo "
     <table class = \"Box\">
         <tr>";
-    if($OrderBy == "InstitutionCode") echo "  
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=InstitutionCode&nrRecords=$nrRecords\">Inst.</a></td>";
+    if ($OrderBy == "InstitutionCode") echo "  
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=InstitutionCode&nrRecords=$nrRecords\">Inst.</a></td>";
-    if($OrderBy == "AccessionNo") echo "
-        <td class = \"sortra\"> <a href=\"list.php?$adress&OrderBy=AccessionNo&nrRecords=$nrRecords\">Catalogue No.</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=InstitutionCode&amp;nrRecords=$nrRecords\">Inst.</a></td>";
+    if ($OrderBy == "AccessionNo") echo "
+        <td class = \"sortra\"> <a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\">Catalogue No.</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=AccessionNo&nrRecords=$nrRecords\">Catalogue No.</a></td>";
-    if($OrderBy == "Taxon") echo "
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Taxon&nrRecords=$nrRecords\">Taxon</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=AccessionNo&amp;nrRecords=$nrRecords\">Catalogue No.</a></td>";
+    if ($OrderBy == "Taxon") echo "
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=Taxon&nrRecords=$nrRecords\">Taxon</a></td>";
-    if($OrderBy == "Type") echo "
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Type&nrRecords=$nrRecords\"></a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Taxon&amp;nrRecords=$nrRecords\">Taxon</a></td>";
+    if ($OrderBy == "Type") echo "
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Type&amp;nrRecords=$nrRecords\"></a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=TType&nrRecords=$nrRecords\"></a></td>";
-    if($OrderBy == "Country") echo "  
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Country&nrRecords=$nrRecords\">Country</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=TType&amp;nrRecords=$nrRecords\"></a></td>";
+    if ($OrderBy == "Country") echo "  
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=Country&nrRecords=$nrRecords\">Country</a></td>";
-    if($OrderBy == "Province") echo "    
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Province&nrRecords=$nrRecords\">Province</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Country&amp;nrRecords=$nrRecords\">Country</a></td>";
+    if ($OrderBy == "Province") echo "    
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=Province&nrRecords=$nrRecords\">Province</a></td>";
-    if($OrderBy == "District") echo "    
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=District&nrRecords=$nrRecords\">District</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Province&amp;nrRecords=$nrRecords\">Province</a></td>";
+    if ($OrderBy == "District") echo "    
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=District&nrRecords=$nrRecords\">District</a></td>";
-    if($OrderBy == "Date") echo "  
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Date&nrRecords=$nrRecords\">Year</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=District&amp;nrRecords=$nrRecords\">District</a></td>";
+    if ($OrderBy == "Date") echo "  
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=Date&nrRecords=$nrRecords\">Year</a></td>";
-    if($OrderBy == "Collector") echo "  
-        <td class = \"sortra\"><a href=\"list.php?$adress&OrderBy=Collector&nrRecords=$nrRecords\">Collector</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Date&amp;nrRecords=$nrRecords\">Year</a></td>";
+    if ($OrderBy == "Collector") echo "  
+        <td class = \"sortra\"><a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a></td>";
     else echo "
-        <td class = \"sortr\"><a href=\"list.php?$adress&OrderBy=Collector&nrRecords=$nrRecords\">Collector</a></td>";
+        <td class = \"sortr\"><a href=\"list.php?$adress&amp;OrderBy=Collector&amp;nrRecords=$nrRecords\">Collector</a></td>";
     echo "
         </tr>";
-    $i=($page-1)*$pageSize;
+   $i=($page-1)*$pageSize;
     //echo "size: ".sizeof($result);
-    while($row = $Stm->fetch(PDO::FETCH_ASSOC))
-        {
+   while ($row = $Stm->fetch(PDO::FETCH_ASSOC))
+   {
             $i++;
             $collector = $row["Collector"];
             $Province = $row["Province"];
             $District = $row["District"];
             $Type = "";
-            if ((isset($_GET['Type_status']) and $_GET['Type_status'] != '*') or (isset($_GET['Basionym']) and $_GET['Basionym'] != '*') ) { 
-                $Type = "$row[Basionym] <span class = 'typesign'> $row[Type_status] </span>"; 
+            if ((isset($_GET['Type_status']) && $_GET['Type_status'] != '*') || (isset($_GET['Basionym']) && $_GET['Basionym'] != '*') ) { 
+                $Type = "$row[Basionym] <span class = 'typesign'>$row[Type_status]</span>"; 
             } else {
                 if ($row['Type_status']!="") $Type = "<span class = 'typesign'>Type</span>";   
             }
@@ -128,13 +128,13 @@ $Rubrik = getRubr($con);
 $order = orderBy();
 $OrderAdr = $order['Adr'];
 
-if (isset($_GET['ARecord']))
-   $ARecord = $_GET['ARecord'];
+if (isset($_GET['ARecord']) && $_GET['ARecord']!='')
+   $ARecord = (int) $_GET['ARecord'];
 else
    $ARecord = 1;
 
-if (isset($_GET['nrRecords']))
-    $nrRecords = $_GET['nrRecords'];
+if (isset($_GET['nrRecords']) && $_GET['nrRecords']!='')
+    $nrRecords = (int) $_GET['nrRecords'];
 else
     $nrRecords = -1;
 
@@ -150,20 +150,22 @@ $nr = $result_o_nr[1];
 // javascript to change page with arrow key left and right
 $pagep1 = $page+1;
 $pagem1 = $page-1;
+$urladr2 = html_entity_decode($adr.$OrderAdr);
+$nrPages = ceil($nrRecords/$pageSize);
 echo "
  <script type=\"text/javascript\">
       document.onkeydown = checkKey;
       function checkKey(event) {
-         if (event.keyCode == 39) {
-            window.open(\"list.php?$adr$OrderAdr&nrRecords=$nr&Page=$pagep1\",\"_self\");
+         if (event.keyCode == 39 && $page < $nrPages) {
+            window.open(\"list.php?$urladr2&nrRecords=$nr&Page=$pagep1\",\"_self\");
          }
-         if(event.keyCode == 37 && $pagem1 > 0) {
-            window.open(\"list.php?$adr$OrderAdr&nrRecords=$nr&Page=$pagem1\",\"_self\");
+         if (event.keyCode == 37 && $pagem1 > 0) {
+            window.open(\"list.php?$urladr2&nrRecords=$nr&Page=$pagem1\",\"_self\");
          }
       }
 </script>
 
-        <h3> Specimens giving hits for: $Rubrik </h3>
+        <h3>Specimens giving hits for: $Rubrik</h3>
         $nr records found.
         <div class = \"menu2\">
             <ul>
