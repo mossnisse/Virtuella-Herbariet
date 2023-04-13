@@ -21,14 +21,13 @@
     <div class = "subMenu">
 	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality list</h2>
 <?php
-    //<li class = \"record\"><a href=\"locality.php?locality=$_GET[locality]&country=$_GET[country]&province=$_GET[province]&district=$_GET[district]\">Record</a></li>
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 include "ini.php";
 include "locality_sengine.php";
 $con = getConS();
 
-// how correctly encode url links in webpages? should stop Cross Site Scripting
+// how correctly encode url links in webpages should stop Cross Site Scripting
 $urlCountry =  htmlentities(urlencode($_GET['country']));
 $urlProvince = htmlentities(urlencode($_GET['province']));
 $urlDistrict = htmlentities(urlencode($_GET['district']));
@@ -63,7 +62,7 @@ if (isset($pstmt)) {
     echo "<tr><th>Province</th><th>Country</th></tr>";
     while ($row = $pstmt->fetch())
     {
-        echo "<tr><td><a href=\"maps/province.php?ID=$row[ID]\">$row[province]</a></td><td>$row[country]</td></tr>
+        echo "<tr><td><a href=\"maps/province.php?ID=$row[ID]\">$row[province]</a> $row[type_eng]/$row[type_native]</td><td>$row[country]</td></tr>
             ";
     }
 }
@@ -75,7 +74,7 @@ if (isset($dstmt)) {
     echo "<tr><th>District</th><th>Country</th><th>Province</th></tr>";
     while ($row = $dstmt->fetch())
     {
-        echo "<tr><td><a href=\"maps/district.php?ID=$row[ID]\">$row[district]</a></td><td>$row[country]</td><td>$row[province]</td></tr>
+        echo "<tr><td><a href=\"maps/district.php?ID=$row[ID]\">$row[district]</a> $row[typeEng]/$row[typeNative]</td><td>$row[country]</td><td>$row[province]</td></tr>
                 ";
     }
 }

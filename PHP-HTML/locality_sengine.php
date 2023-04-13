@@ -73,7 +73,7 @@ function getDistrictList(PDO $con) : ?PDOStatement {
     if (isset($DLocality) && $DLocality != '%') {
         $listsearch = listSearch('alt_names', $DLocality);
         
-        $query = "SELECT ID, province, district, country FROM district WHERE country Like :country AND province Like :province AND
+        $query = "SELECT ID, province, district, country, typeEng, typeNative FROM district WHERE country Like :country AND province Like :province AND
 										 (district Like :locality or $listsearch[0]) ORDER BY district";
         //echo $query.'<p>';                
         $dstmt = $con->prepare($query);
@@ -98,7 +98,7 @@ function getProvinceList(PDO $con) : ?PDOStatement {
     }    
     if (isset($PLocality) && $PLocality != '%') {
         $listsearch = listSearch('alt_names', $PLocality);
-        $query = "SELECT ID, province, country FROM provinces WHERE country Like :country AND
+        $query = "SELECT ID, province, country, type_eng, type_native FROM provinces WHERE country Like :country AND
 										 (province Like :locality or gadm_name Like :locality or $listsearch[0]) ORDER BY Province";
         $pstmt = $con->prepare($query);           
         //echo "Query: $query<br>";

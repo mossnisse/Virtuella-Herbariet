@@ -45,7 +45,7 @@
             <option value="Spermatophytes / Fröväxter">Spermatophytes / Fröväxter</option>
             <option value="">Unknown / Empty</option>
         </select> </td> <td>Huvudgrupp</td> </tr>
-    <tr> <td class="eng">Subgroup</td> <td class="fbox" id="Subgroupd"> <input type="text" name="Subgroup" id="Subgroup" value="*" size="32" onblur="getList('Subgroup', 'Genus');" onclick="star('Subgroup')" /> </td> <td>Undergrupp</td> </tr>
+    <tr> <td class="eng">Subgroup</td> <td class="fbox" id="Subgroupd"> <input type="text" name="Subgroup" id="Subgroup" value="*" size="32" onblur="getList('Subgroup', 'Genus');" onclick="star('Subgroup');" /> </td> <td>Undergrupp</td> </tr>
     <tr>
         <td class="eng">Genus</td>
         <td class="fbox" id="Genusd">
@@ -60,9 +60,9 @@
             </div>
     </td> <td> Släkte </td> </tr>
     
-    <tr> <td class="eng">Species</td> <td class="fbox" id="Speciesd"> <input type="text" name="Species" id="Species" value="*" size="20" onblur="getList('Species', 'SspVarForm');" onclick="star('Species')" /> </td> <td>Art</td> </tr>
-    <tr> <td class="eng">Intraspecific taxon</td> <td class="fbox" id="SspVarFormd"> <input type="text" name="SspVarForm" id="SspVarForm" value="*" size="32" onclick="star('SspVarForm')" /> </td> <td>Inomartstaxon</td></tr>
-    <tr> <td class="eng">Hybrid</td> <td class="fbox" id="HybridNamed"> <input type="text" name="HybridName" id="HybridName" value="*" size="32" onclick="star('HybridName')" /> </td> <td>Hybrid</td></tr>
+    <tr> <td class="eng">Species</td> <td class="fbox" id="Speciesd"> <input type="text" name="Species" id="Species" value="*" size="20" onblur="getList('Species', 'SspVarForm');" onclick="star('Species');" /> </td> <td>Art</td> </tr>
+    <tr> <td class="eng">Intraspecific taxon</td> <td class="fbox" id="SspVarFormd"> <input type="text" name="SspVarForm" id="SspVarForm" value="*" size="32" onclick="star('SspVarForm');" /> </td> <td>Inomartstaxon</td></tr>
+    <tr> <td class="eng">Hybrid</td> <td class="fbox" id="HybridNamed"> <input type="text" name="HybridName" id="HybridName" value="*" size="32" onclick="star('HybridName');" /> </td> <td>Hybrid</td></tr>
 </table>
 <table class="SBox">
     <tr> <th colspan="2">Select Geographical unit</th>  <th>Välj geografisk enhet</th> </tr>
@@ -78,9 +78,9 @@
             <option value="South & Central America">South & Central America</option>
             <option value="">Unknown / Empty</option>
         </select> </td> <td> Världsdel </td> </tr>
-    <tr> <td class="eng">Country</td> <td class="fbox" id="Countryd"> <input type="text" name="Country" value="*" size="32" id = "Country" onblur="prvName(); disName(); getList('Country', 'Province'); " onclick="star('Country')"/>  </td> <td>Land</td> </tr>
-    <tr> <td class="eng">Province<span id="prvName"></span> </td> <td class="fbox" id="Provinced"> <input type="text" name="Province" value="*" size="32" id = "Province" onblur="getList('Province', 'District');" onclick="star('Province')" /> </td> <td> Provins <span id="sprvName">(landskap)</span> </td> </tr>
-    <tr> <td class="eng">District<span id="disName"></span> </td> <td class="fbox" id="Districtd"> <input type="text" name="District" value="*" size="32" id = "District" onclick="star('District')" /> </td> <td>Distrikt <span id="sdisName">(socken)</span></td> </tr>
+    <tr> <td class="eng">Country</td> <td class="fbox" id="Countryd"> <input type="text" name="Country" value="*" size="32" id = "Country" onblur="prvName(); disName(); getList('Country', 'Province'); " onclick="star('Country');"/>  </td> <td>Land</td> </tr>
+    <tr> <td class="eng">Province<span id="prvName"></span> </td> <td class="fbox" id="Provinced"> <input type="text" name="Province" value="*" size="32" id = "Province" onblur="getList('Province', 'District');" onclick="star('Province');" /> </td> <td> Provins <span id="sprvName">(landskap)</span> </td> </tr>
+    <tr> <td class="eng">District<span id="disName"></span> </td> <td class="fbox" id="Districtd"> <input type="text" name="District" value="*" size="32" id = "District" onclick="star('District');" /> </td> <td>Distrikt <span id="sdisName">(socken)</span></td> </tr>
 </table>
 <table class="SBox">
     <tr> <th colspan="2">Various search fields</th> <th>Diverse sökfält</th> </tr>
@@ -94,13 +94,13 @@
             <option value="UME">UME - Umeå</option>
             <option value="UPS">UPS - Uppsala</option>
         </select> </td> <td>Herbarium</td> </tr>
-    <tr> <td class="eng">Catalogue number</td> <td class="fbox"> <input type="text" name="AccessionNo" value="*" size="32" onclick="star('AccessionNo')" /> </td> <td>Katalognummer</td> </tr>
-    <tr> <td class="eng">Collector</td> <td class="fbox"> <input type="text" name="SmartCollector" value="*" size="32" onclick="star('SmartCollector')" /> </td> <td>Samlare</td> </tr>
-    <tr> <td class="eng">Collector's number</td> <td class="fbox"> <input type="text" name="Collectornumber" value="*" size="32" onclick="star('Collectornumber')" /> </td> <td>Insamlarnummer</td> </tr>
-    <tr> <td class="eng">Collection year</td> <td class="fbox"> From: <input type="text" name="YearStart" value="*" size="5" onclick="star('YearStart')"/> To: <input type="text" name="YearEnd" value="*" size="5" onclick="star('YearEnd')" /> </td> <td> Insamlingsår </td> </tr>
-    <tr> <td class="eng">Collection date</td> <td class="fbox"> Y: <input type="text" name="Year" value="*" size="4" onclick="star('Year')"/> M: <input type="text" name="Month" value="*" size="2" onclick="star('Month')" /> D: <input type="text" name="Day" value="*" size="2" onclick="star('Day')" /> </td> <td> Insamlingsdatum </td> </tr>    
-    <tr> <td class="eng">Original taxon  (as written on label)</td> <td class="fbox"> <input type="text" name="Original_name" value="*" size="32" onclick="star('Original_name')"/> </td> <td>Taxon i original (som på etiketten)</td> </tr>
-    <tr> <td class="eng">Original text (locality etc. In UPS only Locality)</td> <td class="fbox"> <input type="text" name="Original_text" value="*" size="32" onclick="star('Original_text')"/> </td> <td>Originaltext (lokal kan sökas här)</td> </tr>
+    <tr> <td class="eng">Catalogue number</td> <td class="fbox"> <input type="text" name="AccessionNo" value="*" size="32" onclick="star('AccessionNo');" /> </td> <td>Katalognummer</td> </tr>
+    <tr> <td class="eng">Collector</td> <td class="fbox"> <input type="text" name="SmartCollector" value="*" size="32" onclick="star('SmartCollector');" /> </td> <td>Samlare</td> </tr>
+    <tr> <td class="eng">Collector's number</td> <td class="fbox"> <input type="text" name="Collectornumber" value="*" size="32" onclick="star('Collectornumber');" /> </td> <td>Insamlarnummer</td> </tr>
+    <tr> <td class="eng">Collection year</td> <td class="fbox"> From: <input type="text" name="YearStart" value="*" size="5" onclick="star('YearStart');"/> To: <input type="text" name="YearEnd" value="*" size="5" onclick="star('YearEnd');" /> </td> <td> Insamlingsår </td> </tr>
+    <tr> <td class="eng">Collection date</td> <td class="fbox"> Y: <input type="text" name="Year" value="*" size="4" onclick="star('Year');"/> M: <input type="text" name="Month" value="*" size="2" onclick="star('Month');" /> D: <input type="text" name="Day" value="*" size="2" onclick="star('Day');" /> </td> <td> Insamlingsdatum </td> </tr>    
+    <tr> <td class="eng">Original taxon  (as written on label)</td> <td class="fbox"> <input type="text" name="Original_name" value="*" size="32" onclick="star('Original_name');"/> </td> <td>Taxon i original (som på etiketten)</td> </tr>
+    <tr> <td class="eng">Original text (locality etc. In UPS only Locality)</td> <td class="fbox"> <input type="text" name="Original_text" value="*" size="32" onclick="star('Original_text');"/> </td> <td>Originaltext (lokal kan sökas här)</td> </tr>
      <tr> <td class="eng">Image</td> <td class="fbox">
     <select name="Image" size="1" id = "Image">
             <option value="*">*</option>
@@ -129,12 +129,12 @@
         <option value="type?">type?</option>
         <option value="original material">original material</option>
     </select> </td> <td>Typstatus</td> </tr>
-   <tr> <td class="eng">Type of</td> <td class="fbox"> <input type="text" name="Basionym" value="*" size="32" onclick="star('Basionym')" /></td> <td>Typens originalnamn</td> </tr>
+   <tr> <td class="eng">Type of</td> <td class="fbox"> <input type="text" name="Basionym" value="*" size="32" onclick="star('Basionym');" /></td> <td>Typens originalnamn</td> </tr>
 </table>
 
 <table class="SBox">
     <tr> <th colspan="2">Swedish search fields</th> <th> Svenska sökfält </th> </tr>
-    <tr> <td class="eng">Swedish name of taxon<br /> </td> <td class="fbox"> <input type="text" name="Svenskt_namn" value="*" size="32" onclick="star('Svenskt_namn')" /></td> <td>Svenskt växtnamn</td> </tr>
+    <tr> <td class="eng">Swedish name of taxon<br /> </td> <td class="fbox"> <input type="text" name="Svenskt_namn" value="*" size="32" onclick="star('Svenskt_namn');" /></td> <td>Svenskt växtnamn</td> </tr>
     <tr> <td class="eng">Län</td> <td class="fbox" id="Land">
     <select name="Lan" size="1" id = "Lan" onchange="getList('Lan', 'Kommun');">
         <option value="*">*</option>
@@ -160,7 +160,7 @@
         <option value="Västerbottens län">Västerbottens län</option>
         <option value="Norrbottens län">Norrbottens län</option>
     </select> </td> <td>Län</td> </tr>
-    <tr> <td class="eng">Kommun</td> <td class="fbox" id="Kommund"><input type="text" name="Kommun" value="*" size="32" id = "Kommun" onclick="star('Kommun')" /></td> <td>Kommun</td> </tr>
+    <tr> <td class="eng">Kommun</td> <td class="fbox" id="Kommund"><input type="text" name="Kommun" value="*" size="32" id = "Kommun" onclick="star('Kommun');" /></td> <td>Kommun</td> </tr>
     <tr> <td colspan="2"><input type="submit" name= "search" value="Search" /></td> <td><a href="standard_search.html">Clear search fields</a></td> </tr>
 </table>
 
