@@ -7,6 +7,7 @@
     <meta name="author" content="Nils Ericson" />
     <meta name="keywords" content="Virtuella herbariet" />
     <link rel="shortcut icon" href="../favicon.ico" />
+    <style>.mapLabel {background-color: white}</style>
 </head>
 <body id = "locality_map">
     <div class = "menu1">
@@ -43,7 +44,7 @@ include("../ini.php");
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	$query = "select ID, Province from Provinces where country = :country";
+	$query = "select ID, Province, X, Y from Provinces where country = :country ORDER BY Province;";
 	$Stm = $con->prepare($query);
 	$Stm->bindValue(':country', $country, PDO::PARAM_STR);
 	$Stm->execute();
@@ -66,15 +67,22 @@ echo "
 		echo "</td></tr>
 		</table>
 		<div id=\"map\" style=\"width:800px;height:800px;\"></div>
+    <input id=\"showProvinces\" type=\"button\" value=\"show provinces on map\" onclick=\"showProvinces();\" /><br />
 	Provinces
-	<table>";
+	<table>
+    ";
+    $provinces =  $Stm->fetchAll(PDO::FETCH_ASSOC);
+    /*
 	while ($row2 = $Stm->fetch(PDO::FETCH_ASSOC)) {
 		//$urlProvince = urlencode($row2['Province']);
 		echo "<tr><td><a href=\"province.php?ID=$row2[ID]\">$row2[Province]</a></td></tr>";
-	}
-	
-	echo "
-	</table>
+	}*/
+    foreach ($provinces as $row2) {
+        if ($row2['Province']!='')
+            echo "<tr><td><a href=\"province.php?ID=$row2[ID]\">$row2[Province]</a></td></tr>
+        ";
+    }
+	echo "</table>
     <script>
 	    var map;
 		function initMap() {
@@ -88,7 +96,55 @@ echo "
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
-	</script>";
+	</script>
+    <script>
+        let markers = [];
+        let pdata = null;
+        function showProvinces() {
+            var sbutton = document.getElementById(\"showProvinces\");
+            if (sbutton.value == \"show provinces on map\") {
+                sbutton.value = \"hide provinces on map\";
+                pdata = new google.maps.Data();";
+    $i=0;
+    foreach ($provinces as $row2) {
+        if (isset($row2['Y'])) {
+            ++$i;
+            $prov = htmlspecialchars($row2['Province']);
+            echo "
+                pdata.loadGeoJson('gjprovins.php?ID=$row2[ID]');
+                var marker$i =  new google.maps.Marker({
+                    position: new google.maps.LatLng($row2[Y], $row2[X]),
+                    label: {className: 'mapLabel', color: '#000000', fontWeight: 'bold', fontSize: '18px', text: '$prov'}
+                });
+                marker$i.setMap(map);
+                google.maps.event.addListener(marker$i, 'click', (function () {
+                    window.open(\"province.php?ID=$row2[ID]\", \"_self\");
+                }));
+                markers.push(marker$i);";
+        }
+    }
+    echo "
+                pdata.setMap(map);
+            } else {
+                sbutton.value = \"show provinces on map\";
+                for (let i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+                pdata.setMap(null);
+                pdata = null;
+            }";
+            /*
+            echo "
+        var marker$i =  new google.maps.Marker({position: new google.maps.LatLng($row2[Y],$row2[X])});
+        marker$i.setMap(map);
+        var infowindow$i = new google.maps.InfoWindow({content: \"<a href = \\\"province.php?ID=$row2[ID]\\\">$prov</a>\"});
+        google.maps.event.addListener(marker$i, 'click', (function () {
+                infowindow$i.open(map, marker$i);
+            }));";*/
+    echo "
+		}
+    </script>";
 ?>
 	</table>
 	</table>

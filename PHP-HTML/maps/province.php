@@ -7,6 +7,7 @@
     <meta name="author" content="Nils Ericson" />
     <meta name="keywords" content="Virtuella herbariet" />
     <link rel="shortcut icon" href="../favicon.ico" />
+    <style>.mapLabel {background-color: white}</style>
 </head>
 <body id = "locality_map">
     <div class = "menu1">
@@ -48,7 +49,7 @@
 		$Stm->execute();
 		$row = $Stm->fetch(PDO::FETCH_ASSOC);
 	}
-	$query = "select ID, District from District where country= :count and province = :prov";
+	$query = "select ID, District, Latitude, Longitude from District where country= :count and province = :prov ORDER BY District";
 	$Stm2 = $con->prepare($query);
 	$Stm2->bindValue(':prov', $prov, PDO::PARAM_STR);
 	$Stm2->bindValue(':count', $count, PDO::PARAM_STR);
@@ -70,14 +71,21 @@
             <tr><td>Comments:</td><td><$row[comments]/td></tr>
 		</table>
 		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
+    <input id=\"showDistricts\" type=\"button\" value=\"show districts on map\" onclick=\"showDistricts();\" /><br />
 	Districts
 	<table>";
 
-	//use distict id instead?
+    $districts =  $Stm2->fetchAll(PDO::FETCH_ASSOC);
+/*
 	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
 		//$urlDistrict = urlencode($row2['District']);
 		echo "<tr><td><a href=\"district.php?ID=$row2[ID]\">$row2[District]</a></td></tr>";
-	}
+	}*/
+    foreach ($districts as $row2) {
+        if ($row2['District'] !='')
+            echo "<tr><td><a href=\"district.php?ID=$row2[ID]\">$row2[District]</a></td></tr>
+        ";
+    }
 	echo "
 	</table>
 	<script>
@@ -93,7 +101,53 @@
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
-	</script>";
+	</script>
+    <script>
+        let markers = [];
+        let ddata = null;
+        function showDistricts() {
+            var dbutton = document.getElementById(\"showDistricts\");
+            if (dbutton.value == \"show districts on map\") {
+                dbutton.value = \"hide districts on map\";
+                ddata = new google.maps.Data();";
+    $i=0;
+    foreach ($districts as $row2) {
+        if (isset($row2['Latitude'])) {
+            ++$i;
+            $dis = htmlspecialchars($row2['District']);
+            echo "ddata.loadGeoJson('gjdistrict.php?ID=$row2[ID]');
+            var marker$i =  new google.maps.Marker({
+                position: new google.maps.LatLng($row2[Latitude], $row2[Longitude]),
+                label: {className: 'mapLabel', color: '#000000', fontWeight: 'bold', fontSize: '18px', text: '$dis'}
+            });
+            marker$i.setMap(map);
+            google.maps.event.addListener(marker$i, 'click', (function () {
+                window.open(\"district.php?ID=$row2[ID]\", \"_self\");
+            }));
+            markers.push(marker$i);";
+            /*
+            echo "
+        var marker$i =  new google.maps.Marker({position: new google.maps.LatLng($row2[Latitude],$row2[Longitude])});
+        marker$i.setMap(map);
+        var infowindow$i = new google.maps.InfoWindow({content: \"<a href = \\\"district.php?ID=$row2[ID]\\\">$dis</a>\"});
+        google.maps.event.addListener(marker$i, 'click', (function () {
+                infowindow$i.open(map, marker$i);
+            }));";*/
+        }
+	}
+     echo "
+                ddata.setMap(map);
+            } else {
+                dbutton.value = \"show districts on map\";
+                for (let i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+                ddata.setMap(null);
+                ddata = null;
+            }
+		}
+    </script>";
 ?>
 	</table>
 	</table>

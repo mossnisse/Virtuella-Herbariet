@@ -7,6 +7,7 @@
     <meta name="author" content="Nils Ericson" />
     <meta name="keywords" content="Virtuella herbariet" />
     <link rel="shortcut icon" href="../favicon.ico" />
+    <style>.mapLabel {background-color: white}</style>
 </head>
 <body id = "locality_map">
     <div class = "menu1">
@@ -53,7 +54,7 @@
 	}
 	//echo $query;
 	
-	$query = "select locality, ID from locality where district = :district and province = :province and country = :country;";
+	$query = "select locality, ID, `lat`, `long` from locality where district = :district and province = :province and country = :country ORDER BY locality;";
 	$Stm2 = $con->prepare($query);
 	$Stm2->bindValue(':district', $dist, PDO::PARAM_STR);
 	$Stm2->bindValue(':province', $prov, PDO::PARAM_STR);
@@ -80,13 +81,20 @@ echo "
 			<tr><td><a href=\"gjdistrict.php?District=$urlDistrict&Province=$urlProvince\" download>Download GeoJson borders in WGS84</a></td><td></td></tr>
 		</table>
 		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
+    <input id=\"showLocalities\" type=\"button\" value=\"show localities on map\" onclick=\"showLocalities();\" /><br />
 	Localities
 	<table>";
 
+    $localities = $Stm2->fetchAll(PDO::FETCH_ASSOC);
+    /*
 	while ($row2 = $Stm2->fetch(PDO::FETCH_ASSOC)) {
 		echo "
 		<tr><td><a href =\"../locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>";
-	}
+	}*/
+    foreach ($localities as $row2) {
+        echo "<tr><td><a href =\"../locality.php?ID=$row2[ID]\">$row2[locality]</a></tr>
+        ";
+    }
 	echo "
 	</table>
     <script>
@@ -102,7 +110,50 @@ echo "
 	</script>
 	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
-	</script>";
+	</script>
+    
+    <script>
+        let markers = [];
+        function showLocalities() {
+            var lbutton = document.getElementById(\"showLocalities\");
+            if (lbutton.value == \"show localities on map\") {
+                lbutton.value = \"hide localities on map\";";
+    $i=0;
+    foreach ($localities as $row2) {
+        ++$i;
+        $loc = htmlspecialchars($row2['locality']);
+        //                icon: '../icons/blank.png',
+         echo "
+                var marker$i =  new google.maps.Marker({
+                    position: new google.maps.LatLng($row2[lat], $row2[long]),
+                    label: {className: 'mapLabel', color: '#000000', fontWeight: 'bold', fontSize: '18px', text: '$loc'}
+                });
+                marker$i.setMap(map);
+                google.maps.event.addListener(marker$i, 'click', (function () {
+                    window.open(\"../locality.php?ID=$row2[ID]\", \"_self\");
+                }));
+                markers.push(marker$i);";
+        /*
+        echo "
+            var marker$i =  new google.maps.Marker({position: new google.maps.LatLng($row2[lat], $row2[long])});
+            marker$i.setMap(map);
+            var infowindow$i = new google.maps.InfoWindow({content: \"<a href = \\\"../locality.php?ID=$row2[ID]\\\">$loc</a>\"});
+            google.maps.event.addListener(marker$i, 'click', (function () {
+                infowindow$i.open(map, marker$i);
+            }));";
+        */
+	}
+           
+    echo "
+            } else {
+                lbutton.value = \"show localities on map\";
+                for (let i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+            }
+		}
+    </script>";
 ?>
 	</table>
 	</table>
