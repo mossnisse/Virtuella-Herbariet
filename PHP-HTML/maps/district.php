@@ -108,7 +108,7 @@ echo "
 			map.data.loadGeoJson('gjdistrict.php?District=$urlDistrict&Province=$urlProvince');
 		}
 	</script>
-	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
+	<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=initMap\"
 		async defer>
 	</script>
     
