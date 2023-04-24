@@ -487,7 +487,7 @@ function CalcCoord($row,PDO $con) {
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
     elseif (isset($row['Lat_deg']) && isset($row['Long_deg']) && $row['Lat_deg'] != "" && $row['Long_deg'] !="" ) {
-        $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
+        $WGS = latlongtoWGS84(floatval($row['Lat_deg']), floatval($row['Lat_min']), floatval($row['Lat_sec']), $row['Lat_dir'], floatval($row['Long_deg']), floatval($row['Long_min']), floatval($row['Long_sec']), $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
         $WGS['Value'] = "Longitude: $row[Long_deg]º $row[Long_min]' $row[Long_sec]'' $row[Long_dir] Latitude: $row[Lat_deg]º $row[Lat_min]' $row[Lat_sec]'' $row[Lat_dir]";
     }
