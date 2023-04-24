@@ -1,4 +1,5 @@
 <?php
+//include "../ini.php";
 include "../herbes.php";
 
 function flush_buffers(): void {
@@ -402,7 +403,8 @@ function filetable(PDO $con2): void {
 }
 
 function upploadfile(string $backpage) {
-   if ($_POST['kontroll'] != "OK") {
+    global $APass;
+    if ($_POST['kontroll'] != "OK") {
         echo "lyckas inte ladda upp filen, antagligen är det för att filen du försöker ladda upp är för stor <br />
             <a href=\"$backpage\">back to admin page</a> <p />";
         return false;
