@@ -32,7 +32,7 @@ if (isUpdating2()) {
         $uploadfile = $a[1];
         $File_id = instable($con, $sfileName, $instCode, $collCode);
         
-        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY :fline_endings
+        $query = "LOAD DATA INFILE :uploadfile INTO TABLE specimens CHARACTER SET :char_set FIELDS TERMINATED BY ',' ENCLOSED BY '\\\"' LINES TERMINATED BY :line_endings
         (`AccessionNo`, @Day, @Month, @Year, @Genus, @Species, @irang, @iepi, @higerTaxa, collector, Collectornumber, notes, continent, country, province, district, original_text,
         habitat, `Altitude_meter`,`Original_name`, `Exsiccata`, `Exs_no`, @Lat, @Long, @dumy, Type_status, Basionym) 
         SET `sFile_ID` = :fileID, institutionCode = :instCode, collectionCode = :collCode,
