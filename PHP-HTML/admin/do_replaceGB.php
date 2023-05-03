@@ -24,7 +24,8 @@ if (isUpdating2()) {
     $collCode = $_POST['CollectionCode'];
     $instCode = $_POST['InstitutionCode'];
     $char_set = $_POST['char_set'];
-    $line_endings = $_POST['line_endings'];
+    //$line_endings = $_POST['line_endings'];
+    $line_endings = "\r";
     $a = upploadfile("replaceImage.php");
 
     if ($a) {
@@ -43,8 +44,8 @@ if (isUpdating2()) {
             Month = ToInt(@Month),
             Day = ToInt(@Day),
             Sweref99TMN = ToInt(@Sweref99N),
-            Sweref99TME = ToInt(@Sweref99E);
-            Altitude = GBAltitude(@AltitudeLow, @AltitudeHigh)";
+            Sweref99TME = ToInt(@Sweref99E),
+            Altitude_meter = GBAltitude(@AltitudeLow, @AltitudeHigh);";
         doreplace($con,$query, $sfileName, $File_id, $uploadfile, $char_set, $line_endings, $instCode, $collCode);
     }
     setUpdating2(false);
