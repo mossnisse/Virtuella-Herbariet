@@ -99,7 +99,7 @@ function replacepage(string $name, string $script, string $description, string $
             <tr> <td> Line endings: </td> <td> <select name=\"line_endings\" size=\"1\">
                 $lineendings
                 <option value=\"\r\n\">\\r\\n - DOS/Windows</option>
-                <option value=\"\r\">\\r - Mac</option>
+                <option value=\"&#x000D;\">\\r - Mac</option>
                 <option value=\"\n\">\\n - Unix</option>
             </select> </td> </tr>
             
@@ -122,6 +122,7 @@ function instable(PDO $con, string $sfileName, string $instCode, string $collCod
     $stmt->BindValue(':instCode', $instCode, PDO::PARAM_STR);
     $stmt->BindValue(':collCode', $collCode, PDO::PARAM_STR);
     $stmt->execute();
+    $stmt->closeCursor();
     $res = $con->query("SELECT LAST_INSERT_ID()");
     $ro = $res->fetch();
     return $ro[0];
@@ -129,16 +130,18 @@ function instable(PDO $con, string $sfileName, string $instCode, string $collCod
 
 function instablenr(PDO $con, int $sfileID) : void {
     $query = "SELECT count(*) as nr from specimens WHERE sFile_ID = :sfileID Group by sFile_ID;";
-    $stmt = $con->prepare($query);
-    $stmt->BindValue(':sfileID', $sfileID, PDO::PARAM_STR);
-    $stmt->execute();
-    $ro = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmtin = $con->prepare($query);
+    $stmtin->BindValue(':sfileID', $sfileID, PDO::PARAM_STR);
+    $stmtin->execute();
+    $ro = $stmtin->fetch(PDO::FETCH_ASSOC);
+    $stmtin->closeCursor();
     $nr = $ro['nr'];
     $query = "UPDATE sfiles set nr_records = :nr WHERE ID = :sfileID";
-    $stmt = $con->prepare($query);
-    $stmt->BindValue(':nr', $nr, PDO::PARAM_INT);
-    $stmt->BindValue(':sfileID', $sfileID, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmtin2 = $con->prepare($query);
+    $stmtin2->BindValue(':nr', $nr, PDO::PARAM_INT);
+    $stmtin2->BindValue(':sfileID', $sfileID, PDO::PARAM_INT);
+    $stmtin2->execute();
+    $stmtin2->closeCursor();
 }
 
 function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, string $uploadfile, string $char_set, string $line_endings, string $instCode, string $collCode): void {
@@ -165,10 +168,11 @@ function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, str
     echo "':line_endings', $line_endings<p>";
     
     $stmt->execute();
-    warningFormat($con,$sfileName);
+    //warningFormat($con,$sfileName);
     
     echo "<p/>";
     if ($stmt->errorCode() == 0) {
+        $stmt->closeCursor();
         instablenr($con, $file_ID);
         echo "<br /> query: $query <br />  $sfileName now inserted in db. Time: ". $timer->getTime()."<br />";
         echo "
@@ -206,6 +210,7 @@ function doreplace(PDO $con, string $query, string $sfileName, int $file_ID, str
     } else {
         echo 'error when trying to insert file:';
         $errors = $stmt->errorInfo();
+        $stmt->closeCursor();
         echo($errors[2]).'<br />';
         echo "<br /> query: $query <br />";
     }
