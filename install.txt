@@ -27,6 +27,11 @@ php config - php.ini in the php install folder
 	upload_tmp_dir = <temp upload folder>	- temp folder for uploading files
 	upload_max_filesize = 500M		- updating needs to upload big files
 	extension=pdo_mysql			- php uses pdo drivers for MYSQL
+	extension=openssl			- needed for opening other wepbages from php
+	extension=curl				- needed for opening other wepbages from php
+	check that Apache/the webserver finds the versions of openssl .dll files that pHp needs so curl works. copy libcrypto-1_1-x64.dll & libssl-1_1-x64.dll from the php folder to Apache/bin
 
 On windows
 	MYSQL and apache needs rights to read and write in the <upload folder> and <temp uplad folder> the rights get inherited from the temp foder not the final so MYSQL need rights on the tempfolder even if it should not touch the files there.
+	
+OBS restarting Apache don't enable changes in SSL settings you need to stop and start Apache
