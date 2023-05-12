@@ -140,7 +140,29 @@ Function WGStoSweref99TM(float $north, float $east): array {
 
 // Konverterar RUBIN koordinater till RT-90
     
-function alphaNum3($char) {
+/*
+ *
+ *asci
+0 = 48
+9 = 57
+
+A=65
+Z=90
+a=97
+z=122
+ *
+ */
+
+function isnum(string $char): bool {
+    return 47 < ord($char) && ord($char) < 58;
+}
+
+function isalpha(string $char): bool {
+    $ord = ord($char);
+    return (64 < $ord && 91 > $ord) || (96 < $ord && 123 > $ord);
+}
+
+function alphaNum3(string $char): int  {
     if (ctype_alpha($char)) {
         if (ctype_upper($char )) 
             return intval(ord($char)-ord("A"));
@@ -151,7 +173,7 @@ function alphaNum3($char) {
     }
 }
 
-function numAlpha($num) {
+function numAlpha(int $num): string  {
     return chr($num+ord("a"));
 }
 
@@ -163,7 +185,6 @@ function RUBINToRT90(string $RUBIN) {
     $RUBIN = str_replace("\xA0", '', $RUBIN);
     $RUBIN = str_replace("\xC2", '', $RUBIN);
     $RUBIN = str_replace("\xC2\xA0", '', $RUBIN);
-    
     if (ctype_alpha(substr($RUBIN , 1, 1))) {
         $a = substr($RUBIN, 0, 1);
         $b = substr($RUBIN, 1, 1);
@@ -183,6 +204,7 @@ function RUBINToRT90(string $RUBIN) {
         $g = substr($RUBIN, 7, 1);
         $h = substr($RUBIN, 8, 1);
     }
+    if (!is_numeric($a)) return NULL;
     if (ctype_digit($h)) {
         $RT90['N'] = 6050050+intval($a)*50000+intval($c)*5000+intval($e)*1000+intval($f)*100;
         $RT90['E'] = 1200050+alphaNum3($b)*50000+alphaNum3($d)*5000+intval($g)*1000+intval($h)*100;
@@ -195,7 +217,7 @@ function RUBINToRT90(string $RUBIN) {
         $RT90['N'] = 6052500+intval($a)*50000+intval($c)*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
+    } elseif ((ctype_alpha($b) || ctype_digit($b)) {
         $RT90['N'] = 6075000+intval($a)*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
@@ -227,19 +249,21 @@ function LINREGToRT90(string $LINREG) {
         $g = substr($LINREG, 7, 1);
         $h = substr($LINREG, 8, 1);
     }
-    if (ctype_digit($h)) {
+    if (!is_numeric($a)) return NULL;
+    
+    if ((ctype_alpha($h) || ctype_digit($h)) && ctype_digit($g) && ctype_digit($e) && ctype_digit($c)) {
         $RT90['N'] = 6050050+$a*50000+$c*5000+$e*1000+$g*100;
         $RT90['E'] = 1200050+alphaNum3($b)*50000+alphaNum3($d)*5000+alphaNum3($f)*1000+alphaNum3($h)*100;
         $RT90['Prec'] = 100;
-    } elseif (ctype_digit($e) && ctype_digit($g)) {
+    } elseif ((ctype_alpha($f) || ctype_digit($f)) && ctype_digit($e) && ctype_digit($c)) {
         $RT90['N'] = 6050500+$a*50000+$c*5000+$e*1000;
         $RT90['E'] = 1200500+alphaNum3($b)*50000+alphaNum3($d)*5000+alphaNum3($f)*1000;
         $RT90['Prec'] = 1000;
-    } elseif (ctype_digit($c) && (ctype_alpha($d) || ctype_digit($d))) {
+    } elseif ((ctype_alpha($d) || ctype_digit($d))  && ctype_digit($c)) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
+    } elseif ((ctype_alpha($b) || ctype_digit($b))) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
@@ -251,12 +275,10 @@ function LINREGToRT90(string $LINREG) {
 
 // formaterar rubin koder
 function RUBINf(string $RUBIN): string {
-	
     $RUBIN = str_replace(' ', '', $RUBIN);
     $RUBIN = str_replace("\xA0", '', $RUBIN);
     $RUBIN = str_replace("\xC2", '', $RUBIN);
     $RUBIN = str_replace("\xC2\xA0", '', $RUBIN);
-    
     if (ctype_alpha(substr($RUBIN , 1, 1))) {
         $a = substr($RUBIN, 0, 1);
         $b = substr($RUBIN, 1, 1);
@@ -276,19 +298,20 @@ function RUBINf(string $RUBIN): string {
         $g = substr($RUBIN, 7, 1);
         $h = substr($RUBIN, 8, 1);
     }
-    if (ctype_digit($h)) {
+    if (!is_numeric($a)) return '';
+    if (ctype_digit($h) && ctype_digit($g) && ctype_digit($f) && ctype_digit($e) && ctype_digit($c) && ctype_digit($a)) {
         $RT90['N'] = 6050050+$a*50000+$c*5000+$e*1000+$f*100;
         $RT90['E'] = 1200050+alphaNum3($b)*50000+alphaNum3($d)*5000+$g*1000+$h*100;
         $RT90['Prec'] = 100;
-    } elseif (ctype_digit($e) && ctype_digit($g)) {
+    } elseif (ctype_digit($g) && ctype_digit($e) && ctype_digit($c)) {
         $RT90['N'] = 6050500+$a*50000+$c*5000+$e*1000;
         $RT90['E'] = 1200500+alphaNum3($b)*50000+alphaNum3($d)*5000+$g*1000;
         $RT90['Prec'] = 1000;
-    } elseif (ctype_digit($c) && (ctype_alpha($d) || ctype_digit($d))) {
+    } elseif ((ctype_alpha($d) || ctype_digit($d)) && ctype_digit($c)) {
         $RT90['N'] = 6052500+$a*50000+$c*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif (ctype_digit($a) && (ctype_alpha($b) || ctype_digit($b))) {
+    } elseif (ctype_alpha($b) || ctype_digit($b)) {
         $RT90['N'] = 6075000+$a*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
