@@ -30,7 +30,7 @@ include("../ini.php");
 	$country = "";
 	if (isset($_GET['ID'])) {
 		$ID = $_GET['ID'];
-		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments FROM countries where ID = :ID;";
+		$query = "SELECT english, maxX, maxY, minX, minY, code, code3, alt_names, swedish, native, provinceName, districtName, comments FROM countries where ID = :ID;";
 		$Stm = $con->prepare($query);
 		$Stm->bindValue(':ID', $ID, PDO::PARAM_STR);
 		$Stm->execute();
@@ -38,7 +38,7 @@ include("../ini.php");
 		$country = $row['english'];
 	} else {
 		$country = $_GET['Country'];
-		$query = "select maxX, maxY, minX, minY, code, code3, syn, swedish, native, provinceName, districtName, comments from countries where english = :country";
+		$query = "select maxX, maxY, minX, minY, code, code3, alt_names, swedish, native, provinceName, districtName, comments from countries where english = :country";
 		$Stm = $con->prepare($query);
 		$Stm->bindValue(':country', $country, PDO::PARAM_STR);
 		$Stm->execute();
@@ -54,7 +54,7 @@ include("../ini.php");
 echo "
 		<h1><a href=\"../cross_browser.php?SpatLevel=2&SysLevel=0&Sys=Life&Spat=$urlCountry&Herb=All\">$htmlCountry</a></h1>
 		<table>
-		<tr><td>Alternative names:</td><td>$row[syn]</td></tr>
+		<tr><td>Alternative names:</td><td>$row[alt_names]</td></tr>
 		<tr><td>Native name:</td><td>$row[native]</td></tr>
 		<tr><td>Swedish name:</td><td>$row[swedish]</td></tr>
 		<tr><td>Alpha-2 code:</td><td>$row[code]</td></tr>
@@ -94,7 +94,7 @@ echo "
 			map.data.loadGeoJson('gjcountry.php?country=$urlCountry');
 		}
 	</script>
-	<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=initMap\"
+	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
 	</script>
     <script>
