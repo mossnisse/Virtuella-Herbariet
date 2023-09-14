@@ -374,40 +374,60 @@ function get_precision($value): ?int {
 }
 
 function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, string $Lat_dir, string $Long_deg, string $Long_min, string $Long_sec, string $Long_dir): array {
-	if ($Lat_deg != null && $Lat_deg != '') {
+	if ($Lat_deg != null && $Lat_deg != '') 
 		 $Lat_deg = floatval(str_replace(',', '.', $Lat_deg));
-	}
-    else $Lat_deg = null;
-	if ($Long_deg != null && $Long_deg != '') {
+    else
+        $Lat_deg = null;
+        
+	if ($Long_deg != null && $Long_deg != '') 
 		$Long_deg = floatval(str_replace(',', '.', $Long_deg));
-	}
-    else $Long_deg = null;
-    if ($Lat_min != null && $Lat_min != ''){
+    else
+        $Long_deg = null;
+        
+    if ($Lat_min != null && $Lat_min != '')
 		$Lat_min = floatval(str_replace(',', '.', $Lat_min));
-	}
-    else $Lat_min = null;
-    if ($Long_min != null && $Long_min != '') {
+    else
+        $Lat_min = null;
+        
+    if ($Long_min != null && $Long_min != '') 
 		$Long_min = floatval(str_replace(',', '.', $Long_min));
-	}
-    else $Lat_min = null;
-    if ($Long_sec != null && $Long_sec != '') {
-       $Long_sec = floatval(str_replace(',', '.', $Long_sec));
-    }
-    else $Long_sec = null;
-    if ($Lat_sec != null && $Lat_sec != '') {
+    else
+        $Lat_min = null;
+    if ($Long_sec != null && $Long_sec != '') 
+        $Long_sec = floatval(str_replace(',', '.', $Long_sec));
+    else
+        $Long_sec = null;
+    if ($Lat_sec != null && $Lat_sec != '') 
         $Lat_sec = floatval(str_replace(',','.', $Lat_sec));
-    }
-    $Lat_sec = null;
+    else
+        $Lat_sec = null;
     // fixa prec för decimaltal
-    if (isset($Long_sec) && isset($Lat_sec))
+    if (isset($Long_sec) && isset($Lat_sec) && isset($Lat_min) && isset($Long_min) && isset($Lat_deg) && isset($Long_deg) ) {
         $WGS['Prec'] = '100';
-    elseif (isset($Long_min) && isset($Lat_min)) {
+        if ($Lat_dir == 'S')
+            $WGS['Lat'] = -$Lat_deg - $Lat_min/60.0 - $Lat_sec/3600.0;
+        else
+            $WGS['Lat'] = $Lat_deg + $Lat_min/60.0 + $Lat_sec/3600.0;
+        if ($Long_dir == 'W')
+            $WGS['Long'] = -$Long_deg - $Long_min/60.0 - $Long_sec/3600.0;
+        else
+            $WGS['Long'] = $Long_deg + $Long_min/60.0 + $Long_sec/3600.0;
+    }
+    elseif (isset($Long_min) && isset($Lat_min) && isset($Long_deg) && isset($Lat_deg)) {
         $lop = get_precision($Long_min);
         $lap = get_precision($Lat_min);
         if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
         $prec = 2000/pow(10,$lap);
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
+        if ($Lat_dir == 'S')
+            $WGS['Lat'] = -$Lat_deg - $Lat_min/60.0;
+        else
+            $WGS['Lat'] = $Lat_deg + $Lat_min/60.0;
+        if ($Long_dir == 'W')
+            $WGS['Long'] = -$Long_deg - $Long_min/60.0;
+        else
+            $WGS['Long'] = $Long_deg + $Long_min/60.0;
     }
     elseif (isset($Long_deg) && isset($Lat_deg)) {
         $lop = get_precision($Long_deg);
@@ -416,17 +436,17 @@ function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, stri
         $prec = 120000/pow(10,$lap);
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
+         if ($Lat_dir == 'S')
+            $WGS['Lat'] = -$Lat_deg;
+        else
+            $WGS['Lat'] = $Lat_deg;
+        if ($Long_dir == 'W')
+            $WGS['Long'] = -$Long_deg;
+        else
+            $WGS['Long'] = $Long_deg;
     }
     else
         $WGS['Prec'] = 'error';
-    if ($Lat_dir == 'S')
-        $WGS['Lat'] = -$Lat_deg - $Lat_min/60 - $Lat_sec/3600;
-    else
-       $WGS['Lat'] = $Lat_deg + $Lat_min/60 + $Lat_sec/3600;
-    if ($Long_dir == 'W')
-        $WGS['Long'] = -$Long_deg - $Long_min/60 - $Long_sec/3600;
-    else
-        $WGS['Long'] = $Long_deg + $Long_min/60 + $Long_sec/3600;
     return $WGS;
 }
 
@@ -524,7 +544,7 @@ function CalcCoord($row,PDO $con) {
         $WGS['Value'] = "$row[RiketsN]N, $row[RiketsO]E";
     }
     elseif (isset($row['Lat_deg']) && isset($row['Long_deg']) && $row['Lat_deg'] != "" && $row['Long_deg'] !="" ) {
-        $WGS = latlongtoWGS84(floatval($row['Lat_deg']), floatval($row['Lat_min']), floatval($row['Lat_sec']), $row['Lat_dir'], floatval($row['Long_deg']), floatval($row['Long_min']), floatval($row['Long_sec']), $row['Long_dir']);
+        $WGS = latlongtoWGS84($row['Lat_deg'], $row['Lat_min'], $row['Lat_sec'], $row['Lat_dir'], $row['Long_deg'], $row['Long_min'], $row['Long_sec'], $row['Long_dir']);
         $WGS['Source'] = "Latitude / Longitude";
         $WGS['Value'] = "Longitude: $row[Long_deg]º $row[Long_min]' $row[Long_sec]'' $row[Long_dir] Latitude: $row[Lat_deg]º $row[Lat_min]' $row[Lat_sec]'' $row[Lat_dir]";
     }
