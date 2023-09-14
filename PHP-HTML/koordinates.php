@@ -217,7 +217,7 @@ function RUBINToRT90(string $RUBIN) {
         $RT90['N'] = 6052500+intval($a)*50000+intval($c)*5000;
         $RT90['E'] = 1202500+alphaNum3($b)*50000+alphaNum3($d)*5000;
         $RT90['Prec'] = 5000;
-    } elseif ((ctype_alpha($b) || ctype_digit($b)) {
+    } elseif ((ctype_alpha($b) || ctype_digit($b))) {
         $RT90['N'] = 6075000+intval($a)*50000;
         $RT90['E'] = 1225000+alphaNum3($b)*50000;
         $RT90['Prec'] = 50000; 
@@ -373,23 +373,35 @@ function get_precision($value): ?int {
     return $precision; 
 }
 
-function latlongtoWGS84 (float $Lat_deg, float $Lat_min, float $Lat_sec, string $Lat_dir, float $Long_deg, float $Long_min, float $Long_sec, string $Long_dir): array {
-	if ($Lat_deg != null) {
-		 $Lat_deg= str_replace(',', '.', $Lat_deg);
+function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, string $Lat_dir, string $Long_deg, string $Long_min, string $Long_sec, string $Long_dir): array {
+	if ($Lat_deg != null && $Lat_deg != '') {
+		 $Lat_deg = floatval(str_replace(',', '.', $Lat_deg));
 	}
-	if ($Long_deg != null) {
-		$Long_deg= str_replace(',', '.', $Long_deg);
+    else $Lat_deg = null;
+	if ($Long_deg != null && $Long_deg != '') {
+		$Long_deg = floatval(str_replace(',', '.', $Long_deg));
 	}
-    if ($Lat_min != null){
-		$Lat_min= str_replace(',', '.', $Lat_min);
+    else $Long_deg = null;
+    if ($Lat_min != null && $Lat_min != ''){
+		$Lat_min = floatval(str_replace(',', '.', $Lat_min));
 	}
-    if ($Long_min != null) {
-		$Long_min= str_replace(',', '.', $Long_min);
+    else $Lat_min = null;
+    if ($Long_min != null && $Long_min != '') {
+		$Long_min = floatval(str_replace(',', '.', $Long_min));
 	}
+    else $Lat_min = null;
+    if ($Long_sec != null && $Long_sec != '') {
+       $Long_sec = floatval(str_replace(',', '.', $Long_sec));
+    }
+    else $Long_sec = null;
+    if ($Lat_sec != null && $Lat_sec != '') {
+        $Lat_sec = floatval(str_replace(',','.', $Lat_sec));
+    }
+    $Lat_sec = null;
     // fixa prec för decimaltal
-    if (isset($Long_sec) && isset($Lat_sec) && ($Lat_sec != "") && ($Long_sec != ""))
+    if (isset($Long_sec) && isset($Lat_sec))
         $WGS['Prec'] = '100';
-    elseif (isset($Long_min) && isset($Lat_min) && ($Lat_min != "") && ($Long_min != "")) {
+    elseif (isset($Long_min) && isset($Lat_min)) {
         $lop = get_precision($Long_min);
         $lap = get_precision($Lat_min);
         if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
@@ -397,7 +409,7 @@ function latlongtoWGS84 (float $Lat_deg, float $Lat_min, float $Lat_sec, string 
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
     }
-    elseif (isset($Long_deg) && isset($Lat_deg) && ($Lat_deg != "") && ($Long_deg != "")) {
+    elseif (isset($Long_deg) && isset($Lat_deg)) {
         $lop = get_precision($Long_deg);
         $lap = get_precision($Lat_deg);
         if ($lop>$lap) $pdec = $lop; else $pdec = $lap;
@@ -408,15 +420,17 @@ function latlongtoWGS84 (float $Lat_deg, float $Lat_min, float $Lat_sec, string 
     else
         $WGS['Prec'] = 'error';
     if ($Lat_dir == 'S')
-        $WGS['Lat'] = -floatval($Lat_deg)-floatval($Lat_min)/60-floatval($Lat_sec)/3600;
+        $WGS['Lat'] = -$Lat_deg - $Lat_min/60 - $Lat_sec/3600;
     else
-       $WGS['Lat'] = floatval($Lat_deg)+floatval($Lat_min)/60+floatval($Lat_sec)/3600;
+       $WGS['Lat'] = $Lat_deg + $Lat_min/60 + $Lat_sec/3600;
     if ($Long_dir == 'W')
-        $WGS['Long'] = -floatval($Long_deg)-floatval($Long_min)/60-floatval($Long_sec)/3600;
+        $WGS['Long'] = -$Long_deg - $Long_min/60 - $Long_sec/3600;
     else
-        $WGS['Long'] = floatval($Long_deg)+floatval($Long_min)/60+floatval($Long_sec)/3600;
+        $WGS['Long'] = $Long_deg + $Long_min/60 + $Long_sec/3600;
     return $WGS;
 }
+
+//1211
 
 function DistDirectWGS84 (array $WGS, int $distance, string $direction): array {
     // using haversine function assumes earth is spherical.
