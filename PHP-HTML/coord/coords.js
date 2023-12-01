@@ -215,6 +215,7 @@ function checkC() {
 			getDistrict(WGS84);
 			getProvince(WGS84);
 			getCountry(WGS84);
+            getDistPlace(WGS84);
 			getLocality(WGS84);
 		} else {
 			document.getElementById("WGS84").textContent = "";
@@ -222,7 +223,8 @@ function checkC() {
 			document.getElementById("Sweref99TM").textContent = "";
 			document.getElementById("RT90").textContent = "";
 			document.getElementById("RUBIN").textContent ="";
-			document.getElementById("locality").textContent = "";
+			document.getElementById("DistPlace").textContent = "";
+            document.getElementById("locality").textContent = "";
 			document.getElementById("District").textContent = "";
 			document.getElementById("Province").textContent = "";
 			document.getElementById("Country").textContent = "";
@@ -328,6 +330,29 @@ function getCountry(WGS84) {
 	});
 }
 
+function getDistPlace(WGS84) {
+	document.getElementById("DistPlace").textContent = "Wait...";
+	var url = "nearestPlace.php?north="+WGS84[0]+"&east="+WGS84[1];
+	ajax(url, function(json) {
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
+		var loc = JSON.parse(json);
+		if (loc.name !== "") {
+			//document.getElementById("locality").textContent = "<a href =\"../locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
+			document.getElementById("DistPlace").textContent = "";
+			let dlink = document.createElement("a");
+			dlink.appendChild(document.createTextNode(loc.name));
+			dlink.href = "../locality.php?ID="+loc.id;
+            var dist = Math.round(loc.distance/100)/10;
+            document.getElementById("DistPlace").appendChild(document.createTextNode(dist+"km "+loc.direction+" "));
+			document.getElementById("DistPlace").appendChild(dlink);
+			
+		} else {
+			document.getElementById("DistPlace").textContent = "No place in the db within 50km";
+		}
+	});	
+}
+
 function getLocality(WGS84) {
 	document.getElementById("locality").textContent = "Wait...";
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
@@ -386,6 +411,7 @@ function showCoordf(){
 	marker.setMap(map);
 }
 
+// use loadGeojson to simplify the code
 function showDistrictf() {
 	centerMapf();
 	var xmlhttp;
