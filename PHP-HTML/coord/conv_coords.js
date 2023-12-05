@@ -4,63 +4,80 @@ function convertC() {
 	const coordArray = coordinates.split("\n");
 	const outtable = document.getElementById("output_table");
 	outtable.textContent = "";
-	//var row = outtable.insertRow(0);
+    
+    // create output table field names
 	var header = outtable.createTHead();
 	var row = header.insertRow(0); 
-	var cell1 = row.insertCell(0);
-	const convTo =  document.getElementById("ouptput1").value; 
-	cell1.textContent = convTo;
+    const selectTable = document.getElementById("select_table");
+    const convTo = [];
+    for (var i = 0, srow; srow = selectTable.rows[i]; i++) {
+        const fieldName = srow.cells[0].firstChild.value;
+        //window.alert("field: "+fieldName);
+        if (fieldName != "Remove") {
+            var cell1 = row.insertCell(-1);
+            cell1.textContent = fieldName;
+            convTo[i]=fieldName;
+        }
+    }
+	//const convTo =  document.getElementById("ouptput1").value; 
+	
 	//console.log("convert to: "+convTo);
 	for (var i=0;i<coordArray.length;i++){
-		row = outtable.insertRow(-1);
-		var coord = coordArray[i];
-		//console.log("coord: "+coord);
-		var icoord = InterpretCoord(coord);
-		//console.log("icoord: "+icoord);
-		var converted = convertInterpretedCoord(icoord, convTo, i);
-		//console.log("converted: "+converted);
-
-		if (typeof converted === "string") {
-			var cell = row.insertCell(0);
-			cell.textContent = converted;
-		} else {
-			for (var j=0;j<converted.length;j++) {
-				var cellt = row.insertCell(j);
-				cellt.textContent = converted[j];
-			}
-		}
+        row = outtable.insertRow(-1);
+        for (var j=0;j<convTo.length;j++) {
+            var coord = coordArray[i];
+            //console.log("coord: "+coord);
+            var icoord = InterpretCoord(coord);
+            //console.log("icoord: "+icoord);
+            var converted = convertInterpretedCoord(icoord, convTo[j], i, j);
+            //console.log("converted: "+converted);
+            var cell = row.insertCell(-1);
+            if (typeof converted === "string") {
+                cell.textContent = converted;
+            } else {
+                var convText = "";
+                for (var k=0;k<converted.length;k++) {
+                    if (k==0) {
+                        convText = converted[k];
+                    } else {
+                        convText = convText + ', ' + converted[k];
+                    }
+                }
+                cell.textContent = convText;
+            }
+        }
 	}
 }
 
-function convertInterpretedCoord(icoor, toSystem, i) {
+function convertInterpretedCoord(icoor, toSystem, i, j) {
 	var coord;
 	var fromSystem = icoor[1];
 	var unconverted = icoor[0];
 	var interpreted = icoor[2];
-	//console.log("from system: "+fromSystem+" toSystem: "+toSystem+" unconverted: "+unconverted+" interpreted: "+interpreted);
+	console.log("from system: "+fromSystem+" toSystem: "+toSystem+" unconverted: "+unconverted+" interpreted: "+interpreted);
 	switch (toSystem) {
 		case "Country":
 			switch(fromSystem) {
 				case "WGS84":
 					var wgs84 = unconverted;
-					coord = getCountryName(wgs84, i);
+					coord = getCountryName(wgs84, i, j);
 				break;
 				case "RT90":  
 					var wgs84 = RT90toWGS84(unconverted);
-					coord = getCountryName(wgs84, i);
+					coord = getCountryName(wgs84, i, j);
 				break;
 				case "Sweref99TM":
 					var wgs84 = Sweref99TMtoWGS84(unconverted);
-					coord = getCountryName(wgs84, i);
+					coord = getCountryName(wgs84, i, j);
 				break;
 				case "UTM":
 					var wgs84 = UTMtoWGS84(unconverted);
-					coord = getCountryName(wgs84, i);
+					coord = getCountryName(wgs84, i, j);
 				break;
 				case "RUBIN 5x5 km": case "RUBIN 100x100 m": case "RUBIN 1x1 km": case "RUBIN 50x50 km":
 					var rt90 = RUBINtoRT90(unconverted);
 					var wgs84 = RT90toWGS84(rt90);
-					coord = getCountryName(wgs84, i);
+					coord = getCountryName(wgs84, i, j);
 				break;
 				case "unknown":
 					console.log("unknown coordinate");
@@ -72,24 +89,24 @@ function convertInterpretedCoord(icoor, toSystem, i) {
 			switch(fromSystem) {
 				case "WGS84":
 					var wgs84 = unconverted;
-					coord = getProvinceName(wgs84, i);
+					coord = getProvinceName(wgs84, i, j);
 				break;
 				case "RT90":  
 					var wgs84 = RT90toWGS84(unconverted);
-					coord = getProvinceName(wgs84, i);
+					coord = getProvinceName(wgs84, i, j);
 				break;
 				case "Sweref99TM":
 					var wgs84 = Sweref99TMtoWGS84(unconverted);
-					coord = getProvinceName(wgs84, i);
+					coord = getProvinceName(wgs84, i, j);
 				break;
 				case "UTM":
 					var wgs84 = UTMtoWGS84(unconverted);
-					coord = getProvinceName(wgs84, i);
+					coord = getProvinceName(wgs84, i, j);
 				break;
 				case "RUBIN 5x5 km": case "RUBIN 100x100 m": case "RUBIN 1x1 km": case "RUBIN 50x50 km":
 					var rt90 = RUBINtoRT90(unconverted);
 					var wgs84 = RT90toWGS84(rt90);
-					coord = getProvinceName(wgs84, i);
+					coord = getProvinceName(wgs84, i, j);
 				break;
 				case "unknown":
 					console.log("unknown coordinate");
@@ -101,24 +118,24 @@ function convertInterpretedCoord(icoor, toSystem, i) {
 			switch(fromSystem) {
 				case "WGS84":
 					var wgs84 = unconverted;
-					coord = getDistrictName(wgs84, i);
+					coord = getDistrictName(wgs84, i, j);
 				break;
 				case "RT90":  
 					var wgs84 = RT90toWGS84(unconverted);
-					coord = getDistrictName(wgs84, i);
+					coord = getDistrictName(wgs84, i, j);
 				break;
 				case "Sweref99TM":
 					var wgs84 = Sweref99TMtoWGS84(unconverted);
-					coord = getDistrictName(wgs84, i);
+					coord = getDistrictName(wgs84, i, j);
 				break;
 				case "UTM":
 					var wgs84 = UTMtoWGS84(unconverted);
-					coord = getDistrictName(wgs84, i);
+					coord = getDistrictName(wgs84, i, j);
 				break;
 				case "RUBIN 5x5 km": case "RUBIN 100x100 m": case "RUBIN 1x1 km": case "RUBIN 50x50 km":
 					var rt90 = RUBINtoRT90(unconverted);
 					var wgs84 = RT90toWGS84(rt90);
-					coord = getDistrictName(wgs84, i);
+					coord = getDistrictName(wgs84, i, j);
 				break;
 				case "unknown":
 					console.log("unknown coordinate");
@@ -130,24 +147,24 @@ function convertInterpretedCoord(icoor, toSystem, i) {
 			switch(fromSystem) {
 				case "WGS84":
 					var wgs84 = unconverted;
-					coord = getNearestLocalityName(wgs84, i);
+					coord = getNearestLocalityName(wgs84, i, j);
 				break;
 				case "RT90":  
 					var wgs84 = RT90toWGS84(unconverted);
-					coord = getNearestLocalityName(wgs84, i);
+					coord = getNearestLocalityName(wgs84, i, j);
 				break;
 				case "Sweref99TM":
 					var wgs84 = Sweref99TMtoWGS84(unconverted);
-					coord = getNearestLocalityName(wgs84, i);
+					coord = getNearestLocalityName(wgs84, i, j);
 				break;
 				case "UTM":
 					var wgs84 = UTMtoWGS84(unconverted);
-					coord = getNearestLocalityName(wgs84, i);
+					coord = getNearestLocalityName(wgs84, i, j);
 				break;
 				case "RUBIN 5x5 km": case "RUBIN 100x100 m": case "RUBIN 1x1 km": case "RUBIN 50x50 km":
 					var rt90 = RUBINtoRT90(unconverted);
 					var wgs84 = RT90toWGS84(rt90);
-					coord = getNearestLocalityName(wgs84, i);
+					coord = getNearestLocalityName(wgs84, i, j);
 					console.log("locality: "+coord);
 				break;
 				case "unknown":
@@ -156,7 +173,37 @@ function convertInterpretedCoord(icoor, toSystem, i) {
 				break;	
 			}
 		break;
-		case "interpreted":
+        case "Distance":
+            
+            switch(fromSystem) {
+                case "WGS84":
+					var wgs84 = unconverted;
+					coord = getNearestPlace(wgs84, i, j);
+				break;
+				case "RT90":  
+					var wgs84 = RT90toWGS84(unconverted);
+					coord = getNearestPlace(wgs84, i, j);
+				break;
+				case "Sweref99TM":
+					var wgs84 = Sweref99TMtoWGS84(unconverted);
+					coord = getNearestPlace(wgs84, i, j);
+				break;
+				case "UTM":
+					var wgs84 = UTMtoWGS84(unconverted);
+					coord = getNearestPlace(wgs84, i, j);
+				break;
+				case "RUBIN 5x5 km": case "RUBIN 100x100 m": case "RUBIN 1x1 km": case "RUBIN 50x50 km":
+					var rt90 = RUBINtoRT90(unconverted);
+					var wgs84 = RT90toWGS84(rt90);
+					coord = getNearestPlace(wgs84, i, j);
+					console.log("locality: "+coord);
+				break;
+				case "unknown":
+					console.log("unknown coordinate");
+					coord = "Unknown coordinate";
+				break;	
+            }
+		case "Interpreted":
 			coord = fromSystem+": "+interpreted;
 		break;
 		case "DMS":
@@ -764,14 +811,12 @@ function ajax(url, doit)
 	xmlhttp.send(null);
 }
 
-function getDistrictName(WGS84, i) {
+function getDistrictName(WGS84, i, j) {
 	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
 		var distr = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		//let c = row.insertCell(0);
-		//c.innerText = distr.name;
-		row.cells[0].textContent = distr.name;
+		row.cells[j].textContent = distr.name;
 	});
 	return "wait"+i;
 }
@@ -793,12 +838,12 @@ function getDistrict(WGS84) {
 	});
 }
 
-function getProvinceName(WGS84, i) {
+function getProvinceName(WGS84, i, j) {
 	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
 		var prov = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		row.cells[0].textContent = prov.name;
+		row.cells[j].textContent = prov.name;
 	});
 	return "wait"+i;
 }
@@ -818,14 +863,14 @@ function getProvince(WGS84) {
 	});
 }
 
-function getCountryName(WGS84, i) {
+function getCountryName(WGS84, i, j) {
 	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
 	ajax(url, function(json) {
 		var count = JSON.parse(json);
 		row = document.getElementById("output_table").rows[i+1];
-		row.cells[0].textContent = count.name;
+		row.cells[j].textContent = count.name;
 	});
-	return "wait"+i;
+	return "wait<"+i+"><"+j+">";
 }
 
 function getCountry(WGS84) {
@@ -844,16 +889,14 @@ function getCountry(WGS84) {
 	});
 }
 
-function getNearestLocalityName(WGS84, i){
+function getNearestLocalityName(WGS84, i, j){
 	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
 	ajax(url, function(json) {
 		row = document.getElementById("output_table").rows[i+1];
 		var loc = JSON.parse(json);
-		row.cells[0].textContent = loc.direction;
-		let c1 = row.insertCell(0);
-		c1.innerText = loc.distance;
-		let c2 = row.insertCell(0);
-		c2.innerText = loc.name;
+        var dist = Math.round(loc.distance/100)/10
+        var dirtext = dist+ "km " +loc.direction + " " + loc.name;
+		row.cells[j].textContent = dirtext;
 	});
 	return "wait"+i;
 }
@@ -870,6 +913,32 @@ function getLocality(WGS84) {
 		}
 	});	
 }
+
+function getNearestPlace(WGS84, i, j){
+	var url = "nearestPlace.php?north="+WGS84[0]+"&east="+WGS84[1];
+	ajax(url, function(json) {
+		row = document.getElementById("output_table").rows[i+1];
+		var loc = JSON.parse(json);
+        var dist = Math.round(loc.distance/100)/10;
+        var placeText = dist + "km " + loc.direction + " "+ loc.name;
+        row.cells[j].textContent = placeText;
+	});
+	return "wait"+i;
+}
+
+/*
+function getPlace(WGS84) {
+	document.getElementById("place").textContent = "Wait...";
+	var url = "nearestPlace.php?north="+WGS84[0]+"&east="+WGS84[1];
+	ajax(url, function(json) {
+		var loc = JSON.parse(json);
+		if (loc.name !== "") {
+			document.getElementById("place").innerHTML = "<a href =\"http://herbarium.emg.umu.se/locality.php?ID="+loc.id+"\">"+loc.name+"</a> "+loc.distance+"m "+loc.direction;
+		} else {
+			document.getElementById("place").textContent = "No locality in the db within 10km";
+		}
+	});	
+}*/
 
 let map;
 
@@ -1018,4 +1087,63 @@ function getLocation() {
 
 function showPosition(position) {
 	 document.getElementById("coord").value.textContent = position.coords.latitude + ",  " + position.coords.longitude;
+}
+
+function initFieldTable() {
+    const selectTable = document.getElementById("select_table");
+    select_row_html =
+            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
+                <option value=\"Remove\" selected>--</option>\
+                <option value=\"Country\">Country</option>\
+                <option value=\"Province\">Province</option>\
+                <option value=\"District\" >District</option>\
+                <option value=\"Locality\">Nearest locality</option>\
+                <option value=\"WGS84\">WGS84</option>\
+                <option value=\"Sweref99TM\">Sweref99TM</option>\
+                <option value=\"RT90\">RT90</option>\
+                <option value=\"RUBIN\">RUBIN</option>\
+                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
+                <option value=\"MGRS\">MGRS</option>\
+                <option value=\"DMS\">WGS84 DMS</option>\
+                <option value=\"DM\">WGS84 DM</option>\
+                <option value=\"Interpreted\">Interpreted as</option>\
+                <option value=\"Distance\">Distance and direction to nearest place</option>\
+            </select></td>";
+    let row =  selectTable.insertRow(-1);
+    row.innerHTML = select_row_html;
+}
+
+function addField(field) {
+    const selectTable = document.getElementById("select_table");
+    const pcell = field.parentNode;
+    const prow = pcell.parentNode;
+    const rowNumber = prow.rowIndex;
+    //window.alert(field.value+" rows: "+selectTable.rows.length+"row number: "+rowNumber);
+    if (field.value == "Remove" && selectTable.rows.length>1) {
+        //window.alert("remove row");
+        selectTable.deleteRow(rowNumber);
+    }
+    if (rowNumber+1 == selectTable.rows.length && field.value != "Remove") {
+        //window.alert("insert row");
+          select_row_html =
+            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
+                <option value=\"Remove\" selected>--</option>\
+                <option value=\"Country\">Country</option>\
+                <option value=\"Province\">Province</option>\
+                <option value=\"District\" >District</option>\
+                <option value=\"Locality\">Nearest locality</option>\
+                <option value=\"WGS84\">WGS84</option>\
+                <option value=\"Sweref99TM\">Sweref99TM</option>\
+                <option value=\"RT90\">RT90</option>\
+                <option value=\"RUBIN\">RUBIN</option>\
+                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
+                <option value=\"MGRS\">MGRS</option>\
+                <option value=\"DMS\">WGS84 DMS</option>\
+                <option value=\"DM\">WGS84 DM</option>\
+                <option value=\"Interpreted\">Interpreted as</option>\
+                <option value=\"Distance\">Distance and direction to nearest place</option>\
+            </select></td>";
+        let row =  selectTable.insertRow(-1);
+        row.innerHTML = select_row_html;
+    }
 }
