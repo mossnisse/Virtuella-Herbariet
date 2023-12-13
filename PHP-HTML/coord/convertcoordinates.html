@@ -11,11 +11,17 @@
 	<body id="start_page" onload="initFieldTable();">
 		<h1>Check many coordinates</h1>
 		<a href = "check_coord.html">convert/check one coordinates at a time</a><br />
-		<textarea cols = "40" rows="10" id="coordinates" name="coordinates"></textarea>
+        type coordinates in the textarea. valid coordinatesystems wgs84, RT90, Sweref99TM, RUBIN, UTM<br />
+        or import waipoints from an .gpx file: <input type="file" id="file-input" accept =".gpx" /><br />
+		<textarea cols = "80" rows="20" id="coordinates" name="coordinates"></textarea>
 		<br /> Output fields:
         <table id="select_table">
         </table>
 		<input id="convert" type="button" value="Convert" onclick="convertC();" /> <br />
 		<table id="output_table"></table>
+        <script>
+            const fc = document.getElementById('file-input');
+            fc.addEventListener('change', readSingleFile, false);
+        </script>
 	</body>
 </html>

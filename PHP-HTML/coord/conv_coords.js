@@ -10,6 +10,13 @@ function convertC() {
 	var row = header.insertRow(0); 
     const selectTable = document.getElementById("select_table");
     const convTo = [];
+    var waypoints = false;
+    if (coordArray[0] == "gpx waypoints") {
+        console.log("qpx waipoints");
+        waypoints = true;
+        coordArray.shift();
+        coordArray.shift();
+    }
     for (var i = 0, srow; srow = selectTable.rows[i]; i++) {
         const fieldName = srow.cells[0].firstChild.value;
         //window.alert("field: "+fieldName);
@@ -26,7 +33,14 @@ function convertC() {
         row = outtable.insertRow(-1);
         for (var j=0;j<convTo.length;j++) {
             var coord = coordArray[i];
-            //console.log("coord: "+coord);
+            console.log("coord: "+coord);
+            if(waypoints) {
+                arr = coord.split('\t');
+                name = arr[0];
+                coord = arr[1]+', '+arr[2];
+                time = arr[3];
+            }
+            console.log("coord: "+coord);
             var icoord = InterpretCoord(coord);
             //console.log("icoord: "+icoord);
             var converted = convertInterpretedCoord(icoord, convTo[j], i, j);
@@ -1146,4 +1160,40 @@ function addField(field) {
         let row =  selectTable.insertRow(-1);
         row.innerHTML = select_row_html;
     }
+}
+
+/* import gpx files  */
+//function initImport() {}
+
+
+function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    displayContents(contents);
+  };
+  reader.readAsText(file);
+}
+
+function displayContents(contents) {
+    var parser, xmlDoc;
+	parser = new DOMParser();
+	xmlDoc = parser.parseFromString(contents,"text/xml");
+	wpts = xmlDoc.getElementsByTagName("wpt");
+    
+    var element = document.getElementById('coordinates');
+    //element.textContent = wpts;
+    var text = 'gpx waypoints\nname\tlat\lon\time\n';
+    for (var i = 0; i < wpts.length; i++) {
+		var lat = wpts[i].getAttribute('lat');
+		var lon = wpts[i].getAttribute('lon');
+        var name = wpts[i].getElementsByTagName('name')[0].textContent
+        var date = wpts[i].getElementsByTagName('time')[0].textContent
+        text = text + name+'\t'+lat + '\t' +lon+'\t'+date+'\n';
+    }
+    element.textContent = text;
 }
