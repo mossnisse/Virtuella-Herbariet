@@ -71,6 +71,11 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">Type Auctor</Data></Cell>
             </Row>";
 
+function removeIllegal($str) {
+    $str = str_replace("\x0B","\r",$str);  // Filemaker changes linebreak to vertial tab when exporting, so changing back
+    return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]|\xED[\xA0-\xBF].|\xEF\xBF[\xBE\xBF]/', "\xEF\xBF\xBD", $str); // remove controll characters that is illegal in XML
+}
+            
 foreach($result as $row)
 {
      //Date Collected
@@ -86,27 +91,27 @@ foreach($result as $row)
     $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
     
     if (isset($row['Original_text']))
-        $original_text = htmlspecialchars($row['Original_text'], ENT_XML1);
+        $original_text = removeIllegal(htmlspecialchars($row['Original_text'], ENT_XML1, ENT_DISALLOWED));
     else
         $original_text = "";
     if (isset($row['Original_name']))
-        $original_name = htmlspecialchars($row['Original_name'], ENT_XML1);
+        $original_name = removeIllegal(htmlspecialchars($row['Original_name'], ENT_XML1, ENT_DISALLOWED));
     else
         $original_name = "";
     if (isset($row['Notes']))
-        $notes = htmlspecialchars($row['Notes'], ENT_XML1);
+        $notes = removeIllegal(htmlspecialchars($row['Notes'], ENT_XML1, ENT_DISALLOWED));
     else
         $notes = "";
     if (isset($row['Collector']))
-        $collector = htmlspecialchars($row['Collector'], ENT_XML1);
+        $collector = removeIllegal(htmlspecialchars($row['Collector'], ENT_XML1, ENT_DISALLOWED));
     else
         $collector = "";
     if (isset($row['collectornumber']))
-        $collecotrnr = htmlspecialchars($row['collectornumber'], ENT_XML1);
+        $collecotrnr = removeIllegal(htmlspecialchars($row['collectornumber'], ENT_XML1, ENT_DISALLOWED));
     else
         $collecotrnr = "";
     if (isset($row['Comments']))
-        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+        $comments = removeIllegal(htmlspecialchars($row['Comments'], ENT_XML1, ENT_DISALLOWED));
     else
         $comment = "";
     

@@ -1,5 +1,7 @@
 <?php
 // halvfärdig export funktion till enkel CSV
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 set_time_limit(300);
 include "../herbes.php";
 header ("content-type: text/xml");
@@ -51,6 +53,11 @@ echo "<?xml version=\"1.0\"?>
                 <Cell><Data ss:Type=\"String\">Medobservatör</Data></Cell>
                 <Cell><Data ss:Type=\"String\">Andrahand</Data></Cell>
             </Row>";
+            
+function removeIllegal($str) {
+    $str = str_replace("\x0B","\r",$str);  // Filemaker changes linebreak to vertial tab when exporting, so changing back
+    return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]|\xED[\xA0-\xBF].|\xEF\xBF[\xBE\xBF]/', "\xEF\xBF\xBD", $str);  // remove controll characters that is illegal in XML
+}
 
 foreach($result as $row)
 {
@@ -67,7 +74,7 @@ foreach($result as $row)
     $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1); 
     
     if (isset($row['Original_text']))
-        $original_text = htmlspecialchars($row['Original_text']);
+        $original_text = removeIllegal(htmlspecialchars($row['Original_text']));
     else
         $original_text = "";
     if (isset($row['Original_name']))
@@ -75,7 +82,7 @@ foreach($result as $row)
     else
         $original_name = "";
     if (isset($row['Notes']))
-        $notes = htmlspecialchars($row['Notes'], ENT_XML1);
+        $notes = removeIllegal(htmlspecialchars($row['Notes'], ENT_XML1));
     else
         $notes = "";
     if (isset($row['Collector']))
@@ -87,13 +94,19 @@ foreach($result as $row)
     else
         $collecotrnr = "";
     if (isset($row['Comments']))
-        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+        $comments = removeIllegal(htmlspecialchars($row['Comments'], ENT_XML1));
     else
         $comments = "";
     if (isset($row['Original_text']))
-        $orgext = htmlspecialchars($row['Original_text'], ENT_XML1);
+        $orgext = removeIllegal(htmlspecialchars($row['Original_text'], ENT_XML1));
     else
         $orgext = "";
+    if (isset($row['Locality']))
+        $locality = htmlspecialchars($row['Locality'], ENT_XML1);
+    else
+        $locality = "";
+        
+    
 
     $samling ="";
     switch($row['institutionCode']) {
@@ -132,7 +145,7 @@ foreach($result as $row)
     echo "
             <Row>
                 <Cell><Data ss:Type=\"String\">$scientificName</Data></Cell>
-                <Cell><Data ss:Type=\"String\">$row[Locality]</Data></Cell>
+                <Cell><Data ss:Type=\"String\">$locality</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$Norr</Data></Cell>
                 <Cell><Data ss:Type=\"String\">$Ost</Data></Cell>
                 <Cell><Data ss:Type=\"String\"></Data></Cell>

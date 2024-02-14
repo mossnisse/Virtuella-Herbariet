@@ -39,6 +39,11 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
     </ucr:Metadata>
     <ucr:UMECoreRecordSet>";
 
+function removeIllegal($str) {
+    $str = str_replace("\x0B","\r",$str);  // Filemaker changes linebreak to vertial tab when exporting, so changing back
+    return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]|\xED[\xA0-\xBF].|\xEF\xBF[\xBE\xBF]/', "\xEF\xBF\xBD", $str);  // remove controll characters that is illegal in XML
+}
+    
 foreach($result as $row)
 {
     
@@ -60,7 +65,7 @@ foreach($result as $row)
     $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
 
     if (isset($row['Comments']))
-        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+        $comments = removeIllegal(htmlspecialchars($row['Comments'], ENT_XML1));
     else
         $comments = "";
 

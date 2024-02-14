@@ -39,6 +39,12 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
     <ense:RecordSet>
 ";
 
+
+function removeIllegal($str) {
+    $str = str_replace("\x0B","\r",$str); // Filemaker changes linebreak to vertial tab when exporting, so changing back
+    return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]|\xED[\xA0-\xBF].|\xEF\xBF[\xBE\xBF]/', "\xEF\xBF\xBD", $str); // remove controll characters that is illegal in XML
+}
+
 foreach($result as $row)
 {
     
@@ -91,9 +97,10 @@ foreach($result as $row)
         $Locality = htmlspecialchars($row['Locality'], ENT_XML1);
         
     if (isset($row['Comments']))
-        $comments = htmlspecialchars($row['Comments'], ENT_XML1);
+        $comments = removeIllegal(htmlspecialchars($row['Comments'], ENT_XML1));
     else 
         $comments = "";
+    
     
     // Taxa
     $scientificName = htmlspecialchars(scientificName($row["Genus"], $row["Species"], $row["SspVarForm"], $row["HybridName"]), ENT_XML1);
@@ -133,11 +140,11 @@ foreach($result as $row)
     if (isset($row['Original_name']) && $row['Original_name']!="")
         $Remarks = "\nTaxon on label: ".htmlspecialchars($row['Original_name'], ENT_XML1);
     if (isset($row['Original_text']) && $row['Original_text']!="")
-        $Remarks = "\nText on label: ".htmlspecialchars($row['Original_text'], ENT_XML1);
+        $Remarks = "\nText on label: ".removeIllegal(htmlspecialchars($row['Original_text'], ENT_XML1));
     if (isset($row['Notes']) && $row['Notes']!="") 
-       $Remarks.="\nNotes on specimen: ".htmlspecialchars($row['Notes'], ENT_XML1);
+       $Remarks.="\nNotes on specimen: ".removeIllegal(htmlspecialchars($row['Notes'], ENT_XML1));
     if (isset($row['Comments']) && $row['Comments']!="") 
-        $Remarks.="\nRemarks by registrator: ".htmlspecialchars($row['Comments'], ENT_XML1);
+        $Remarks.="\nRemarks by registrator: ". $comments;
    
      //Date Collected
     if ($row['Year']!="" && $row['Month']!="" && $row['Day']!="")
