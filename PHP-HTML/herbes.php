@@ -1,7 +1,6 @@
 <?php
 // Code Written By Nils Ericson 2009-11-21
 // funtions that are used on varios pages
-ini_set('display_errors', 1);error_reporting(E_ALL);
 include_once "ini.php";
 include_once "koordinates.php";
 
@@ -257,7 +256,7 @@ function xmlf(string $str):string {
 	}
 }*/
 
-function CSVf(string $str): string {
+function CSVf(?string $str): string {
 	if ($str == null) {
 		return '';
 	} else {
@@ -265,6 +264,7 @@ function CSVf(string $str): string {
 		$str = str_replace("\n\r","\\n",$str);
 		$str = str_replace("\n","\\n",$str);
 		$str = str_replace("\r","\\n",$str);
+        $str = str_replace("\"","\\\"",$str);
 		//$str = str_replace(",","\\,",$str);
 		return $str;
 	}
