@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="author" content="Nils Ericson" />
+        <title>Virtuella herbariet export function for specimen-locality links</title>
+        <link rel="shortcut icon" href="favicon.ico" />
+	</head>
+	<body>
+		<h1>Export for Specimen-Locality links</h1>
+		Funktion för export av coordinatdata för kollekt som är länkade till lokaler (Koordinater kan också beräknas från många andra källor som kan vara sämmre eller bättre). <br>
+        Kan kallas direkt med httpd-GET med in parametrarna i URL (så kan användas som ett API) exempel på URL http://herbarium.emg.umu.se/admin/exportCoordinates.php?institutionCode=UPS&datum=2024-01-01&pagesize=1000&page=1<br>
+        datum och institutionCode är friviliga<p>
+        In parametrar <br/>
+        InstitutionCode - Vilket herbarium UPS,LD,S,UMR,OHN,GB,Alla<br/>
+		date - datum för att bara söka ut coordinater som är uppdaterat efter datumet. Format: YYYY-MM-DD <br/>
+		page size - max antal poster i en fil. <br/>
+		page - om inte allt får plats i en fil iterera up från 1 tills du får en tom fil. <p/>
+        
+        Resultat</br> 
+		Fil format: CSV; Character coding = UTF8; brytning mellan poster= Windows style line endings \r\n; Brytning mellan fält = tab \t<br/>
+		Fältordning:<br/>
+		InstitutionCode - Vilket herbariut som kollektet är från<br/>
+        CollectionNumber - Accesions numer/ samlingsnummer I herbariet för att identifiera kollektet<br/>
+        created - när länken mellan kollekt och lokal är gjord<br/>
+        createdby - vem som skapade länken<br/>
+        modified - senast när länken är skapad<br/>
+        modifiedby - vem som ändrade länken sist<br/>
+        distance - avstånd från lokal i meter, är inskrivet om både upgift om avstånd och riktning finns i originaltexten för kollektet<br/>
+        direction - riktning från lokal  E, NE, ENE  och så vidare, är inskrivet om både upgift om avstånd och riktning finns i originaltexten för kollektet<br/>
+        locality - lokal som kollektet är länkat till<br/>
+        district - distriktet som lokalen ligger i (kan skilja sig från vad kollektet är registrerat på i herbariet)<br/>
+        province - provinsen som lokalen ligger i (kan skilja sig från vad kollektet är registrerat på i herbariet)<br/>
+        country - landet som lokalen ligger i<br/>
+        continent - världsdelen som lokalen ligger i<br/>
+        lat - WGS84 Norr för lokalen (bättre koordinat för det enskilda kollektet kan räknas ut med distance och direction, inte helt trivial matte)<br/>
+        long - WGS84 Öst för lokalen (bättre koordinat kan räknas ut med distance och direction)<br/>
+        coordinateprecision - Felmarginal för lokalen, sätter inte individuella felmarginaler för olika kollekt<br/>
+		<form enctype="multipart/form-data" action="exportCoordinates.php" method="get" accept-charset="utf-8">
+			<table>
+            <tr> <td>InstitutionCode</td><td>
+                <select name="institutionCode">
+                    <option value = "UPS">UPS</option>
+                    <option value = "LD">LD</option>
+                    <option value = "S">S</option>
+                    <option value = "UME">UME</option>
+                    <option value = "OHN">OHN</option>
+                    <option value = "GB">GB</option>
+                    <option value = "Alla">Alla</option>
+                </select>
+            </td></tr>
+			<tr> <td>Datum:</td> <td> <input type="text" name ="datum" /></td> </tr>
+			<tr> <td>Page size:</td> <td> <input type="text" name ="pagesize" /></td> </tr>
+			<tr> <td>Page:</td> <td> <input type="text" name ="page" /></td> </tr>
+			<tr> <td><input type="submit" value="Ladda ner" /></td> </tr>
+			</table>
+		</form>
+	</body>
+</html>
