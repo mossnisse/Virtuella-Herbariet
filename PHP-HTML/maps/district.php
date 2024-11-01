@@ -68,16 +68,17 @@
     $htmlDistrict = htmlentities($dist);
     $htmlCountry = htmlentities($count);
     $htmlProvince = htmlentities($prov);
+    $comments = preg_replace("/\r\n|\r|\n/", '<br/>', $row["comments"]);
 
 echo "
 		<h1><a href=\"../cross_browser.php?SpatLevel=4&SysLevel=0&Spat=$urlDistrict&Sys=Life&Province=$urlProvince+&Herb=All\">$htmlDistrict</a></h1>
 		<table>
-			<tr><td>Code:</td><td>$row[code]</td></tr>
+			<tr><td>ISO-6166-2 code:</td><td>$row[code]</td></tr>
 			<tr><td>Type:</td><td>$row[typeEng]/$row[typeNative]</td></tr>
 			<tr><td>Alternative names:</td><td>$row[alt_names]</td></tr>
             <tr><td>Country:</td><td><a href=\"../maps/country.php?Country=$urlCountry\">$htmlCountry</a></td></tr>
             <tr><td>Province:</td><td><a href=\"../maps/province.php?Country=$urlCountry&Province=$urlProvince\">$htmlProvince</a></td></tr>
-            <tr><td>Comments:</td><td>$row[comments]</td></tr>
+            <tr><td>Comments:</td><td>$comments</td></tr>
 			<tr><td><a href=\"gjdistrict.php?District=$urlDistrict&Province=$urlProvince\" download>Download GeoJson borders in WGS84</a></td><td></td></tr>
 		</table>
 		<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
@@ -108,7 +109,7 @@ echo "
 			map.data.loadGeoJson('gjdistrict.php?District=$urlDistrict&Province=$urlProvince');
 		}
 	</script>
-	<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=initMap\"
+	<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU&callback=initMap\"
 		async defer>
 	</script>
     
