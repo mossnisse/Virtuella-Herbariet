@@ -57,4 +57,38 @@ function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, f
 	}
 	return true;
 }
+
+function isPointInsidePolly(float $east, float $north, float $xmax, float $ymax, String $geojson): bool {
+    $decoded = json_decode($geojson);
+	$multiPolygon = $decoded->features[0]->geometry->coordinates;
+	$nr_intersections = 0;
+	$xout = $xmax + 0.1;  // point outside the region
+	$yout = $ymax + 0.1;
+    foreach($multiPolygon as $polygon) {
+		foreach($polygon as $ring) {
+			$xold = -2000000;
+			$yold = -2000000;
+			foreach($ring as $coord) {
+				//echo $coord[1].", ".$coord[0]."<br>\n";
+				if ($xold != -2000000) {
+					if (linesIntersect($xout, $yout, $east, $north, $xold, $yold, $coord[0], $coord[1])) {
+						$nr_intersections++;
+						//echo "intersects<br>\n";
+					}
+				}
+				$xold = $coord[0];
+				$yold = $coord[1];
+			}
+		}
+	}
+    return $nr_intersections%2==1;
+}
+
+function isPointInsidePollyandBox(float $east, float $north, float $xmax, float $ymax, float $xmin, float $ymin, String $geojson): bool {
+    if ($east<$xmax and $east>$xmin and $north<$ymax and $north>$ymin) {
+        return isPointInsidePolly($east, $north, $xmax, $ymax, $geojson);
+    } else {
+        return false;
+    }
+}
 ?>
