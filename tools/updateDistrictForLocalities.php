@@ -9,8 +9,8 @@
 <?php
 include "../ini.php";
 include "../coord/mathstuff.php";
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 set_time_limit(4800);
 
 $con = getConA();
@@ -36,7 +36,7 @@ echo "nr localities: $nrLoc<br>";
 # select all localities in Sweden
 $query = "SELECT locality.lat, locality.`long`, district.xmax, district.xmin, district.ymax, district.ymin, locality.locality, locality.province, locality.district, district.geojson as geojson
         FROM locality left JOIN district ON locality.district = district.district and locality.province = district.province
-        WHERE locality.country = \"Sweden\" limit :limit offset :offset";
+        WHERE locality.country = \"Sweden\" and district.country = \"Sweden\" limit :limit offset :offset";
         
 # get districts with the given coordinate inside the bounding boxe fo the district) you need to chect the geojson if it inside the actuall borders
 $queryGetDistrict = "SELECT ID, geojson, district, xmax, ymax, typeNative, typeEng FROM district where xmax>:east and xmin<:east and ymax>:north and ymin<:north and country = \"Sweden\";";
