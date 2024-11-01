@@ -28,7 +28,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missmatch countries
 echo "</table>
     <h3>Locality with country missing in the countries table</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality left JOIN countries ON locality.country = countries.english WHERE countries.id IS NULL;";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -39,7 +40,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missmatch provinces
 echo "</table>
     <h3>Locality with province missing in the provinces table</h3>
-    <table>";
+    <table>
+    <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality left JOIN provinces ON locality.province = provinces.Province AND locality.country = provinces.country WHERE provinces.id IS NULL;";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -50,7 +52,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missmatch district
 echo "</table>
     <h3>Locality with district missing in the district table</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality left JOIN district ON locality.district = district.District  and district.province = district.Province AND locality.country = district.country WHERE district.id IS NULL;";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -61,7 +64,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missing wgs84 coordinat4es
 echo "</table>
     <h3>Locality with missing wgs84 coordinates</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality WHERE lat IS NULL OR lat = 0 OR `LONG`IS NULL OR `long`=0;";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -72,7 +76,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // errornous wgs84 coordinates
 echo "</table>
     <h3>Locality with wgs84 coordinates not on earth</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality WHERE lat > 90 OR lat <-90 OR `LONG` >180 OR `long` <-180;";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -83,7 +88,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missing rt90 coordinat4es
 echo "</table>
     <h3>Locality in Sweden with missing rt90 coordinates</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality WHERE (rt90N IS NULL OR rt90N =0 OR rt90E IS NULL OR rt90E =0) AND country = \"Sweden\";";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -94,7 +100,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // missing sweref99TM coordinat4es
 echo "</table>
     <h3>Locality in Sweden with missing sweref99TM coordinates</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality WHERE (swtMn IS NULL OR swtmN = 0 OR swtme IS NULL OR swtme =0) AND country = \"sweden\";";
 $Stm = $con->prepare($query);
 $Stm->execute();
@@ -105,7 +112,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // coordinates outside country bounding box
 echo "</table>
     <h3>Locality with coordinate outside the country bounding box</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT locality.ID as id, locality, locality.province, country, locality.continent, locality.district FROM locality inner JOIN countries ON locality.country = countries.english 
 WHERE locality.lat > countries.maxY OR locality.lat < countries.minY OR locality.`long` > countries.maxX OR locality.`long` < countries.minX;";
 $Stm = $con->prepare($query);
@@ -117,7 +125,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // coordinates outside province bounding box
 echo "</table>
     <h3>Locality with coordinate outside the province bounding box</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT locality.ID as id, locality, locality.province, locality.country, locality.continent, locality.district, provinces.geojson as geojson FROM locality inner JOIN provinces ON locality.province = provinces.province and locality.country = provinces.country
 WHERE locality.lat > provinces.maxY OR locality.lat < provinces.minY OR locality.`long` > provinces.maxX OR locality.`long` < provinces.minX;";
 $Stm = $con->prepare($query);
@@ -133,7 +142,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 // coordinates outside district bounding box
 echo "</table>
     <h3>Locality with coordinate outside the district bounding box</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT locality.ID as id, locality, locality.province, locality.country, locality.continent, locality.district, district.geojson as geojson FROM locality inner JOIN district ON locality.district = district.district and locality.province = district.province
 WHERE (locality.lat > district.ymax OR locality.lat < district.ymin OR locality.`long` > district.xmax OR locality.`long` < district.xmin) and (not locality.district =\"\") and not locality is null;";
 $Stm = $con->prepare($query);
@@ -150,7 +160,8 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 
 echo "</table>
     <h3>Locality with coordinate inside the country bounding box but outside the borders</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th></th></tr>";
 $query = "SELECT locality.ID as id, locality, locality.province, country, countries.geojson as geojson, locality.continent, locality.district, maxX, minX, maxY, minY, lat, `long` FROM locality inner JOIN countries ON locality.country = countries.english 
 WHERE locality.lat < countries.maxY and locality.lat > countries.minY and locality.`long` < countries.maxX and locality.`long` > countries.minX and country = \"Norway\";";
 $Stm = $con->prepare($query);
@@ -193,16 +204,14 @@ while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 
 echo "</table>
     <h3>Locality in Sweden missing coordinate precission</h3>
-    <table>";
+    <table>
+        <tr><th>Locality</th><th>Continent</th><th>Country</th><th>Province</th><th>District</th></tr>";
 $query = "SELECT * FROM locality WHERE Coordinateprecision IS NULL AND country = \"Sweden\" ORDER BY province";
 $Stm = $con->prepare($query);
 $Stm->execute();
 while ($row = $Stm->fetch(PDO::FETCH_ASSOC)) {
 	echo "<TR><TD><A href=\"../locality.php?ID=$row[id]\">$row[locality]</A></TD><TD>$row[continent]</TD><TD>$row[country]</TD><TD>$row[province]</TD><TD>$row[district]</TD></TR>";
 }
-
-echo "</table>
-    <h3>Locality with district missing in the district table<h3>";
 
 ?>
 	</table>
