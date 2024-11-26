@@ -404,11 +404,11 @@ function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, stri
     // fixa prec för decimaltal
     if (isset($Long_sec) && isset($Lat_sec) && isset($Lat_min) && isset($Long_min) && isset($Lat_deg) && isset($Long_deg) ) {
         $WGS['Prec'] = '100';
-        if ($Lat_dir == 'S')
+        if ($Lat_dir == 'S' && $Lat_deg>0)
             $WGS['Lat'] = -$Lat_deg - $Lat_min/60.0 - $Lat_sec/3600.0;
         else
             $WGS['Lat'] = $Lat_deg + $Lat_min/60.0 + $Lat_sec/3600.0;
-        if ($Long_dir == 'W')
+        if ($Long_dir == 'W' && $Long_deg>0)
             $WGS['Long'] = -$Long_deg - $Long_min/60.0 - $Long_sec/3600.0;
         else
             $WGS['Long'] = $Long_deg + $Long_min/60.0 + $Long_sec/3600.0;
@@ -420,11 +420,11 @@ function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, stri
         $prec = 2000/pow(10,$lap);
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
-        if ($Lat_dir == 'S')
+        if ($Lat_dir == 'S' && $Lat_deg>0)
             $WGS['Lat'] = -$Lat_deg - $Lat_min/60.0;
         else
             $WGS['Lat'] = $Lat_deg + $Lat_min/60.0;
-        if ($Long_dir == 'W')
+        if ($Long_dir == 'W' && $Long_deg>0)
             $WGS['Long'] = -$Long_deg - $Long_min/60.0;
         else
             $WGS['Long'] = $Long_deg + $Long_min/60.0;
@@ -436,11 +436,11 @@ function latlongtoWGS84 (string $Lat_deg, string $Lat_min, string $Lat_sec, stri
         $prec = 120000/pow(10,$lap);
         if ($prec<500) $prec = 500;
         $WGS['Prec'] = $prec;
-         if ($Lat_dir == 'S')
+        if ($Lat_dir == 'S' && $Lat_deg>0)
             $WGS['Lat'] = -$Lat_deg;
         else
             $WGS['Lat'] = $Lat_deg;
-        if ($Long_dir == 'W')
+        if ($Long_dir == 'W' && $Long_deg>0)
             $WGS['Long'] = -$Long_deg;
         else
             $WGS['Long'] = $Long_deg;
