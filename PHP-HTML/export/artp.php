@@ -1,8 +1,8 @@
 <?php
 // halvfärdig export funktion till enkel CSV
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-set_time_limit(300);
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+set_time_limit(1000);
 include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="virtherb_artp.xml"');
@@ -13,7 +13,10 @@ $whatstat = "specimens.institutionCode, specimens.collectionCode, specimens.Acce
           specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
 $page = (int) $_GET['Page'];
-$pageSize = 100000;
+$pageSize = 50000;
+if (isset($_GET['pageSize'])) {
+    $pageSize = (int) $_GET['pageSize'];
+}
 $GroupBy = "";
 $order['SQL'] = "";
 $nrRecords = (int) $_GET['nrRecords'];
@@ -104,9 +107,7 @@ foreach($result as $row)
     if (isset($row['Locality']))
         $locality = htmlspecialchars($row['Locality'], ENT_XML1);
     else
-        $locality = "";
-        
-    
+        $locality = ""; 
 
     $samling ="";
     switch($row['institutionCode']) {

@@ -1,5 +1,5 @@
 <?php
-set_time_limit(300);
+set_time_limit(1000);
 include "../herbes.php";
 header ("content-type: text/xml");
 header('Content-Disposition: attachment; filename="DWC.xml"');
@@ -11,7 +11,10 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue";
           
 $page = (int) $_GET['Page'];
-$pageSize = 100000;
+$pageSize = 50000;
+if (isset($_GET['pageSize'])) {
+    $pageSize = (int) $_GET['pageSize'];
+}
 $GroupBy = "";
 $order['SQL'] = "";
 $nrRecords = (int) $_GET['nrRecords'];

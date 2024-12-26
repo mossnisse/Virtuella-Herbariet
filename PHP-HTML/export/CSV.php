@@ -1,6 +1,6 @@
 <?php
-// halvfärdig export funktion till enkel CSV
-set_time_limit(300);
+
+set_time_limit(1000);
 include "../herbes.php";
 header ("content-type: text/csv");
 header('Content-Disposition: attachment; filename="export.csv"');
@@ -14,10 +14,14 @@ $whatstat = "specimens.institutionCode, specimens.AccessionNo, specimens.Collect
              specimens.`Long`, specimens.`Lat`, specimens.CSource, specimens.CValue, specimens.Type_status, specimens.TAuctor, specimens.Basionym, specimens.CSource, specimens.CValue, specimens.CPrec, image1, image2, image3, image4";
           
 $page = (int) $_GET['Page'];
-$pageSize = 100000;
+$pageSize = 50000;
+if (isset($_GET['pageSize'])) {
+    $pageSize = (int) $_GET['pageSize'];
+}
 $GroupBy = "";
 $order['SQL'] = "";
 $nrRecords = (int) $_GET['nrRecords'];
+
 
 $con = getConS();
 
