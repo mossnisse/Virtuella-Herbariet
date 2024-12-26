@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,17 +17,17 @@
 -- Dumping structure for table samhall.fix_country
 CREATE TABLE IF NOT EXISTS `fix_country` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `ContinentS` enum('','Africa','Antarctica','Asia','Australia & Oceania','Europe','North America','Oceania','South & Central America','South America','Austrailia') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
-  `CountryS` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
-  `Continent` enum('','Africa','Antarctica','Asia','Australia & Oceania','Europe','North America','Oceania','South & Central America','South America','Austrailia') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
-  `Country` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '',
+  `ContinentS` enum('','Africa','Antarctica','Asia','Australia & Oceania','Europe','North America','Oceania','South & Central America','South America','Austrailia') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT 'Wrong continent + Country that should be automatically corrected',
+  `CountryS` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT 'Wrong continent + Country  that should be automatically corrected',
+  `Continent` enum('','Africa','Antarctica','Asia','Australia & Oceania','Europe','North America','Oceania','South & Central America','South America','Austrailia') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT 'correct Continent',
+  `Country` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT 'correct Country',
   `coments` text,
   PRIMARY KEY (`id`),
   KEY `ContinentS` (`ContinentS`),
   KEY `CountryS` (`CountryS`)
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb3 COMMENT='a table for automaticaly change country names when importing data to the db';
+) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb3 COMMENT='a table for automaticaly change country names when importing data to the db';
 
--- Dumping data for table samhall.fix_country: ~125 rows (approximately)
+-- Dumping data for table samhall.fix_country: ~127 rows (approximately)
 INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country`, `coments`) VALUES
 	(2, 'Africa', 'Côte D’Ivoire', 'Africa', 'Côte d\'Ivoire', NULL),
 	(3, 'Antarctica', 'French Southern Territories', 'Africa', 'French Southern Territories', 'UPS'),
@@ -46,7 +46,7 @@ INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country
 	(17, 'Asia', 'Viet Nam', 'Asia', 'Vietnam', NULL),
 	(18, 'Europe', 'Austria / Switzerland', 'Europe', '', NULL),
 	(19, 'Europe', 'Denmark / Sweden', 'Europe', '', NULL),
-	(20, 'Europe', 'Macedonia, The Former Yugoslav Republic of', 'Europe', 'Macedonia', ', förkortar namn'),
+	(20, 'Europe', 'Macedonia, The Former Yugoslav Republic of', 'Europe', 'North Macedonia', ', förkortar namn'),
 	(21, 'Europe', 'Norway / Sweden', 'Europe', '', NULL),
 	(22, 'Europe', 'Russian Federation', 'Europe', 'Russia', ', förkortar namn'),
 	(24, 'North America', 'Honduras', 'South & Central America', 'Honduras', 'byter Världsdel'),
@@ -153,7 +153,9 @@ INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country
 	(145, 'North America', 'Bolivia', 'South & Central America', 'Bolivia', NULL),
 	(146, 'North America', 'Brazil', 'South & Central America', 'Brazil', 'S'),
 	(147, 'North America', 'Svalbard and Jan Mayen', 'Europe', 'Svalbard and Jan Mayen', 'S'),
-	(148, 'Oceania', 'South Georgia and the South Sandwich Islands', 'South America', 'South Georgia and the South Sandwich Islands', NULL);
+	(148, 'Oceania', 'South Georgia and the South Sandwich Islands', 'South & Central America', 'South Georgia and the South Sandwich Islands', NULL),
+	(149, 'Europe', 'Macedonia', 'Europe', 'North Macedonia', 'The name of the country have stabilized to North Macedonia'),
+	(150, 'Africa', 'Saint Helena', 'Africa', 'Saint Helena, Ascension and Tristan da Cunha', 'Saint Helena ska räknas som en provins');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

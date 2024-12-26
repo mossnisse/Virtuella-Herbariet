@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS `fix_prov` (
   PRIMARY KEY (`id`),
   KEY `SCountry` (`SCountry`),
   KEY `SProvince` (`SProvince`)
-) ENGINE=InnoDB AUTO_INCREMENT=643 DEFAULT CHARSET=utf8mb3 COMMENT='data for automaticaly change province names when importing data';
+) ENGINE=InnoDB AUTO_INCREMENT=645 DEFAULT CHARSET=utf8mb3 COMMENT='data for automaticaly change province names when importing data';
 
--- Dumping data for table samhall.fix_prov: ~526 rows (approximately)
+-- Dumping data for table samhall.fix_prov: ~528 rows (approximately)
 INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `comments`) VALUES
 	(1, 'Sweden', 'Småland (Inre)', 'Sweden', 'Småland', NULL),
 	(2, 'Sweden', 'Småland (Kalmar)', 'Sweden', 'Småland', NULL),
@@ -554,7 +554,9 @@ INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `c
 	(639, 'Sweden', 'Göteborg', 'Sweden', 'Västergötland', NULL),
 	(640, 'Sweden', 'Göteborgsområdet', 'Sweden', 'Västergötland', NULL),
 	(641, 'Sweden', 'Kalmarkusten', 'Sweden', 'Småland', NULL),
-	(642, 'Sweden', 'Småland (SmI)', 'Sweden', 'Småland', NULL);
+	(642, 'Sweden', 'Småland (SmI)', 'Sweden', 'Småland', NULL),
+	(643, 'Denmark', 'Sjaelland', 'Denmark', 'Sjælland', NULL),
+	(644, 'France', 'Provence-Alpes-Côte d’Azur', 'France', 'Provence-Alpes-Côte d\'Azur', NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
