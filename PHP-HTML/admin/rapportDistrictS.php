@@ -6,7 +6,7 @@
 	<meta name="author" content="Nils Ericson" />
 </head>
 <body>
-	För distrikt i Sverige används socknar. Det följer typ Riksantikvarieämbetsts socknar med en del undantag.
+	För distrikt i Sverige används socknar. Det följer gränser och namn som de var 1935 <a href=https://github.com/mossnisse/Sockenkarta> github geopackage and CSV file</a>
 	<H3> Distrikt med tabb/mellanslag i början/slutet från Sverige</H3>
 	<table>
 		<TR><TH>Catalogue No.</TH><TH>Province</TH><TH>District<TH></TR>
