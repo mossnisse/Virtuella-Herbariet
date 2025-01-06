@@ -23,11 +23,10 @@ CREATE TABLE IF NOT EXISTS `fix_country` (
   `Country` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT 'correct Country',
   `coments` text,
   PRIMARY KEY (`id`),
-  KEY `ContinentS` (`ContinentS`),
-  KEY `CountryS` (`CountryS`)
-) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb3 COMMENT='a table for automaticaly change country names when importing data to the db';
+  UNIQUE KEY `Index 2` (`CountryS`,`ContinentS`)
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb3 COMMENT='a table for automaticaly change country names when importing data to the db';
 
--- Dumping data for table samhall.fix_country: ~127 rows (approximately)
+-- Dumping data for table samhall.fix_country: ~123 rows (approximately)
 INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country`, `coments`) VALUES
 	(2, 'Africa', 'Côte D’Ivoire', 'Africa', 'Côte d\'Ivoire', NULL),
 	(3, 'Antarctica', 'French Southern Territories', 'Africa', 'French Southern Territories', 'UPS'),
@@ -103,7 +102,6 @@ INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country
 	(84, 'South America', 'French Guiana', 'South & Central America', 'French Guiana', NULL),
 	(85, 'South America', 'Falkland Islands (UK)', 'South & Central America', 'Falkland Islands', NULL),
 	(86, 'South America', '', 'South & Central America', '', NULL),
-	(87, 'South America', '', 'South & Central America', '', NULL),
 	(88, 'South America', 'Anguilla', 'South & Central America', 'Anguilla', NULL),
 	(91, 'South America', 'Curacao', 'South & Central America', 'Curaçao', NULL),
 	(92, 'South America', 'Falkland Islands', 'South & Central America', 'Falkland Islands', NULL),
@@ -113,7 +111,6 @@ INSERT INTO `fix_country` (`id`, `ContinentS`, `CountryS`, `Continent`, `Country
 	(97, 'North America', 'Saint Vincent And The Grenedines', 'South & Central America', 'Saint Vincent and the Grenadines', NULL),
 	(99, 'North America', 'Virgin Islands, U.S.', 'South & Central America', 'Virgin Islands, U.S.', NULL),
 	(100, 'Australia & Oceania', '', 'Oceania', '', NULL),
-	(101, 'Australia & Oceania', '', 'Oceania', '', NULL),
 	(102, 'Australia & Oceania', 'Australia', 'Oceania', 'Australia', NULL),
 	(103, 'Australia & Oceania', 'New Zealand', 'Oceania', 'New Zealand', NULL),
 	(104, 'Australia & Oceania', 'New Zeeland', 'Oceania', 'New Zealand', NULL),

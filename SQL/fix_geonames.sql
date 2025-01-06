@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -25,6 +25,9 @@ update specimens join fix_prov on specimens.country = fix_prov.SCountry and spec
 update specimens join fix_uk_prov on specimens.province = fix_uk_prov.SProvince 
  set specimens.province = fix_uk_prov.province, specimens.district = fix_uk_prov.district 
  where specimens.country = "United Kingdom";
+ 
+update specimens join fix_district on specimens.province = fix_district.SProvince and specimens.district = fix_district.SDistrict set specimens.province = fix_district.province, specimens.district = fix_district.district;
+
 END//
 DELIMITER ;
 

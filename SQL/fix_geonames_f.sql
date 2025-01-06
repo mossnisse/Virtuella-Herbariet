@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -16,7 +16,10 @@
 
 -- Dumping structure for procedure samhall.fix_geonames_f
 DELIMITER //
-CREATE PROCEDURE `fix_geonames_f`(s_file Integer)
+CREATE PROCEDURE `fix_geonames_f`(
+	IN `s_file` Integer
+)
+    NO SQL
 BEGIN
 update specimens join fix_country on specimens.continent = fix_country.continentS and specimens.country = fix_country.countryS set specimens.continent = fix_country.continent, specimens.country = fix_country.country where specimens.sFile_ID=s_file;
 
@@ -25,6 +28,9 @@ update specimens join fix_prov on specimens.country = fix_prov.SCountry and spec
 update specimens join fix_uk_prov on specimens.province = fix_uk_prov.SProvince 
  set specimens.province = fix_uk_prov.province, specimens.district = fix_uk_prov.district 
  where specimens.country = "United Kingdom" and specimens.sFile_ID=s_file;
+ 
+update specimens join fix_district on specimens.province = fix_district.SProvince and specimens.district = fix_district.SDistrict set specimens.province = fix_district.province, specimens.district = fix_district.district where specimens.sFile_ID = 1288; 
+ 
 END//
 DELIMITER ;
 

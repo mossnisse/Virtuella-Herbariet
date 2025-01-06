@@ -23,18 +23,17 @@ CREATE TABLE IF NOT EXISTS `fix_prov` (
   `Province` varchar(40) CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci NOT NULL DEFAULT '',
   `comments` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `SCountry` (`SCountry`),
-  KEY `SProvince` (`SProvince`)
-) ENGINE=InnoDB AUTO_INCREMENT=645 DEFAULT CHARSET=utf8mb3 COMMENT='data for automaticaly change province names when importing data';
+  UNIQUE KEY `Index 2` (`SProvince`,`SCountry`)
+) ENGINE=InnoDB AUTO_INCREMENT=661 DEFAULT CHARSET=utf8mb3 COMMENT='data for automaticaly change province names when importing data';
 
--- Dumping data for table samhall.fix_prov: ~528 rows (approximately)
+-- Dumping data for table samhall.fix_prov: ~526 rows (approximately)
 INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `comments`) VALUES
 	(1, 'Sweden', 'Småland (Inre)', 'Sweden', 'Småland', NULL),
 	(2, 'Sweden', 'Småland (Kalmar)', 'Sweden', 'Småland', NULL),
 	(3, 'Sweden', 'Småland (Klm)', 'Sweden', 'Småland', NULL),
 	(4, 'Sweden', 'Småland, Inre', 'Sweden', 'Småland', NULL),
-	(5, 'Sweden', 'Södermanland/Uppland', 'Sweden', 'Södermanland / Uppland', NULL),
-	(6, 'Sweden', 'Stockholm', 'Sweden', 'Södermanland / Uppland', NULL),
+	(5, 'Sweden', 'Södermanland/Uppland', 'Sweden', '', NULL),
+	(6, 'Sweden', 'Stockholm', 'Sweden', '', NULL),
 	(7, 'Svalbard and Jan Mayen', 'Björnöya', 'Svalbard and Jan Mayen', 'Bjørnøya', NULL),
 	(9, 'Spain', 'Canary Islands', 'Spain', 'Canarias', NULL),
 	(11, 'Spain', 'Castile and Leon', 'Spain', 'Castilla y León', NULL),
@@ -269,10 +268,7 @@ INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `c
 	(282, 'Denmark', 'Jylland (Øst)', 'Denmark', 'Jylland', NULL),
 	(283, 'Denmark', 'Mön', 'Denmark', 'Møn', NULL),
 	(284, 'Denmark', 'Nordjylland', 'Denmark', 'Jylland', NULL),
-	(285, 'Denmark', 'Nordjylland (TBU d. 10)', 'Denmark', 'Jylland', NULL),
 	(286, 'Denmark', 'Sjaelland', 'Denmark', 'Sjælland', NULL),
-	(287, 'Denmark', 'Sjælland (TBU d. 39 a)', 'Denmark', 'Sjælland', NULL),
-	(288, 'Denmark', 'Sjælland (TBU d. 41)', 'Denmark', 'Sjælland', NULL),
 	(290, 'Denmark', 'Sydjylland', 'Denmark', 'Jylland', NULL),
 	(291, 'Denmark', 'Vestjylland', 'Denmark', 'Jylland', NULL),
 	(292, 'Denmark', 'Østjylland', 'Denmark', 'Jylland', NULL),
@@ -450,7 +446,7 @@ INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `c
 	(483, 'Chile', 'Isla Robinson Crusoe (Más a Tier', 'Chile', 'Archipiélago Juan Fernández', NULL),
 	(484, 'Chile', 'Juan Fernandez Islands', 'Chile', 'Archipiélago Juan Fernández', NULL),
 	(485, 'Chile', 'Libertador General Bernardo O\'Hi', 'Chile', 'O\'Higgins', NULL),
-	(486, 'Chile', 'Magallanes (excl. Antarctica Chi', 'Chile', 'Magallanes', NULL),
+	(486, 'Chile', 'Magallanes (excl. Antarctica Chilena)', 'Chile', 'Magallanes', NULL),
 	(487, 'Chile', 'Magallanes y Antárctica Chilena', 'Chile', 'Magallanes', NULL),
 	(488, 'Chile', 'O’Higgins', 'Chile', 'O\'Higgins', NULL),
 	(489, 'Chile', 'Región de Los Rios', 'Chile', 'Los Ríos', NULL),
@@ -484,7 +480,6 @@ INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `c
 	(518, 'French Polynesia', 'Marquesas Islands', 'French Polynesia', 'Îles Marquises', NULL),
 	(519, 'Samoa', 'Savai’i', 'Samoa', 'Savai\'i', NULL),
 	(520, 'Bolivia', 'Beni', 'Bolivia', 'El Beni', NULL),
-	(521, 'Brazil', 'parana', 'Brazil', 'Paraná', 'S'),
 	(522, 'Chile', 'Aisén del General Carlos Ibáñez', 'Chile', 'Aisén', NULL),
 	(523, 'Chile', 'Los Rios', 'Chile', 'Los Ríos', NULL),
 	(524, 'Colombia', 'Atlantico', 'Colombia', 'Atlántico', NULL),
@@ -555,8 +550,21 @@ INSERT INTO `fix_prov` (`id`, `SCountry`, `SProvince`, `Country`, `Province`, `c
 	(640, 'Sweden', 'Göteborgsområdet', 'Sweden', 'Västergötland', NULL),
 	(641, 'Sweden', 'Kalmarkusten', 'Sweden', 'Småland', NULL),
 	(642, 'Sweden', 'Småland (SmI)', 'Sweden', 'Småland', NULL),
-	(643, 'Denmark', 'Sjaelland', 'Denmark', 'Sjælland', NULL),
-	(644, 'France', 'Provence-Alpes-Côte d’Azur', 'France', 'Provence-Alpes-Côte d\'Azur', NULL);
+	(645, 'France', 'Basse-Normandie', 'France', 'Normandie', 'Basse and Haute Normandie merged 2016'),
+	(646, 'France', 'Haute-Normandie', 'France', 'Normandie', 'Basse and Haute Normandie merged 2016'),
+	(647, 'Cook Islands', 'Tonga', 'Tonga', '', NULL),
+	(648, 'Anguilla', 'Guadeloupe', 'Guadeloupe', '', NULL),
+	(649, 'Anguilla', 'Saint Croix', 'Virgin Islands, U.S.', 'Saint Croix', NULL),
+	(650, 'Cook Islands', 'French Polynesia', 'French Polynesia', '', NULL),
+	(651, 'Morocco', 'Tanger-Asilah', 'Morocco', 'Tanger-Tétouan-Al Hoceïma', NULL),
+	(652, 'Cook Islands', 'Samoa, Western', 'Samoa', '', NULL),
+	(653, 'Anguilla', 'Martinique', 'Martinique', '', NULL),
+	(655, 'Mauritius', 'Mauritius', 'Mauritius', '', NULL),
+	(656, 'France', 'Languedoc-Roussillon', 'France', 'Occitanie', 'Since 2016 Languedoc-Roussillon is a part of '),
+	(657, 'France', 'Aquitaine', 'France', 'Nouvelle-Aquitaine', 'Since 1 January 2016 Aquitaine has been part '),
+	(658, 'Argentina', 'Tierra del Fuego (excl. Antárida e Islas', 'Argentina', 'Tierra del Fuego', NULL),
+	(659, 'Anguilla', 'Saint Barthélemy', 'Saint Barthélemy', '', NULL),
+	(660, 'Cook Islands', 'Cook Islands', 'Cook Islands', '', NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

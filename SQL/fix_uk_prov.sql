@@ -2,7 +2,7 @@
 -- Host:                         172.18.144.38
 -- Server version:               8.0.31 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.2.0.6576
+-- HeidiSQL Version:             12.4.0.6659
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `fix_uk_prov` (
   `Province` enum('England','Isle of Man','Wales','Scotland','Northern Ireland','') CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci DEFAULT NULL,
   `District` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `SProvine` (`SProvince`)
+  UNIQUE KEY `SProvine` (`SProvince`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb3 COMMENT='and table to automaticaly fix UK provinces when importing data';
 
 -- Dumping data for table samhall.fix_uk_prov: ~95 rows (approximately)
