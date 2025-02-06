@@ -1,0 +1,80 @@
+update from geonames.org SQL scripts
+
+
+CREATE TABLE IF NOT EXISTS `geonames_cities500` (
+	`geonameid` INT(10) NULL DEFAULT NULL COMMENT 'integer id of record in geonames database',
+	`name` VARCHAR(200) NULL DEFAULT NULL COMMENT 'name of geographical point (utf8) varchar(200)' COLLATE 'utf8mb4_swedish_ci',
+	`asciiname` VARCHAR(200) NULL DEFAULT NULL COMMENT 'name of geographical point in plain ascii characters, varchar(200)' COLLATE 'utf8mb4_swedish_ci',
+	`alternatenames` TEXT NULL DEFAULT NULL COMMENT 'alternatenames, comma separated, ascii names automatically transliterated, convenience attribute from alternatename table, varchar(10000)' COLLATE 'utf8mb4_swedish_ci',
+	`latitude` DOUBLE NULL DEFAULT NULL COMMENT 'latitude in decimal degrees (wgs84)',
+	`longitude` DOUBLE NULL DEFAULT NULL COMMENT 'longitude in decimal degrees (wgs84)',
+	`feature_class` BINARY(1) NULL DEFAULT NULL COMMENT 'see http://www.geonames.org/export/codes.html, char(1)',
+	`feature_code` VARBINARY(10) NULL DEFAULT NULL COMMENT 'see http://www.geonames.org/export/codes.html, varchar(10)',
+	`country_code` BINARY(2) NULL DEFAULT NULL COMMENT 'ISO-3166 2-letter country code, 2 characters',
+	`cc2` VARBINARY(2000) NULL DEFAULT NULL COMMENT 'alternate country codes, comma separated, ISO-3166 2-letter country code, 200 characters',
+	`admin1_code` VARCHAR(20) NULL DEFAULT NULL COMMENT 'fipscode (subject to change to iso code), see exceptions below, see file admin1Codes.txt for display names of this code; varchar(20)' COLLATE 'utf8mb4_swedish_ci',
+	`admin2_code` VARCHAR(80) NULL DEFAULT NULL COMMENT 'code for the second administrative division, a county in the US, see file admin2Codes.txt; varchar(80) ' COLLATE 'utf8mb4_swedish_ci',
+	`admin3_code` VARCHAR(20) NULL DEFAULT NULL COMMENT 'code for third level administrative division, varchar(20)' COLLATE 'utf8mb4_swedish_ci',
+	`admin4_code` VARCHAR(20) NULL DEFAULT NULL COMMENT 'code for fourth level administrative division, varchar(20)' COLLATE 'utf8mb4_swedish_ci',
+	`population` BIGINT(19) NULL DEFAULT NULL COMMENT 'bigint (8 byte int) ',
+	`elevation` INT(10) NULL DEFAULT NULL COMMENT 'in meters, integer',
+	`dem` INT(10) NULL DEFAULT NULL COMMENT 'digital elevation model, srtm3 or gtopo30, average elevation of 3\'\'x3\'\' (ca 90mx90m) or 30\'\'x30\'\' (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.',
+	`timezone` VARCHAR(40) NULL DEFAULT NULL COMMENT 'the iana timezone id (see file timeZone.txt) varchar(40)' COLLATE 'utf8mb4_swedish_ci',
+	`modification_date` DATE NULL DEFAULT NULL COMMENT 'date of last modification in yyyy-MM-dd format'
+)
+COMMENT='data from https://www.geonames.org/ under a Creative Commons Attribution 4.0 License, all credits to them. Downloaded 2025-02-05'
+COLLATE='utf8mb4_swedish_ci'
+ENGINE=InnoDB
+
+#DELETE FROM geonames_cities500;
+
+LOAD DATA INFILE 'C:/uploads/cities500.txt' INTO TABLE geonames_cities500 CHARACTER SET 'utf8mb4' FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' 
+(geonameid, `NAME`, asciiname, alternatenames, latitude, longitude, feature_class, feature_code, country_code, cc2, admin1_code, admin2_code, admin3_code, admin4_code,  population, @velevation, dem, timezone, modification_date ) 
+SET elevation = NULLIF(@velevation,'');
+
+CREATE TABLE `geonames_feature_classes` (
+	`code` CHAR(1) NULL DEFAULT NULL COLLATE 'utf8mb3_swedish_ci',
+	`name` VARCHAR(30) NULL DEFAULT NULL COLLATE 'utf8mb3_swedish_ci'
+)
+COLLATE='utf8mb3_swedish_ci'
+ENGINE=InnoDB
+;
+
+
+
+CREATE TABLE IF NOT EXISTS `geonames_continent_codes` (
+  `code` char(2) COLLATE utf8mb3_swedish_ci DEFAULT NULL,
+  `name` varchar(14) COLLATE utf8mb3_swedish_ci DEFAULT NULL,
+  `geonameId` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_swedish_ci;
+
+INSERT INTO `geonames_continent_codes` (`code`, `name`, `geonameId`) VALUES
+	('AF', 'Africa', 6255146),
+	('AS', 'Asia', 6255147),
+	('EU', 'Europe', 6255148),
+	('NA', 'North America', 6255149),
+	('OC', 'Oceania', 6255151),
+	('SA', 'South America', 6255150),
+	('AN', 'Antarctica', 6255152);
+
+CREATE TABLE IF NOT EXISTS `geonames_feature_codes_en` (
+  `code` varbinary(10) DEFAULT NULL,
+  `name` varchar(50) COLLATE utf8mb3_swedish_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb3_swedish_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_swedish_ci COMMENT='name and description for feature classes and feature codes ';
+
+CREATE TABLE IF NOT EXISTS `geonames_feature_classes` (
+  `code` char(1) COLLATE utf8mb3_swedish_ci DEFAULT NULL,
+  `name` varchar(30) COLLATE utf8mb3_swedish_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_swedish_ci;
+
+INSERT INTO `geonames_feature_classes` (`code`, `name`) VALUES
+	('A', 'country, state, region,...'),
+	('H', 'stream, lake, ...'),
+	('L', 'parks,area, ...'),
+	('P', 'city, village,...'),
+	('R', 'road, railroad'),
+	('S', 'spot, building, farm'),
+	('T', 'mountain,hill,rock,... '),
+	('U', 'undersea'),
+	('V', 'forest,heath,...');
