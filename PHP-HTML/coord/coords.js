@@ -217,6 +217,7 @@ function checkC() {
 			getCountry(WGS84);
             getDistPlace(WGS84);
 			getLocality(WGS84);
+            getCity500(WGS84);
 		} else {
 			document.getElementById("WGS84").textContent = "";
 			document.getElementById("WGS84DMS").textContent = "";
@@ -370,6 +371,27 @@ function getLocality(WGS84) {
 			document.getElementById("locality").appendChild(document.createTextNode(" "+loc.distance+"m "+loc.direction));
 		} else {
 			document.getElementById("locality").textContent = "No locality in the db within 10km";
+		}
+	});	
+}
+
+function getCity500(WGS84) {
+	document.getElementById("geoname").textContent = "Wait...";
+	var url = "nearestGeoname500.php?north="+WGS84[0]+"&east="+WGS84[1];
+	ajax(url, function(json) {
+		//json = json.substring(1,json.length); // remove BOM mark
+		//console.log(json);
+		var loc = JSON.parse(json);
+		if (loc.name !== "") {
+			//document.getElementById("locality").textContent = "<a href =\"../locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
+			document.getElementById("geoname").textContent = "";
+			/*let dlink = document.createElement("a");
+			dlink.appendChild(document.createTextNode(loc.name));
+			dlink.href = "../locality.php?ID="+loc.id;*/
+			document.getElementById("geoname").appendChild(document.createTextNode(loc.name));
+			document.getElementById("geoname").appendChild(document.createTextNode(", "+loc.distance+"m "+loc.direction));
+		} else {
+			document.getElementById("geoname").textContent = "No city with 500 pop in the geonames.org data within 10km";
 		}
 	});	
 }
