@@ -1,10 +1,11 @@
-let WGS84;
+// javascript functions so that check_coord.html works
+// written by Nils Ericson 2025-03-07
+
 let showMap = false;
 let districtID;
 let provinceID;
 let countryID;
-let RUBIN;
-let RT90;
+let WGS84;
 let sys;
 
 function checkC() {
@@ -13,232 +14,86 @@ function checkC() {
 	document.getElementById("showDistrict").disabled = true;
 	document.getElementById("showProvince").disabled = true;
 	document.getElementById("showCountry").disabled = true;
+	document.getElementById("showRUBIN").disabled = true;
 	
-	var coord = document.getElementById("coord").value;
-	coord = coord.trim();
-	sys = "unknown";
-	var interpreted = "";
-	WGS84 = "";
-	RT90 = "";
-	var Sweref99TM = "";
-	RUBIN = "";
-	//checking parsing coordinates with easting and northing
-	coord = coord.replaceAll("\t",","); // if east and nort separated by tab
-	var nrComma = countC(coord,",");
-	var nrSpaces= countC(coord," ");
-	var c1 ="";
-	var c2 ="";
-	var s ="";
-	// coordinate with decimal comma and space between N and E
-	if (nrComma==2) {
-		coord = coord.replaceAll(",",".");
-		nrComma=0;
-	}
-	// coordinate with decimal comma and comma between N and E
-	if (nrComma==3) {
-		var ind1 = coord.indexOf(",");
-		var ind2 = coord.lastIndexOf(",");
-		coord = coord.substring(0,ind1) + "." + coord.substring(ind1+1);
-		coord = coord.substring(0,ind2) + "." + coord.substring(ind2+1);
-		nrComma=1;
-	}
-	// coordinate with space between N and E
-	if (nrComma===0 && nrSpaces==1) {
-		s = coord.split(" ");
-		c1 = s[0];
-		c2 = s[1];
-	}
-	// coordinate with comma between N and E
-	if (nrComma==1) {
-		s = coord.split(",");
-		c1 = s[0];
-		c2 = s[1];
-	}
+	const coord = parseUnknowCoord(document.getElementById("coord").value);
+	
+	document.getElementById("interpred").textContent = coord.sys + `: ` + coord.interpreted;
+	if (coord.sys != "unknown") {
+		document.getElementById("showCoordinate").disabled = false;
+		document.getElementById("showDistrict").disabled = false;
+		document.getElementById("showProvince").disabled = false;
+		document.getElementById("showCountry").disabled = false;
+		WGS84 = coord.WGS84;
+        sys = coord.sys;
+		document.getElementById("WGS84").textContent = printWGS84(WGS84);
+		document.getElementById("WGS84DMS").textContent = WGS84toDMS(WGS84);
+		document.getElementById("WGS84DM").textContent = WGS84toDM(WGS84);
 
-	//if (coord.indexOf(",") != -1 ) {
-		//c1 = coord.substring(0,coord.search(','));
-		//c2 = coord.substring(coord.search(',')+1,coord.length);
-		c1 = c1.trim();
-		c2 = c2.trim();
-		
-		// if reversed RT90 coordinate reverse them
-		if (c2>6100000 && c2<7700000 && c1>1180000 && c1<1890000) {
-			var ctemp = c1;
-			c1 = c2;
-			c2 = ctemp;
+		// todo check if outside borders and enable buttons;
+		if (coord.sys != "Sweref99TM") {
+			Sweref99TM = WGS84toSweref99TM(WGS84);	
 		}
-		// if reversed sweref99TM coordinates reverse them
-		if (c2>6100000 && c2<7700000 && c1>230000 && c1<930000) {
-			var ctemp2 = c1;
-			c1 = c2;
-			c2 = ctemp2;
-		}
-		if (c1>=-90 && c1<=90 && c2>=-180 && c2<=180) {
-			if  (!isNaN(c1) && !isNaN(c2) && c1!=="" && c2 !=="") {
-				sys = "WGS84";
-				interpreted = c1+"N, "+c2+"E";
-				WGS84 = [parseFloat(c1, 10), parseFloat(c2, 10)];
-				RT90 = WGS84toRT90(WGS84);
-				RUBIN = RT90toRUBIN(RT90);
-				Sweref99TM = WGS84toSweref99TM(WGS84);
-			}	
-		} else
-		if (c1>=6100000 && c1<=7800000 && c2>=1180000 && c2<=1890000) {
-			sys = "RT90";
-			interpreted = c1+"N, "+c2+"E";
-			RT90 = [parseInt(c1, 10), parseInt(c2, 10)];
-			RUBIN = RT90toRUBIN(RT90);
-			WGS84 = RT90toWGS84(RT90);
-			Sweref99TM = WGS84toSweref99TM(WGS84);
-			
-		} else
-		if (c1>=6100000 && c1<=7700000 && c2>=230000 && c2<=930000) {
-			sys = "Sweref99TM";
-			interpreted = c1+"N, "+c2+"E";
-			Sweref99TM = [parseInt(c1, 10), parseInt(c2, 10)];
-			WGS84 = Sweref99TMtoWGS84(Sweref99TM);
-			RT90 = WGS84toRT90(WGS84);
-			RUBIN = RT90toRUBIN(RT90);
-		} else
-		console.log(coord);
-		if (nrSpaces == 2) {
-			sys = "UTM";
-			interpreted = coord;
-			UTM = coord.split(" ");
-			WGS84 = UTMtoWGS84(UTM);
-			Sweref99TM = WGS84toSweref99TM(WGS84);
-			RT90 = WGS84toRT90(WGS84);
-			RUBIN = RT90toRUBIN(RT90);
-		}
-		
-	//} else {
-		//checking and parsing RUBIN
-		var isRUBIN = false;
-		var N1,E1,N2,E2,N3,E3 = "";
-		coord = coord.replace(/\s+/g, '');  //remove white spaces
-		if (coord.length ==2) {
-			coord = "0"+coord;
-		}
-		if (coord.length==3) {
-			N1 = coord.substring(0,2);
-			E1 = coord.substring(2,3).toUpperCase();
-			if (N1>=0 && N1<=32 && E1>="A" && E1<="N") {   //&& typeof N1 === 'number'
-				sys = "RUBIN 50x50 km";
-				interpreted = N1+E1;
-				RUBIN = interpreted;
-				isRUBIN = true;
-			}
-		}
-		if (coord.length==4) {
-			coord = "0"+coord;
-		}
-		if (coord.length==5) {
-			N1 = coord.substring(0,2);
-			E1 = coord.substring(2,3).toUpperCase();
-			N2 = coord.substring(3,4);
-			E2 = coord.substring(4,5).toLowerCase();
-			if (E2>="0" && E2<="9") {  // if 5km easting is wirtten as a number convert to the coresponing letter
-				var ascii = E2.charCodeAt(0);
-				E2 = String.fromCharCode(ascii+49);
-			}
-			if (N1>=0 && N1<=32 && E1>="A" && E1<="N" && N2>="0" && N2<="9" && E2>="a" && E2<="j" ) {
-				sys = "RUBIN 5x5 km";
-				interpreted = N1+E1+N2+E2;
-				RUBIN = interpreted;
-				isRUBIN = true;
-			}		
-		}
-		if (coord.length==8) {
-			coord = "0"+coord;
-		}
-		if (coord.length ==9) {
-			N1 = coord.substring(0,2);
-			E1 = coord.substring(2,3).toUpperCase();
-			N2 = coord.substring(3,4);
-			E2 = coord.substring(4,5).toLowerCase();
-			if (E2>="0" && E2<="9") {  // if 5km easting is wirtten as a number convert to the coresponing letter
-				var ascii2 = E2.charCodeAt(0);
-				E2 = String.fromCharCode(ascii2+49);
-			}
-			N3 = coord.substring(5,7);
-			E3 = coord.substring(7,9);
-			if (N3.substring(1,2) == "-" && E3.substring(1,2) == "-") {
-				var N4 = N3.substring(0,1);
-				var E4 = E3.substring(0,1);
-				if (N1>=0 && N1<=32 && E1>="A" && E1<="N" && N2>="0" && N2<="9" && E2>="a" && E2<="j" && N4>=0 && N4<=5 && E4>=0 && E4<=5) {
-					sys = "RUBIN 1x1 km";
-					interpreted = N1+E1+N2+E2+" "+N3+E3;
-					RUBIN = interpreted;
-					isRUBIN = true;
-				}
-				} else if (N1>=0 && N1<=32 && E1>="A" && E1<="N" && N2>="0" && N2<="9" && E2>="a" && E2<="j" && N3>=0 && N3<=50 && E3>=0 && E3<=50) {
-					sys = "RUBIN 100x100 m";
-					interpreted = N1+E1+N2+E2+" "+N3+E3;
-					RUBIN = interpreted;
-					isRUBIN = true;
-				}	
-			}
-			if (isRUBIN) {
-				RT90 = RUBINtoRT90(interpreted);
-				WGS84 = RT90toWGS84(RT90);
-				document.getElementById("showCoordinate").disabled = false;
-				Sweref99TM = WGS84toSweref99TM(WGS84);
-			}
-		//}
-		
-		document.getElementById("interpred").textContent = sys + `: ` + interpreted;
-		
-		if (WGS84 !== "") {
-			document.getElementById("WGS84").textContent = WGS84[0].toPrecision(8)+", "+WGS84[1].toPrecision(8);
-			var WGSDMS = WGS84toDMS(WGS84);
-			document.getElementById("WGS84DMS").textContent = WGSDMS;
-			var WGSDM = WGS84toDM(WGS84);
-			document.getElementById("WGS84DM").textContent = WGSDM;
-			if (Sweref99TM != "outside defined area") {
-				document.getElementById("Sweref99TM").textContent = Sweref99TM[0]+", "+Sweref99TM[1];
-			} else {
-				document.getElementById("Sweref99TM").textContent = Sweref99TM;
-			}
-			if (RT90 != "outside defined area") {
-				document.getElementById("RT90").textContent = RT90[0]+", "+RT90[1];
-			} else {
-				document.getElementById("RT90").textContent = RT90;
-			}
-			document.getElementById("RUBIN").textContent = RUBIN;
-			document.getElementById("showCoordinate").disabled = false;
-			if (sys.substring(0,5) == "RUBIN") {
-				document.getElementById("showRUBIN").disabled = false;
-			}
-			var UTM = WGS84toUTM(WGS84);
-			document.getElementById("UTM").textContent = UTM[0]+" "+UTM[1]+", "+UTM[2];
-			document.getElementById("MGRS").textContent = WGS84toMGRS(WGS84);
-			getDistrict(WGS84);
-			getProvince(WGS84);
-			getCountry(WGS84);
-            getDistPlace(WGS84);
-			getLocality(WGS84);
-            getCity500(WGS84);
+		if (Sweref99TM!="outside defined area") {
+			document.getElementById("Sweref99TM").textContent = Sweref99TM.north + ", " + Sweref99TM.east;
 		} else {
-			document.getElementById("WGS84").textContent = "";
-			document.getElementById("WGS84DMS").textContent = "";
-			document.getElementById("Sweref99TM").textContent = "";
-			document.getElementById("RT90").textContent = "";
-			document.getElementById("RUBIN").textContent ="";
-			document.getElementById("DistPlace").textContent = "";
-            document.getElementById("locality").textContent = "";
-			document.getElementById("District").textContent = "";
-			document.getElementById("Province").textContent = "";
-			document.getElementById("Country").textContent = "";
+			document.getElementById("Sweref99TM").textContent = "outside defined area";
 		}
-}
-	
-
-function countC (str, ch) {
-	var result=0, i=0;
-	for (i;i<str.length;i++) {
-		if (str[i]==ch) result++;
+		if (coord.sys != "RT90") {
+			RT90 = WGS84toRT90(WGS84);
+		}
+		if (RT90!="outside defined area") {
+			document.getElementById("RT90").textContent = RT90.north+", "+RT90.east;
+		} else {
+			document.getElementById("RT90").textContent = "outside defined area";
+		}
+        //console.log(coord.sys.slice(0,5));
+		if (coord.sys.slice(0,5) != "RUBIN") {
+			RUBIN = RT90toRUBIN(RT90);
+		} else {
+            RUBIN = coord.interpreted;
+            document.getElementById("showRUBIN").disabled = false;
+        }
+		document.getElementById("RUBIN").textContent = RUBIN;
+		if (coord.sys != "UTM") {
+			UTM = WGS84toUTM(WGS84);
+		}
+		if (UTM!="outside defined area") {
+			document.getElementById("UTM").textContent = UTM.GZD+" "+UTM.east+"E, "+UTM.north+"N";
+		} else {
+			document.getElementById("UTM").textContent = "outside defined area";
+		}
+		if (coord.sys != "MGRSnew") {
+			MGRSnew = UTMtoMGRSnew(UTM);
+		}
+		document.getElementById("MGRSnew").textContent = MGRSnew;
+		if (coord.sys != "MGRSold") {
+			MGRSold = UTMtoMGRSold(UTM);
+		}
+		document.getElementById("MGRSold").textContent = MGRSold;			
+		getDistrict(WGS84);
+		getProvince(WGS84);
+		getCountry(WGS84);
+        getDistPlace(WGS84);
+		getLocality(WGS84);
+        getCity500(WGS84);
+	} else {
+		document.getElementById("WGS84").textContent = "";
+		document.getElementById("WGS84DM").textContent = "";
+		document.getElementById("WGS84DMS").textContent = "";
+		document.getElementById("Sweref99TM").textContent = "";
+		document.getElementById("RT90").textContent = "";
+		document.getElementById("RUBIN").textContent ="";
+		document.getElementById("UTM").textContent ="";
+		document.getElementById("MGRSnew").textContent = "";
+		document.getElementById("MGRSold").textContent = "";
+		document.getElementById("DistPlace").textContent = "";
+        document.getElementById("locality").textContent = "";
+        document.getElementById("geoname").textContent = "";
+		document.getElementById("District").textContent = "";
+		document.getElementById("Province").textContent = "";
+		document.getElementById("Country").textContent = "";
 	}
-	return result;
 }
 
 function ajax(url, doit)
@@ -265,7 +120,7 @@ function ajax(url, doit)
 
 function getDistrict(WGS84) {
 	document.getElementById("District").textContent = "Wait...";
-	var url = "districtFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	var url = "districtFromC.php?North="+WGS84.north+"&East="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -288,7 +143,7 @@ function getDistrict(WGS84) {
 
 function getProvince(WGS84) {
 	document.getElementById("Province").textContent = "Wait...";
-	var url = "provinceFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	var url = "provinceFromC.php?North="+WGS84.north+"&East="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -311,7 +166,7 @@ function getProvince(WGS84) {
 
 function getCountry(WGS84) {
 	document.getElementById("Country").textContent = "Wait...";
-	var url = "countryFromC.php?North="+WGS84[0]+"&East="+WGS84[1];
+	var url = "countryFromC.php?North="+WGS84.north+"&East="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -333,7 +188,7 @@ function getCountry(WGS84) {
 
 function getDistPlace(WGS84) {
 	document.getElementById("DistPlace").textContent = "Wait...";
-	var url = "nearestPlace.php?north="+WGS84[0]+"&east="+WGS84[1];
+	var url = "nearestPlace.php?north="+WGS84.north+"&east="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -356,7 +211,7 @@ function getDistPlace(WGS84) {
 
 function getLocality(WGS84) {
 	document.getElementById("locality").textContent = "Wait...";
-	var url = "nearestLocality.php?north="+WGS84[0]+"&east="+WGS84[1];
+	var url = "nearestLocality.php?north="+WGS84.north+"&east="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -377,7 +232,7 @@ function getLocality(WGS84) {
 
 function getCity500(WGS84) {
 	document.getElementById("geoname").textContent = "Wait...";
-	var url = "nearestGeoname500.php?north="+WGS84[0]+"&east="+WGS84[1];
+	var url = "nearestGeoname500.php?north="+WGS84.north+"&east="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
 		//console.log(json);
@@ -421,13 +276,13 @@ function showMapf() {
 function centerMapf() {
 	//alert("center map"+WGS84[0]+", "+WGS84[1]);
 	showMapf();
-	map.setCenter(new google.maps.LatLng(WGS84[0],WGS84[1]));
+	map.setCenter(new google.maps.LatLng(WGS84.north,WGS84.east));
 }
 
 function showCoordf(){
 	centerMapf();
 	var marker=new google.maps.Marker({
-        position: new google.maps.LatLng(WGS84[0],WGS84[1]),
+        position: new google.maps.LatLng(WGS84.north,WGS84.east),
         map: map
     });
 	marker.setMap(map);
@@ -496,7 +351,6 @@ function showCountryf() {
 }
 
 function showRUBINf() {
-	//console.log(sys);
 	centerMapf();
 	var rubinsize = 100;
 	if (sys == "RUBIN 50x50 km") {
@@ -509,17 +363,26 @@ function showRUBINf() {
 		rubinsize = 100;
 	}
 	
-	var p1 = RT90toWGS84([RT90[0]-rubinsize/2,RT90[1]-rubinsize/2]);
-	var p2 = RT90toWGS84([RT90[0]-rubinsize/2,RT90[1]+rubinsize/2]);
-	var p3 = RT90toWGS84([RT90[0]+rubinsize/2,RT90[1]+rubinsize/2]);
-	var p4 = RT90toWGS84([RT90[0]+rubinsize/2,RT90[1]-rubinsize/2]);
+    var RT90_t = {"north":0,"east":0};
+    RT90_t.north =  RT90.north-rubinsize/2;
+    RT90_t.east =  RT90.east-rubinsize/2;
+	var p1 = RT90toWGS84(RT90_t);
+    RT90_t.north =  RT90.north-rubinsize/2;
+    RT90_t.east =  RT90.east+rubinsize/2;
+	var p2 = RT90toWGS84(RT90_t);
+    RT90_t.north =  RT90.north+rubinsize/2;
+    RT90_t.east =  RT90.east+rubinsize/2;
+	var p3 = RT90toWGS84(RT90_t);
+    RT90_t.north =  RT90.north+rubinsize/2;
+    RT90_t.east =  RT90.east-rubinsize/2;
+	var p4 = RT90toWGS84(RT90_t);
 
 	var RUBINC = [
-        new google.maps.LatLng(p1[0], p1[1]),
-        new google.maps.LatLng(p2[0], p2[1]),
-        new google.maps.LatLng(p3[0], p3[1]),
-        new google.maps.LatLng(p4[0], p4[1]),
-        new google.maps.LatLng(p1[0], p1[1])
+        new google.maps.LatLng(p1.north, p1.east),
+        new google.maps.LatLng(p2.north, p2.east),
+        new google.maps.LatLng(p3.north, p3.east),
+        new google.maps.LatLng(p4.north, p4.east),
+        new google.maps.LatLng(p1.north, p1.east)
     ];
               	    
     RUBINSq = new google.maps.Polygon({

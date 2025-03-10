@@ -5,20 +5,26 @@
         <meta name="author" content="Nils Ericson" />
         <title>Virtuella herbariet: Check many coordinates</title>
         <link rel="shortcut icon" href="../favicon.ico" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 		<script src="coord-transform.js" type="text/javascript"></script>
+		<script src="parse-coordinates.js" type="text/javascript"></script>
 		<script src="conv_coords.js" type="text/javascript"></script>
 	</head>
 	<body id="start_page" onload="initFieldTable();">
 		<h1>Check many coordinates</h1>
 		<a href = "check_coord.html">convert/check one coordinates at a time</a><br />
-        type coordinates in the textarea. valid coordinatesystems wgs84, RT90, Sweref99TM, RUBIN, UTM<br />
+        type coordinates in the textarea. valid coordinatesystems wgs84, RT90, Sweref99TM, RUBIN, UTM, MGRS<br />
         or import waipoints from an .gpx file: <input type="file" id="file-input" accept =".gpx" /><br />
-		<textarea cols = "80" rows="20" id="coordinates" name="coordinates"></textarea>
+		<textarea cols = "80" rows="20" id="coordinates" name="coordinates">63.81904, 20.31014
+14G8h
+96.8W 32.8N</textarea>
 		<br /> Output fields:
         <table id="select_table">
         </table>
-		<input id="convert" type="button" value="Convert" onclick="convertC();" /> <br />
+		<input id="convert" type="button" value="Convert" onclick="convertC();" /> <input id="showMap" type="button" value="Show map" onclick="showMap();" /> <br />
 		<table id="output_table"></table>
+        <div id="map" style="height: 360px;"></div>
         <script>
             const fc = document.getElementById('file-input');
             fc.addEventListener('change', readSingleFile, false);

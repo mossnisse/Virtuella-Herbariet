@@ -6,6 +6,7 @@
         <title>Virtuella herbariet: Check coordinate</title>
         <link rel="shortcut icon" href="../favicon.ico" />
 		<script src="coord-transform.js" type="text/javascript"></script>
+		<script src="parse-coordinates.js" type="text/javascript"></script>
 		<script src="coords.js" type="text/javascript"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU"></script>
 		<style>
@@ -28,7 +29,8 @@
 					<option value="RT90">RT90</option>
 					<option value="RUBIN">RUBIN</option>
 					<option value="UTM">UTM(gridzone,WGS84)</option>
-					<option value="MGRS">MGRS</option>
+					<option value="MGRS">MGRS AA scheme</option>
+					<option value="MGRS">MGRS AL scheme</option>
 					<option value="DMS">WGS84 DMS</option>
 					<option value="DM">WGS84 DM</option>
 		</select>
@@ -47,17 +49,25 @@
 				<tr><td>WGS84 DMS</td><td id = "WGS84DMS"></td></tr>
 				<tr><td>WGS84 DM</td><td id = "WGS84DM"></td></tr>
 				<tr><td>Sweref99TM</td><td id = "Sweref99TM"></td></tr>
-				<tr><td>RT90:</td><td id = "RT90"></td></tr>
+				<tr><td>RT90</td><td id = "RT90"></td></tr>
 				<tr><td>RUBIN</td><td id = "RUBIN"></td></tr>
+				<tr><td>UTM</td><td id = "UTM"></td></tr>
+				<tr><td>MGRS AA scheme</td><td id = "MGRSnew"></td></tr>
+				<tr><td>MGRS AL scheme</td><td id = "MGRSold"></td></tr>
 				<tr><td>Country</td><td id = "Country"></td></tr>
 				<tr><td>Province</td><td id = "Province"></td></tr>
 				<tr><td>District</td><td id = "District"></td></tr>
                 <tr><td>Distance to nearest place</td><td id = "DistPlace"></td></tr>
 				<tr><td>Nearest locality</td><td id = "locality"></td></tr>
-                <tr><td>Nearest city 500 pop from geonames.org</td><td id = 'geoname'></td></tr>
-				<tr><td>UTM(gridzone,WGS84)</td><td id = "UTM"></td></tr>
-				<tr><td>MGRS</td><td id = "MGRS"></td></tr>
+                <tr><td>Nearest city </td><td id = 'geoname'></td></tr>
 			</table>
+			<br/>
+			<b>RT90</b> is RT90 2,5 gon V (RT 38 and "Riktes nät" should be more or less the same thing. On old maps it onlys says "Riktets nät" and in the instructions you can use less numbers to denote an less exact coordinate)<br/>
+			<b>UTM</b> here uses gridzone and WGS84. After the grizoone commes northing and last easting in meters. Older coordinates often uses older elipsoids than WGS84 and the coordinate can be a couple of hundred meters wrong. Sometimes the MGRS gridzone is not used and instead only S/N to denote if it's the southern or northern hemisphere. Note that gridzone S is in the northern hemisphere)<br/>
+			<b>MGRS AA scheme</b> (new, usually with WGS84 or something close enough so it doesn't matter)<br/>
+			<b>MGRS AL scheme</b> (old, often not WGS84 but here interpreted as it so it can often be a couple of hundreds meters wrong)
+			<b>Nearest city</b> uses the 500 population cities from <a href="https://geonames.org">geonames.org</a> (all cities with a population > 500 or seats of adm div down to PPLA4) so all credits to the geonames.org people.
+
 		</div>
 		<! -- <input id="getLocation" type="button" value="get your location" onclick="getLocation();" />
 		<input id="showCoordinate" type="button" value="show coordinate" disabled onclick="showCoordf();" />
