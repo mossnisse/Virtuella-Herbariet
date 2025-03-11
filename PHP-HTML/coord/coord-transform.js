@@ -225,8 +225,8 @@ function DMStoWGS84(north, east) {
 function WGS84toDMS(WGS84) {
 	const north = WGS84.north;
 	const east = WGS84.east;
-	const NDeg = Math.floor(north);
-	const EDeg = Math.floor(east);
+	var NDeg = Math.floor(north);
+	var EDeg = Math.floor(east);
 	const NMin = Math.floor((north-NDeg)*60);
 	const EMin = Math.floor((east-EDeg)*60);
 	const NSec = Math.round((((north-NDeg)*60)-NMin)*60);
@@ -241,8 +241,8 @@ function WGS84toDMS(WGS84) {
 function WGS84toDM(WGS84) {
 	const north = WGS84.north;
 	const east = WGS84.east;
-	const NDeg = Math.floor(north);
-	const EDeg = Math.floor(east);
+	var NDeg = Math.floor(north);
+	var EDeg = Math.floor(east);
 	const NMin = Math.round((north-NDeg)*60*100)/100;
 	const EMin = Math.round((east-EDeg)*60*100)/100;
 	var NDir = "";
@@ -525,7 +525,7 @@ function SQIdNumtoAlpha(num) {
 
 // convert UTM coordinates to MGRS AA scheme - new
 function UTMtoMGRSnew(UTM) {
-	//console.log("UTM: "+UTM.GZD+"");
+	console.log("UTM: "+UTM.GZD+"");
 
 	const GZDNorth = UTM.GZD.slice(-1);  // The northing part of the GZD
 	if (UTM.GZD.length == 3) {

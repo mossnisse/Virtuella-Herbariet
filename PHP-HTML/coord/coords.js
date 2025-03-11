@@ -16,16 +16,35 @@ function checkC() {
 	document.getElementById("showCountry").disabled = true;
 	document.getElementById("showRUBIN").disabled = true;
 	
+	// empty output fields
+	document.getElementById("interpred").textContent = "";
+	document.getElementById("WGS84").textContent = "";
+	document.getElementById("WGS84DM").textContent = "";
+	document.getElementById("WGS84DMS").textContent = "";
+	document.getElementById("Sweref99TM").textContent = "";
+	document.getElementById("RT90").textContent = "";
+	document.getElementById("RUBIN").textContent ="";
+	document.getElementById("UTM").textContent ="";
+	document.getElementById("MGRSnew").textContent = "";
+	document.getElementById("MGRSold").textContent = "";
+	document.getElementById("DistPlace").textContent = "";
+  document.getElementById("locality").textContent = "";
+  document.getElementById("geoname").textContent = "";
+	document.getElementById("District").textContent = "";
+	document.getElementById("Province").textContent = "";
+	document.getElementById("Country").textContent = "";
+
 	const coord = parseUnknowCoord(document.getElementById("coord").value);
 	
 	document.getElementById("interpred").textContent = coord.sys + `: ` + coord.interpreted;
 	if (coord.sys != "unknown") {
+    console.log("known coordinte");
 		document.getElementById("showCoordinate").disabled = false;
 		document.getElementById("showDistrict").disabled = false;
 		document.getElementById("showProvince").disabled = false;
 		document.getElementById("showCountry").disabled = false;
 		WGS84 = coord.WGS84;
-        sys = coord.sys;
+    sys = coord.sys;
 		document.getElementById("WGS84").textContent = printWGS84(WGS84);
 		document.getElementById("WGS84DMS").textContent = WGS84toDMS(WGS84);
 		document.getElementById("WGS84DM").textContent = WGS84toDM(WGS84);
@@ -41,6 +60,8 @@ function checkC() {
 		}
 		if (coord.sys != "RT90") {
 			RT90 = WGS84toRT90(WGS84);
+		} else {
+			RT90 = coord.coordOBJ;
 		}
 		if (RT90!="outside defined area") {
 			document.getElementById("RT90").textContent = RT90.north+", "+RT90.east;
@@ -57,42 +78,34 @@ function checkC() {
 		document.getElementById("RUBIN").textContent = RUBIN;
 		if (coord.sys != "UTM") {
 			UTM = WGS84toUTM(WGS84);
-		}
-		if (UTM!="outside defined area") {
-			document.getElementById("UTM").textContent = UTM.GZD+" "+UTM.east+"E, "+UTM.north+"N";
 		} else {
-			document.getElementById("UTM").textContent = "outside defined area";
+			UTM = coord.coordOBJ;
+			console.log("parse UTM GZD: "+UTM.GZD);
 		}
+		document.getElementById("UTM").textContent = printUTM(UTM);
+		
 		if (coord.sys != "MGRSnew") {
-			MGRSnew = UTMtoMGRSnew(UTM);
+			if (UTM!="outside defined area") {
+				MGRSnew = UTMtoMGRSnew(UTM);
+			} else {
+				MGRSnew="outside defined area";
+			}
 		}
 		document.getElementById("MGRSnew").textContent = MGRSnew;
 		if (coord.sys != "MGRSold") {
-			MGRSold = UTMtoMGRSold(UTM);
+			if (UTM!="outside defined area") {
+				MGRSold = UTMtoMGRSold(UTM);
+			} else {
+				MGRSold = "outside defined area";
+			}
 		}
 		document.getElementById("MGRSold").textContent = MGRSold;			
 		getDistrict(WGS84);
 		getProvince(WGS84);
 		getCountry(WGS84);
-        getDistPlace(WGS84);
+    getDistPlace(WGS84);
 		getLocality(WGS84);
-        getCity500(WGS84);
-	} else {
-		document.getElementById("WGS84").textContent = "";
-		document.getElementById("WGS84DM").textContent = "";
-		document.getElementById("WGS84DMS").textContent = "";
-		document.getElementById("Sweref99TM").textContent = "";
-		document.getElementById("RT90").textContent = "";
-		document.getElementById("RUBIN").textContent ="";
-		document.getElementById("UTM").textContent ="";
-		document.getElementById("MGRSnew").textContent = "";
-		document.getElementById("MGRSold").textContent = "";
-		document.getElementById("DistPlace").textContent = "";
-        document.getElementById("locality").textContent = "";
-        document.getElementById("geoname").textContent = "";
-		document.getElementById("District").textContent = "";
-		document.getElementById("Province").textContent = "";
-		document.getElementById("Country").textContent = "";
+    getCity500(WGS84);
 	}
 }
 

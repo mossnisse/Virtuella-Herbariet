@@ -67,9 +67,8 @@ function parseUnknowCoord(coord) {
 		coordOBJ = R;
 		WGS84 = RT90toWGS84(RT90);
 	}
-	return {"sys":sys,"WGS84":WGS84,"interpreted":interpreted,"coordObj":coordOBJ};
+	return {"sys":sys,"WGS84":WGS84,"interpreted":interpreted,"coordOBJ":coordOBJ};
 }
-
 
 // check if coord is an valid RUBIN string. if true returns object with sys and interpreted (counds as true) else returns false;
 // can start with one digit, 
@@ -292,7 +291,11 @@ function isUTM(coord) {
 }
 
 function printUTM(UTM) {
-	return UTM.GZD+" "+UTM.north+"N, "+UTM.east+"E";
+	if (UTM != "outside defined area")
+		return UTM.GZD+" "+UTM.north+"N, "+UTM.east+"E";
+	else {
+		return "outside defined area";
+	}
 }
 
 function splitXYCoord(coord) {
@@ -343,6 +346,14 @@ function isRT90(coord) {
 	return false;
 }
 
+function printRT90(RT90) {
+	if (RT90!="outside defined area") {
+		return RT90.north + ", "+RT90.east;
+	} else {
+		return "outside defined area";
+	}
+}
+
 function isSweref99TM(coord) {
 	const c = splitXYCoord(coord);
 	// if reversed sweref99TM coordinates reverse them
@@ -353,6 +364,14 @@ function isSweref99TM(coord) {
 		return {"sys":"sweref99TM", "interpreted":c.c1+"E, "+c.c2+"N","east":c.c2,"north":c.c1};
 	}
 	return false;
+}
+
+function printSweref99TM(sweref) {
+	if (sweref!="outside defined area") {
+		return sweref.north + ", "+sweref.east;
+	} else {
+		return "outside defined area";
+	}
 }
 
 function isDecimalLatLong(coord) {

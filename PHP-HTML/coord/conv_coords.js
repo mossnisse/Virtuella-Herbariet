@@ -101,11 +101,11 @@ function convertInterpretedCoord(icoor, toSystem, i, j) {
 		break;
 		case "RT90":
 			RT90 = WGS84toRT90(wgs84);
-			coord = RT90.north + ", " + RT90.east;
+			coord = printRT90(RT90);
 		break;
 		case "Sweref99TM":
 			Sweref99TM = WGS84toSweref99TM(wgs84);
-			coord = Sweref99TM.north +", "+Sweref99TM.east;
+			coord = printSweref99TM(Sweref99TM);
 		break;
 		case "UTM":
 			UTM = WGS84toUTM(wgs84);
@@ -117,11 +117,20 @@ function convertInterpretedCoord(icoor, toSystem, i, j) {
 		break;
 		case "MGRS-new":
 			UTM = WGS84toUTM(wgs84);
-			coord = UTMtoMGRSnew(UTM);
+            if (UTM != "outside defined area") {
+                coord = UTMtoMGRSnew(UTM);
+            } else {
+                coord = "outside defined area";
+            }
+			
         break;
 		case "MGRS-old":
 			UTM = WGS84toUTM(wgs84);
-			coord = UTMtoMGRSold(UTM);
+            if (UTM != "outside defined area") {
+			     coord = UTMtoMGRSold(UTM);
+            } else {
+                coord = "outside defined area";
+            }
 		break;
 	}
 	return coord;
