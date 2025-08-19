@@ -23,13 +23,14 @@
 // sida med länkar till olika export funktioner
 include "herbes.php";
 
+$pagesize = 50000;
 $adr = getSimpleAdr();
 $order = orderBy();
 $OrderAdr = $order['Adr'];
 $nr = (int) $_GET['nrRecords'];
 $con = getConS();
 $Rubrik = getRubr($con);
-$pages = ceil($nr/100000);
+$pages = ceil($nr/$pagesize);
 if (isset($_GET['ARecord']) && $_GET['ARecord']!='')
    $ARecord = (int) $_GET['ARecord'];
 else
@@ -52,7 +53,7 @@ echo "
             </ul>
         </div>
         <table class = \"outerBox\"> <tr> <td>
-    The export functions are still under development and may not work properly. Caracter encoding is UTF-8. The file will contain max 100000 posts even if the search gives more.
+    The export functions are still under development and may not work properly. Caracter encoding is UTF-8. The file will contain max $pagesize posts even if the search gives more.
     <table class = \"Box\"> <tr> <td>
     Export result set as xml (Darwin Core) (";
     for ($p=1; $p<$pages+1; $p++) {
