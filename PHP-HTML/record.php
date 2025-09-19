@@ -420,7 +420,27 @@ if ($row) {
                 <div id=\"smap\" >Loading...</div>
                 <noscript><b>JavaScript must be enabled in order for you to use this Map.</b></noscript>
             </td> </tr>
-            <tr> <td>Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m</td> </tr>
+            <tr> <td>Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m";
+            if ($row['Country'] == "Sweden") {
+                $sweref = WGStoSweref99TM($CLat, $CLong);
+                echo "
+                <script type=\"text/javascript\">
+                    function showMinKartaI() {
+                        //console.log(\"Min Karta\");
+                        url = \"https://minkarta.lantmateriet.se/plats/3006/v2.0/?e=$sweref[east]&n=$sweref[north]&z=8&mapprofile=karta&layers=%5B%5B%223%22%5D%2C%5B%221%22%5D%5D\";
+                        window.open(url, '_blank').focus();
+                    }
+                    function showKartbildI() {
+                        //console.log(\"Kartbild.com\");
+                        url = \"https://kartbild.com/?marker=$CLat,$CLong#14/$CLat/$CLong/0x20\";
+                        window.open(url, '_blank').focus();
+                    }
+                </script>
+                <input id=\"MinKarta\" type=\"button\" value=\"open MinKarta.se\"  onclick=\"showMinKartaI();\" />
+                <input id=\"Kartbild\" type=\"button\" value=\"open Karbild.com\" onclick=\"showKartbildI();\" />";
+        }
+        echo "
+            </td></tr>
         </table>";
     }
        
@@ -518,25 +538,25 @@ if ($row) {
         if (!$filename == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
-         <table>
-                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
-            </table>";
+        <table>
+            <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
+        </table>";
         }
         $filename = $row["Image3"];
         if (!$filename == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
-         <table>
-                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
-            </table>";
+        <table>
+            <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
+        </table>";
         }
         $filename = $row["Image4"];
         if (!$filename == "") {
             $thumb = str_replace("large","small", $filename);
             echo "
-         <table>
-                <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
-            </table>";
+        <table>
+            <tr> <td><a href=\"$filename\" target =\"_blank\"> <img src=\"$thumb\"</a></td></tr>
+        </table>";
         }
     } elseif ($row['InstitutionCode'] == "GB" && !$row['Image1'] == "") {   
         $filenamesub = "http://herbarium.gu.se/web/images/$row[Image1].jpg";
