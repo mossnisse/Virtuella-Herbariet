@@ -15,6 +15,10 @@ function checkC() {
 	document.getElementById("showProvince").disabled = true;
 	document.getElementById("showCountry").disabled = true;
 	document.getElementById("showRUBIN").disabled = true;
+    document.getElementById("showRUBIN").style.display = "none";
+    document.getElementById("MinKarta").style.display = "none";
+    document.getElementById("Kartbild").style.display = "none";
+    //document.getElementById("Norgeskart").style.display = "none";
 	
 	// empty output fields
 	document.getElementById("interpred").textContent = "";
@@ -28,8 +32,8 @@ function checkC() {
 	document.getElementById("MGRSnew").textContent = "";
 	document.getElementById("MGRSold").textContent = "";
 	document.getElementById("DistPlace").textContent = "";
-  document.getElementById("locality").textContent = "";
-  document.getElementById("geoname").textContent = "";
+    document.getElementById("locality").textContent = "";
+    document.getElementById("geoname").textContent = "";
 	document.getElementById("District").textContent = "";
 	document.getElementById("Province").textContent = "";
 	document.getElementById("Country").textContent = "";
@@ -38,13 +42,13 @@ function checkC() {
 	
 	document.getElementById("interpred").textContent = coord.sys + `: ` + coord.interpreted;
 	if (coord.sys != "unknown") {
-    console.log("known coordinte");
+        //console.log("known coordinte");
 		document.getElementById("showCoordinate").disabled = false;
 		document.getElementById("showDistrict").disabled = false;
 		document.getElementById("showProvince").disabled = false;
 		document.getElementById("showCountry").disabled = false;
 		WGS84 = coord.WGS84;
-    sys = coord.sys;
+        sys = coord.sys;
 		document.getElementById("WGS84").textContent = printWGS84(WGS84);
 		document.getElementById("WGS84DMS").textContent = WGS84toDMS(WGS84);
 		document.getElementById("WGS84DM").textContent = WGS84toDM(WGS84);
@@ -103,9 +107,10 @@ function checkC() {
 		getDistrict(WGS84);
 		getProvince(WGS84);
 		getCountry(WGS84);
-    getDistPlace(WGS84);
+        getDistPlace(WGS84);
 		getLocality(WGS84);
-    getCity500(WGS84);
+        getCity500(WGS84);
+        
 	}
 }
 
@@ -192,6 +197,14 @@ function getCountry(WGS84) {
 			dlink.href = "../maps/country.php?ID="+count.ID;
 			document.getElementById("Country").appendChild(dlink);
 			document.getElementById("showCountry").disabled = false;
+            if (count.ID==1) {  // counry = Sweden  then shows button for RUBIN and Swedish map sites
+                console.log("Sverige");
+                document.getElementById("showRUBIN").style.display = "initial";
+                document.getElementById("MinKarta").style.display = "initial";
+                document.getElementById("Kartbild").style.display = "initial";
+            } else if (count.ID==2) { // country = Norway
+                //document.getElementById("Norgeskart").style.display = "initial";
+            }
 		} else {
 			document.getElementById("Country").textContent = "outside borders";
 		}
@@ -421,3 +434,31 @@ function getLocation() {
 function showPosition(position) {
 	 document.getElementById("coord").value.textContent = position.coords.latitude + ",  " + position.coords.longitude;
 }
+
+
+function showMinKartaf() {
+    // koordinatsutem = sweref99TM
+    Sweref99TM = WGS84toSweref99TM(WGS84);
+    url = "https://minkarta.lantmateriet.se/plats/3006/v2.0/?e="+Sweref99TM.east+"&n="+Sweref99TM.north+"&z=8&mapprofile=karta&layers=%5B%5B%223%22%5D%2C%5B%221%22%5D%5D";
+    window.open(url, '_blank').focus();
+}
+
+function showKartbildf() {
+    // koordinatsytem wgs84?
+    url = "https://kartbild.com/?marker="+WGS84.north+","+WGS84.east+"#14/"+WGS84.north+"/"+WGS84.east+"/0x20";
+    window.open(url, '_blank').focus();
+}
+
+function showKartplatsenf() {
+    // koordinatsystem =  (ETRS-TM35FIN) Konvertera 
+    url = "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=sv&share=customMarker&n=7339206.405491202&e=515358.1677837897&title=test&desc=&zoom=6&layers=W3siaWQiOjIsIm9wYWNpdHkiOjEwMH1d-z";
+    window.open(url, '_blank').focus();
+}
+
+function showNorgeskartf() {
+    // koordinatsystem EU89 UTM33, väldigt likt sweref99TM testar utan konvertering, undefined outside area
+    Sweref99TM = WGS84toSweref99TM(WGS84);
+    url = "https://norgeskart.no/#!?project=norgeskart&layers=1001&zoom=9&lat="+Sweref99TM.north+"&lon="+Sweref99TM.east+"&markerLat="+Sweref99TM.north+"&markerLon="+Sweref99TM.east;
+    window.open(url, '_blank').focus();
+}
+
