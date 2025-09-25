@@ -23,8 +23,11 @@
 	<table class = "outerBox"> <tr> <td>
 		<table class="SBox">
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 			try {
 				include "ini.php";
+                include "koordinates.php";
 				$con = getConS();
 				$stmt = "";
 				if (isset($_GET['ID'])) {
@@ -72,7 +75,35 @@
 				<tr><td>Size/Precision:</td><td>$row[Coordinateprecision] m.</td></tr>
 				<tr><td>Created:</td><td>$create_date $row[createdby]</td></tr>
 				<tr><td>Modified:</td><td>$mod_date $row[modifiedby]</td></tr>
-				<tr><td><a href=\"list.php?Country=$urlCountry&Province=$urlProvince&District=$urlDistrict&Locality=$urlLocality\">Specimens</a></td><td>OBS more specimens can come from the same place that is not registered with the locality name</td></tr>
+				<tr><td><a href=\"list.php?Country=$urlCountry&Province=$urlProvince&District=$urlDistrict&Locality=$urlLocality\">Specimens</a></td><td>OBS more specimens can come from the same place that is not registered with the locality name</td></tr>";
+                if ($row['country']=="Sweden") {
+                    $url = "https://minkarta.lantmateriet.se/plats/3006/v2.0/?e=$row[SWTME]&n=$row[SWTMN]&z=8&mapprofile=karta&layers=%5B%5B%223%22%5D%2C%5B%221%22%5D%5D";
+                    $url2 = "https://kartbild.com/?marker=$row[lat],$row[long]#14/$row[lat]/$row[long]+/0x20";
+                    echo
+                "<tr><td><a href=\"$url\" target = \"_blank\">open Min karta</a></td>
+                <td><a href=\"$url2\" target = \"_blank\">open kartbild.com</a></td></tr>";
+                } else if ($row['country']=="Denmark") {
+                    $UTM32 = WGS84toUTM32($row['lat'], $row['long']);
+                    $mapSize = 10000;
+                    $eastStart = $UTM32['east']-$mapSize;
+                    $eastEnd = $UTM32['east']+$mapSize;
+                    $northStart = $UTM32['north']-$mapSize;
+                    $northEnd = $UTM32['north']+$mapSize;
+                    $url = "https://miljoegis.mim.dk/spatialmap?mapheight=942&mapwidth=1874&label=&ignorefavorite=true&profile=miljoegis-geologiske-interesser&wkt=POINT($UTM32[east]+$UTM32[north])&page=content-showwkt&selectorgroups=grundkort&layers=theme-dtk_skaermkort_daf+userpoint&opacities=1+1&mapext=$eastStart+$northStart+$eastEnd+$northEnd+&maprotation=";
+                    echo
+                    "<tr><td><a href=\"$url\" target = \"_blank\">open MiljøGis</a></td></tr>";
+                } else if ($row['country']=="Finland") {
+                    $FIN = WGS84toETRSTM35FIN($row['lat'], $row['long']);
+                    $url = "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=sv&share=customMarker&n=$FIN[north]&e=$FIN[east]&title=test&desc=&zoom=6&layers=W3siaWQiOjIsIm9wYWNpdHkiOjEwMH1d-z";
+                    echo
+                    "<tr><td><a href=\"$url\" target = \"_blank\">open Kartplatsen</a></td></tr>";
+                } else if ($row['country']=="Norway") {
+                    $UTM33 = WGS84toUTM33($row['lat'], $row['long']);
+                    $url = "https://norgeskart.no/#!?project=norgeskart&layers=1001&zoom=9&lat=$UTM33[north]&lon=$UTM33[east]&markerLat=$UTM33[north]&markerLon=$UTM33[east]";
+                    echo
+                    "<tr><td><a href=\"$url\" target = \"_blank\">open Norgeskart</a></td></tr>";
+                }
+                echo "
 				</table>
 					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
 					<script>

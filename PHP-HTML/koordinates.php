@@ -41,7 +41,6 @@ function RT90ToWGS (float $RiketsN, float $RiketsO): array {
     return $WGS;
 }
 
-
 Function Sweref99TMToWGS(float $north, float $east): array {
     //echo "Sweref99Tm$north, $east";
     $degToRad = M_PI/180;
@@ -137,6 +136,128 @@ Function WGStoSweref99TM(float $north, float $east): array {
 	$sweref['east'] = round($y);
 	return $sweref;
 }
+
+// EPSG:25832 is used in Denmark its UTM zone 32 with ETRS89 it should be similar enough as WGS84
+function WGS84toUTM32(float $north, float $east) {
+	$UTM_centralMeridian = 9.0;
+	$UTM_false_northing = 0.0;   //N0  
+	if ($north<=0) {
+		$UTM_false_northing = 10000000;       
+	} 
+	$UTM_false_easting = 500000.0; //E0
+	$atscale = 6364902.166165086;
+	$beta1 = 0.0008377318206303529;
+	$beta2 = 7.608527714248998e-7;
+	$beta3 = 1.1976380015605234e-9;
+	$beta4 = 2.443376194522064e-12;
+	$phi = $north * M_PI/180.0;
+    $lambda = $east * M_PI/180.0;
+    $lambda_zero = $UTM_centralMeridian * M_PI/180.0;
+    $phi_star = $phi - sin($phi) * cos($phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * pow(sin($phi), 2) +
+                2.592527480950674e-7 * pow(sin($phi), 4) +
+                1.971698908689572e-9 * pow(sin($phi), 6));
+    $delta_lambda = $lambda - $lambda_zero;
+    $xi_prim = atan(tan($phi_star) / cos($delta_lambda));
+    $eta_prim = atanh(cos($phi_star) * sin($delta_lambda));
+    $x = $atscale * ($xi_prim +
+                $beta1 * sin(2.0 * $xi_prim) * cosh(2.0 * $eta_prim) +
+                $beta2 * sin(4.0 * $xi_prim) * cosh(4.0 * $eta_prim) +
+                $beta3 * sin(6.0 * $xi_prim) * cosh(6.0 * $eta_prim) +
+                $beta4 * sin(8.0 * $xi_prim) * cosh(8.0 * $eta_prim))+
+                $UTM_false_northing;;
+    $y = $atscale * ($eta_prim +
+                $beta1 * cos(2.0 * $xi_prim) * sinh(2.0 * $eta_prim) +
+                $beta2 * cos(4.0 * $xi_prim) * sinh(4.0 * $eta_prim) +
+                $beta3 * cos(6.0 * $xi_prim) * sinh(6.0 * $eta_prim) +
+                $beta4 * cos(8.0 * $xi_prim) * sinh(8.0 * $eta_prim)) +
+        		$UTM_false_easting;
+	$UTM['north'] = round($x);
+	$UTM['east'] = round($y);
+	return $UTM;
+}
+
+// används för moderna finska kartor. Antar att WGS84 är tillräkligt likt EGS84 EUREF-FIN för att inte behöva ändra geodetiskt datum.
+// använder samma transvers mercator projection som UTM zon 35
+function WGS84toETRSTM35FIN(float $north, float $east) {
+    $UTM_centralMeridian = 27;
+	$UTM_false_northing = 0.0;   //N0  
+	if ($north<=0) {
+		$UTM_false_northing = 10000000;       
+	} 
+	$UTM_false_easting = 500000.0; //E0
+	$atscale = 6364902.166165086;
+	$beta1 = 0.0008377318206303529;
+	$beta2 = 7.608527714248998e-7;
+	$beta3 = 1.1976380015605234e-9;
+	$beta4 = 2.443376194522064e-12;
+	$phi = $north * M_PI/180.0;
+    $lambda = $east * M_PI/180.0;
+    $lambda_zero = $UTM_centralMeridian * M_PI/180.0;
+    $phi_star = $phi - sin($phi) * cos($phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * pow(sin($phi), 2) +
+                2.592527480950674e-7 * pow(sin($phi), 4) +
+                1.971698908689572e-9 * pow(sin($phi), 6));
+    $delta_lambda = $lambda - $lambda_zero;
+    $xi_prim = atan(tan($phi_star) / cos($delta_lambda));
+    $eta_prim = atanh(cos($phi_star) * sin($delta_lambda));
+    $x = $atscale * ($xi_prim +
+                $beta1 * sin(2.0 * $xi_prim) * cosh(2.0 * $eta_prim) +
+                $beta2 * sin(4.0 * $xi_prim) * cosh(4.0 * $eta_prim) +
+                $beta3 * sin(6.0 * $xi_prim) * cosh(6.0 * $eta_prim) +
+                $beta4 * sin(8.0 * $xi_prim) * cosh(8.0 * $eta_prim))+
+                $UTM_false_northing;;
+    $y = $atscale * ($eta_prim +
+                $beta1 * cos(2.0 * $xi_prim) * sinh(2.0 * $eta_prim) +
+                $beta2 * cos(4.0 * $xi_prim) * sinh(4.0 * $eta_prim) +
+                $beta3 * cos(6.0 * $xi_prim) * sinh(6.0 * $eta_prim) +
+                $beta4 * cos(8.0 * $xi_prim) * sinh(8.0 * $eta_prim)) +
+        		$UTM_false_easting;
+	$UTM['north'] = round($x);
+	$UTM['east'] = round($y);
+	return $UTM;
+}
+
+// asumes WGS84 but is simmilar enough to work like EU89 for modern Norwegian maps. UTM33 is used for most Norwegian maps.
+function WGS84toUTM33(float $north, float $east) {
+    $UTM_centralMeridian = 15;
+	$UTM_false_northing = 0.0;   //N0  
+	if ($north<=0) {
+		$UTM_false_northing = 10000000;       
+	} 
+	$UTM_false_easting = 500000.0; //E0
+	$atscale = 6364902.166165086;
+	$beta1 = 0.0008377318206303529;
+	$beta2 = 7.608527714248998e-7;
+	$beta3 = 1.1976380015605234e-9;
+	$beta4 = 2.443376194522064e-12;
+	$phi = $north * M_PI/180.0;
+    $lambda = $east * M_PI/180.0;
+    $lambda_zero = $UTM_centralMeridian * M_PI/180.0;
+    $phi_star = $phi - sin($phi) * cos($phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * pow(sin($phi), 2) +
+                2.592527480950674e-7 * pow(sin($phi), 4) +
+                1.971698908689572e-9 * pow(sin($phi), 6));
+    $delta_lambda = $lambda - $lambda_zero;
+    $xi_prim = atan(tan($phi_star) / cos($delta_lambda));
+    $eta_prim = atanh(cos($phi_star) * sin($delta_lambda));
+    $x = $atscale * ($xi_prim +
+                $beta1 * sin(2.0 * $xi_prim) * cosh(2.0 * $eta_prim) +
+                $beta2 * sin(4.0 * $xi_prim) * cosh(4.0 * $eta_prim) +
+                $beta3 * sin(6.0 * $xi_prim) * cosh(6.0 * $eta_prim) +
+                $beta4 * sin(8.0 * $xi_prim) * cosh(8.0 * $eta_prim))+
+                $UTM_false_northing;;
+    $y = $atscale * ($eta_prim +
+                $beta1 * cos(2.0 * $xi_prim) * sinh(2.0 * $eta_prim) +
+                $beta2 * cos(4.0 * $xi_prim) * sinh(4.0 * $eta_prim) +
+                $beta3 * cos(6.0 * $xi_prim) * sinh(6.0 * $eta_prim) +
+                $beta4 * cos(8.0 * $xi_prim) * sinh(8.0 * $eta_prim)) +
+        		$UTM_false_easting;
+	$UTM['north'] = round($x);
+	$UTM['east'] = round($y);
+	return $UTM;
+}
+
 
 // Konverterar RUBIN koordinater till RT-90
     

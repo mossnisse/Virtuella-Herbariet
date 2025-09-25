@@ -421,11 +421,31 @@ if ($row) {
                 <noscript><b>JavaScript must be enabled in order for you to use this Map.</b></noscript>
             </td> </tr>
             <tr> <td>Location of map symbol: Lat $CLat Long $CLong. Generated from $CText: $CValue Precision: $row[CPrec]m";
-            if ($row['Country'] == "Sweden") {
-                $sweref = WGStoSweref99TM($CLat, $CLong);
+        if ($row['Country'] == "Sweden") {
+            $sweref = WGStoSweref99TM($CLat, $CLong);
                 echo "<br><a href= \"https://minkarta.lantmateriet.se/plats/3006/v2.0/?e=$sweref[east]&n=$sweref[north]&z=8&mapprofile=karta&layers=%5B%5B%223%22%5D%2C%5B%221%22%5D%5D\" target = \"_blank\">open Min Karta</a>
                     <br><a href= \"https://kartbild.com/?marker=$CLat,$CLong#14/$CLat/$CLong/0x20\" target = \"_blank\">open Kartbild.com</a>";
-        }
+        } else if ($row['Country']=="Denmark") {
+                    $UTM32 = WGS84toUTM32($CLat, $CLong);
+                    $mapSize = 10000;
+                    $eastStart = $UTM32['east']-$mapSize;
+                    $eastEnd = $UTM32['east']+$mapSize;
+                    $northStart = $UTM32['north']-$mapSize;
+                    $northEnd = $UTM32['north']+$mapSize;
+                    $url = "https://miljoegis.mim.dk/spatialmap?mapheight=942&mapwidth=1874&label=&ignorefavorite=true&profile=miljoegis-geologiske-interesser&wkt=POINT($UTM32[east]+$UTM32[north])&page=content-showwkt&selectorgroups=grundkort&layers=theme-dtk_skaermkort_daf+userpoint&opacities=1+1&mapext=$eastStart+$northStart+$eastEnd+$northEnd+&maprotation=";
+                    echo
+                    "<br><a href=\"$url\" target = \"_blank\">open MiljøGis</a>";
+                } else if ($row['Country']=="Finland") {
+                    $FIN = WGS84toETRSTM35FIN($CLat, $CLong);
+                    $url = "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=sv&share=customMarker&n=$FIN[north]&e=$FIN[east]&title=test&desc=&zoom=6&layers=W3siaWQiOjIsIm9wYWNpdHkiOjEwMH1d-z";
+                    echo
+                    "<br><a href=\"$url\" target = \"_blank\">open Kartplatsen</a>";
+                } else if ($row['Country']=="Norway") {
+                    $UTM33 = WGS84toUTM33($CLat, $CLong);
+                    $url = "https://norgeskart.no/#!?project=norgeskart&layers=1001&zoom=9&lat=$UTM33[north]&lon=$UTM33[east]&markerLat=$UTM33[north]&markerLon=$UTM33[east]";
+                    echo
+                    "<br><a href=\"$url\" target = \"_blank\">open Norgeskart</a>";
+                }
         echo "
             </td></tr>
         </table>";
