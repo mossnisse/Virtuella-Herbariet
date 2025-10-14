@@ -7,9 +7,13 @@ let provinceID;
 let countryID;
 let WGS84;
 let sys;
+let MGRSnew;
+let clickLong;
+let clickLat;
+
 
 function checkC() {
-	// disable map buttons
+	// disable map buttons, buttons that should be gets enabled later
 	document.getElementById("showCoordinate").disabled = true;
 	document.getElementById("showDistrict").disabled = true;
 	document.getElementById("showProvince").disabled = true;
@@ -18,7 +22,12 @@ function checkC() {
     document.getElementById("showRUBIN").style.display = "none";
     document.getElementById("MinKarta").style.display = "none";
     document.getElementById("Kartbild").style.display = "none";
-    //document.getElementById("Norgeskart").style.display = "none";
+    document.getElementById("Norgeskart").style.display = "none";
+    document.getElementById("Kartplatsen").style.display = "none";
+    document.getElementById("showMGRSAA").style.display = "none";
+    document.getElementById("showMGRSAL").style.display = "none";
+    document.getElementById("showGridZone").style.display = "none";
+    document.getElementById("Miljogis").style.display = "none";
 	
 	// empty output fields
 	document.getElementById("interpred").textContent = "";
@@ -42,11 +51,7 @@ function checkC() {
 	
 	document.getElementById("interpred").textContent = coord.sys + `: ` + coord.interpreted;
 	if (coord.sys != "unknown") {
-        //console.log("known coordinte");
 		document.getElementById("showCoordinate").disabled = false;
-		document.getElementById("showDistrict").disabled = false;
-		document.getElementById("showProvince").disabled = false;
-		document.getElementById("showCountry").disabled = false;
 		WGS84 = coord.WGS84;
         sys = coord.sys;
 		document.getElementById("WGS84").textContent = printWGS84(WGS84);
@@ -72,7 +77,6 @@ function checkC() {
 		} else {
 			document.getElementById("RT90").textContent = "outside defined area";
 		}
-        //console.log(coord.sys.slice(0,5));
 		if (coord.sys.slice(0,5) != "RUBIN") {
 			RUBIN = RT90toRUBIN(RT90);
 		} else {
@@ -84,25 +88,32 @@ function checkC() {
 			UTM = WGS84toUTM(WGS84);
 		} else {
 			UTM = coord.coordOBJ;
-			console.log("parse UTM GZD: "+UTM.GZD);
+            document.getElementById("showGridZone").style.display = "initial";
+			//console.log("parse UTM GZD: "+UTM.GZD);
 		}
 		document.getElementById("UTM").textContent = printUTM(UTM);
 		
-		if (coord.sys != "MGRSnew") {
+		if (coord.sys.slice(0,8) != "MGRS-new") {
 			if (UTM!="outside defined area") {
 				MGRSnew = UTMtoMGRSnew(UTM);
 			} else {
-				MGRSnew="outside defined area";
+				MGRSnew = "outside defined area";
 			}
-		}
+		} else {
+            document.getElementById("showMGRSAA").style.display = "initial";
+            document.getElementById("showGridZone").style.display = "initial";
+        }
 		document.getElementById("MGRSnew").textContent = MGRSnew;
-		if (coord.sys != "MGRSold") {
+		if (coord.sys.slice(0,8) != "MGRS-old") {
 			if (UTM!="outside defined area") {
 				MGRSold = UTMtoMGRSold(UTM);
 			} else {
 				MGRSold = "outside defined area";
 			}
-		}
+		} else {
+            document.getElementById("showMGRSAL").style.display = "initial";
+            document.getElementById("showGridZone").style.display = "initial";
+        }
 		document.getElementById("MGRSold").textContent = MGRSold;			
 		getDistrict(WGS84);
 		getProvince(WGS84);
@@ -141,10 +152,9 @@ function getDistrict(WGS84) {
 	var url = "districtFromC.php?North="+WGS84.north+"&East="+WGS84.east;
 	ajax(url, function(json) {
 		//json = json.substring(1,json.length); // remove BOM mark
-		//console.log(json);
 		var distr = JSON.parse(json);
 		if (distr.name != "outside borders") {
-			//document.getElementById("District").innerHTML = "<a href =\"../maps/district.php?ID="+distr.ID+"\">"+distr.name+"</a> "+distr.typeNative+"/"+distr.typeEng;
+            //console.log("inside border");
 			document.getElementById("District").textContent = "";
 			let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(distr.name));
@@ -167,7 +177,6 @@ function getProvince(WGS84) {
 		//console.log(json);
 		var prov = JSON.parse(json);
 		if (prov.name != "outside borders") {
-			//document.getElementById("Province").innerHTML = "<a href =\"../maps/province.php?ID="+prov.ID+"\">"+prov.name+"</a> "+prov.typeNative+"/"+prov.typeEng;
 			document.getElementById("Province").textContent = "";
 			let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(prov.name));
@@ -190,7 +199,6 @@ function getCountry(WGS84) {
 		//console.log(json);
 		var count = JSON.parse(json);
 		if (count.name != "outside borders") {
-			//document.getElementById("Country").innerHTML = "<a href =\"../maps/country.php?ID="+count.ID+"\">"+count.name+"</a>";
 			document.getElementById("Country").textContent = "";
 			let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(count.name));
@@ -198,12 +206,15 @@ function getCountry(WGS84) {
 			document.getElementById("Country").appendChild(dlink);
 			document.getElementById("showCountry").disabled = false;
             if (count.ID==1) {  // counry = Sweden  then shows button for RUBIN and Swedish map sites
-                console.log("Sverige");
                 document.getElementById("showRUBIN").style.display = "initial";
                 document.getElementById("MinKarta").style.display = "initial";
                 document.getElementById("Kartbild").style.display = "initial";
-            } else if (count.ID==2) { // country = Norway
-                //document.getElementById("Norgeskart").style.display = "initial";
+            } else if (count.ID==2) {   // country = Norway
+                document.getElementById("Norgeskart").style.display = "initial";
+            } else if (count.ID==4) {   // country = Finland
+                document.getElementById("Kartplatsen").style.display = "initial";
+            } else if (count.ID==5) { // country = Denmark
+                document.getElementById("Miljogis").style.display = "initial";
             }
 		} else {
 			document.getElementById("Country").textContent = "outside borders";
@@ -220,7 +231,6 @@ function getDistPlace(WGS84) {
 		//console.log(json);
 		var loc = JSON.parse(json);
 		if (loc.name !== "") {
-			//document.getElementById("locality").textContent = "<a href =\"../locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
 			document.getElementById("DistPlace").textContent = "";
 			let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(loc.name));
@@ -243,7 +253,6 @@ function getLocality(WGS84) {
 		//console.log(json);
 		var loc = JSON.parse(json);
 		if (loc.name !== "") {
-			//document.getElementById("locality").textContent = "<a href =\"../locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
 			document.getElementById("locality").textContent = "";
 			let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(loc.name));
@@ -264,7 +273,6 @@ function getCity500(WGS84) {
 		//console.log(json);
 		var loc = JSON.parse(json);
 		if (loc.name !== "") {
-			//document.getElementById("locality").textContent = "<a href =\"../locality.php?ID="+loc.id+"\">"+loc.name+"</a>, "+loc.distance+"m "+loc.direction;
 			document.getElementById("geoname").textContent = "";
 			/*let dlink = document.createElement("a");
 			dlink.appendChild(document.createTextNode(loc.name));
@@ -277,14 +285,36 @@ function getCity500(WGS84) {
 	});	
 }
 
+
+function setC(){
+    document.getElementById("coord").value = clickLat.toFixed(6)+", "+clickLong.toFixed(6);
+    checkC();
+}
+
 let map;
 
 function initMap() {
 	if (showMap) {
+        
+        let infoWindow = new google.maps.InfoWindow({});
+        
 		map = new google.maps.Map(document.getElementById("map"), {
 			center: { lat: -34.397, lng: 150.644 },
 			zoom: 8,
 		});
+        
+        map.addListener("click", (mapsMouseEvent) => {
+            infoWindow.close();
+            infoWindow = new google.maps.InfoWindow({
+                position: mapsMouseEvent.latLng,
+            });
+            clickLong = mapsMouseEvent.latLng.lng();
+            clickLat = mapsMouseEvent.latLng.lat();
+            infoWindow.setContent(
+                clickLat.toFixed(6)+", "+clickLong.toFixed(6)+"<br> <button type=\"button\" onclick=\"setC();\">Check coordinate</button>"
+            );
+            infoWindow.open(map);
+        });
 	}
 }
 
@@ -300,7 +330,6 @@ function showMapf() {
 }
 
 function centerMapf() {
-	//alert("center map"+WGS84[0]+", "+WGS84[1]);
 	showMapf();
 	map.setCenter(new google.maps.LatLng(WGS84.north,WGS84.east));
 }
@@ -423,6 +452,81 @@ function showRUBINf() {
     RUBINSq.setMap(map);
 }
 
+function showGridZone() {
+    centerMapf();
+    corners = GZDcorners(UTM.GZD);
+
+	var GZDc = [
+        new google.maps.LatLng(corners.north1, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east1)
+    ];
+              	    
+    GZDSq = new google.maps.Polygon({
+        paths: GZDc,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    GZDSq.setMap(map);
+}
+
+
+// obs can intersect gridzoone
+function showMGRSAAsquare() {
+    centerMapf();
+    corners = MGRSnewCorners(MGRSnew);
+    
+    var SQc = [
+        new google.maps.LatLng(corners.north1, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east1)
+    ];
+              	    
+    Sq = new google.maps.Polygon({
+        paths: SQc,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    Sq.setMap(map);
+}
+
+// obs can intersect gridzoone
+function showMGRSALsquare() {
+    centerMapf();
+    corners = MGRSoldCorners(MGRSold);
+    
+    var SQc = [
+        new google.maps.LatLng(corners.north1, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east1),
+        new google.maps.LatLng(corners.north2, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east2),
+        new google.maps.LatLng(corners.north1, corners.east1)
+    ];
+              	    
+    Sq = new google.maps.Polygon({
+        paths: SQc,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+    });
+
+    Sq.setMap(map);
+}
+
 function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -434,7 +538,6 @@ function getLocation() {
 function showPosition(position) {
 	 document.getElementById("coord").value.textContent = position.coords.latitude + ",  " + position.coords.longitude;
 }
-
 
 function showMinKartaf() {
     // koordinatsutem = sweref99TM
@@ -450,15 +553,30 @@ function showKartbildf() {
 }
 
 function showKartplatsenf() {
-    // koordinatsystem =  (ETRS-TM35FIN) Konvertera 
-    url = "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=sv&share=customMarker&n=7339206.405491202&e=515358.1677837897&title=test&desc=&zoom=6&layers=W3siaWQiOjIsIm9wYWNpdHkiOjEwMH1d-z";
+    // koordinatsystem =  (ETRS-TM35FIN) Konvertera
+    FIN = WGS84toETRSTM35FIN(WGS84);
+    url = "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=sv&share=customMarker&n="+FIN.north+"&e="+FIN.east+"&title=test&desc=&zoom=6&layers=W3siaWQiOjIsIm9wYWNpdHkiOjEwMH1d-z";
     window.open(url, '_blank').focus();
 }
 
 function showNorgeskartf() {
     // koordinatsystem EU89 UTM33, väldigt likt sweref99TM testar utan konvertering, undefined outside area
-    Sweref99TM = WGS84toSweref99TM(WGS84);
-    url = "https://norgeskart.no/#!?project=norgeskart&layers=1001&zoom=9&lat="+Sweref99TM.north+"&lon="+Sweref99TM.east+"&markerLat="+Sweref99TM.north+"&markerLon="+Sweref99TM.east;
+    UTM33 = WGS84toUTM33(WGS84);
+    url = "https://norgeskart.no/#!?project=norgeskart&layers=1001&zoom=9&lat="+UTM33.north+"&lon="+UTM33.east+"&markerLat="+UTM33.north+"&markerLon="+UTM33.east;
     window.open(url, '_blank').focus();
 }
 
+function showMiljogis() {  // Map service for Denmark
+    UTM32 = WGS84toUTM32(WGS84);
+    mapSize = 10000;
+    eastStart = UTM.east-mapSize;
+    eastEnd = UTM.east+mapSize;
+    northStart = UTM.north-mapSize;
+    northEnd = UTM.north+mapSize;
+    url = "https://miljoegis.mim.dk/spatialmap?mapheight=942&mapwidth=1874&label=&ignorefavorite=true&profile=miljoegis-geologiske-interesser&wkt=POINT("+UTM32.east+"+"+UTM32.north+")&page=content-showwkt&selectorgroups=grundkort&layers=theme-dtk_skaermkort_daf+userpoint&opacities=1+1&mapext="+eastStart+"+"+northStart+"+"+eastEnd+"+"+northEnd+"&maprotation=";
+    //console.log(url);
+    window.open(url, '_blank').focus();
+}
+
+
+// Iceland coordinate system ISN: 2569715, 209939
