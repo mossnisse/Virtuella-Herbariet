@@ -11,8 +11,7 @@ $con = getConS();
 $query = "SELECT * FROM locality";
 $result = $con->query($query);
 
-echo "ID,locality,district,province,country,continent,latitude,longitude,RT90N,RT90E,Sweref99TMN,Sweref99TME,
-alternative_names,coordinate_source,Coordinate_precision,comments,created_by,created,modified\r";
+echo "ID,locality,district,province,country,continent,latitude,longitude,RT90N,RT90E,Sweref99TMN,Sweref99TME,alternative_names,coordinate_source,Coordinate_precision,comments,created_by,created,modified\r";
 while ($row = $result->fetch())
 {
     echo "$row[id],\"".CSVf($row['locality'])."\",\"".CSVf($row['district'])."\",\"".CSVf($row['province'])
