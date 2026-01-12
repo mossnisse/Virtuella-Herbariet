@@ -109,7 +109,7 @@ $districtsJson = json_encode(array_map(function($dist) {
             border-radius: 50%;
             box-shadow: 0 0 4px rgba(0,0,0,0.4);
         }
-        #map {
+        #leaf_map {
             width: 800px;
             height: 800px;
             margin: 10px 0;
@@ -147,7 +147,7 @@ $districtsJson = json_encode(array_map(function($dist) {
                                 </table>
                                 <p><a href="gjprovins.php?Country=<?php echo $urlCountry; ?>&amp;Province=<?php echo $urlProvince; ?>" download>Download GeoJson borders in WGS84</a></p>
                                 
-                                <div id="map"></div>
+                                <div id="leaf_map"></div>
                                 <input id="showDistricts" type="button" value="show districts on map" /><br />
                                 
                                 <h3>Districts</h3>
@@ -183,7 +183,7 @@ $districtsJson = json_encode(array_map(function($dist) {
         var districts = <?php echo $districtsJson; ?>;
         
         // Initialize map
-        var map = L.map('map').fitBounds(bounds);
+        var map = L.map('leaf_map').fitBounds(bounds);
         
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

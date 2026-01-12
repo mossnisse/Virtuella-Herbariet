@@ -105,7 +105,7 @@ $provincesJson = json_encode(array_map(function($prov) {
             border-radius: 50%;
             box-shadow: 0 0 4px rgba(0,0,0,0.4);
         }
-        #map {
+        #leaf_map {
             width: 800px;
             height: 800px;
             margin: 10px 0;
@@ -148,7 +148,7 @@ $provincesJson = json_encode(array_map(function($prov) {
                                 </table>
                                 <p><a href="gjcountry.php?country=<?php echo $urlCountry; ?>" download>Download GeoJson borders in WGS84</a></p>
                                 
-                                <div id="map"></div>
+                                <div id="leaf_map"></div>
                                 <input id="showProvinces" type="button" value="show provinces on map" /><br />
                                 
                                 <h3>Provinces</h3>
@@ -184,7 +184,7 @@ $provincesJson = json_encode(array_map(function($prov) {
         var provinces = <?php echo $provincesJson; ?>;
         
         // Initialize map
-        var map = L.map('map').fitBounds(bounds);
+        var map = L.map('leaf_map').fitBounds(bounds);
         
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

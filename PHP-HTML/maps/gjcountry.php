@@ -1,24 +1,34 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
+header("Cache-Control: public, max-age=86400"); // Cache for 24 hours
 include "../ini.php";
-$con = getConS();
-if (array_key_exists('country', $_GET)) {
-   $country = $_GET['country'];
-   $query = "SELECT geojson FROM countries where english = :country;";
-   $Stm = $con->prepare($query);
-   $Stm->bindValue(':country', $country, PDO::PARAM_STR);
-} else {
-   $id = $_GET['ID'];
-   $query = "SELECT geojson FROM countries where ID = :id;";
-   $Stm = $con->prepare($query);
-   $Stm->bindValue(':id', $id, PDO::PARAM_INT);
+
+try {
+    $con = getConS();
+    $row = null;
+
+    if (!empty($_GET['country'])) {
+        $sql = "SELECT geojson FROM countries WHERE english = :val";
+        $param = [':val' => $_GET['country'], 'type' => PDO::PARAM_STR];
+    } elseif (!empty($_GET['ID'])) {
+        $sql = "SELECT geojson FROM countries WHERE ID = :val";
+        $param = [':val' => $_GET['ID'], 'type' => PDO::PARAM_INT];
+    } else {
+        http_response_code(400); // Bad Request
+        echo json_encode(["error" => "Missing country or ID parameter"]);
+        exit;
+    }
+    $stm = $con->prepare($sql);
+    $stm->bindValue(':val', $param[':val'], $param['type']);
+    $stm->execute();
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($row && !empty($row['geojson'])) {
+        echo $row['geojson'];
+    } else {
+        http_response_code(404);
+        echo json_encode(["error" => "GeoJSON data not found"]);
+    }
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(["error" => "Internal server error"]);
 }
-//echo "$query <p>";
-$Stm->execute();
-$row = $Stm->fetch(PDO::FETCH_ASSOC);
-if ($row ) {
-   echo $row['geojson'];
-} else {
-   echo "couldnt find the geojson data: "+$query;
-} 
-?>
