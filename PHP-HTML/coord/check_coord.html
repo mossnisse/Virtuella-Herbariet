@@ -5,9 +5,9 @@
         <meta name="author" content="Nils Ericson" />
         <title>Virtuella herbariet: Check coordinate</title>
         <link rel="shortcut icon" href="../favicon.ico" />
-		<script src="coord-transform.js?v=1" type="text/javascript"></script>
-		<script src="parse-coordinates.js?v=1" type="text/javascript"></script>
-		<script src="coords.js?v=5" type="text/javascript"></script>
+		<script src="coord-transform.js?v=2" type="text/javascript"></script>
+		<script src="parse-coordinates.js?v=2" type="text/javascript"></script>
+		<script src="coords.js?v=7" type="text/javascript"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDl241DQUv1gfk5rshjvIb5nNfcYz7hNkU"></script>
 		<style>
 			#map { height: 70%; }
@@ -75,9 +75,14 @@
 		<input id="showProvince" type="button" value="show province" disabled onclick="showProvincef();" />
 		<input id="showCountry" type="button" value="show country" disabled onclick="showCountryf();" />
 		<input id="showRUBIN" type="button" value="show RUBIN" disabled onclick="showRUBINf();" />
-        <input id="MinKarta" type="button" value="open MinKarta.se"  onclick="showMinKartaf();" />
+        <input id="MinKarta" type="button" value="open MinKarta"  onclick="showMinKartaf();" />
         <input id="Kartbild" type="button" value="open Karbild.com" onclick="showKartbildf();" />
-        <! -- <input id="Norgeskart" type="button" value="open Norgeskart"  onclick="showNorgeskartf();" />
+        <input id="Norgeskart" type="button" value="open Norgeskart"  onclick="showNorgeskartf();" />
+        <input id="Kartplatsen" type="button" value="open Kartplatsen"  onclick="showKartplatsenf();" />
+        <input id="showGridZone" type="button" value="show UTM Gridzone"  onclick="showGridZone();" />
+        <input id="showMGRSAA" type="button" value="show MGRS Square"  onclick="showMGRSAAsquare();" />
+        <input id="showMGRSAL" type="button" value="show MGRS Square"  onclick="showMGRSALsquare();" />
+        <input id="Miljogis" type="button" value="open Miljøgis"  onclick="showMiljogis();" />
 		<div id="map"></div>
 	</body>
 </html>
