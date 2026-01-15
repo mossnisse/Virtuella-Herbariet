@@ -37,7 +37,7 @@ try {
 
     // Default response if no hit is found
     $response = [
-        "ID" => "0",
+        "ID" => "-1",
         "name" => "outside borders",
         "typeNative" => "NaN",
         "typeEng" => "NaN"
