@@ -188,7 +188,7 @@ function RUBINtoRT90(interpreted) {
 }
 
 function RT90toRUBIN(RT90) {
-	if (RT90.north >= 6100000 && RT90.east >= 1200000 && RT90.north >= 1180000 && RT90.east <= 1890000) {
+	if (RT90.north >= 6100000 && RT90.east >= 1200000 && RT90.north <= 7700000 && RT90.east <= 1890000) {
 		const n = Math.round(RT90.north)-6050000;
 		const e = Math.round(RT90.east)-1200000;
 		const n1 = Math.floor(n/50000);
@@ -270,7 +270,7 @@ function WGS84toUTMGridZone(WGS84) {
 		else gridZone = "B";
 	} else if (lat > 84) {
 		//Arctic special zones
-		if (lon<0) griZone = "Y";
+		if (lon<0) gridZone = "Y";
 		else gridZone = "Z";
 	} else {
 		//grid zone
