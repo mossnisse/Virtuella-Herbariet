@@ -11,11 +11,11 @@ function parseUnknowCoord(coord) {
 	var Sweref99TM = false;
 	var RT90 = false;
 	var UTM = false;
-	MGRSnew = false;
-	MGRSold = false;
+	var MGRSnew = false;
+	var MGRSold = false;
 	var RUBIN = false;
 	var coordOBJ = false;
-	if      (R = isRT90(coord)) {
+	if (R = isRT90(coord)) {
 		sys = "RT90 2.5 gon V";
 		interpreted = R.interpreted;
 		RT90 = R;
@@ -80,7 +80,7 @@ function isRUBIN(coord) {
 	//var isRUBIN = false;
 	//var N1,E1,N2,E2,N3,E3 = "";
 	coord = coord.replace(/\s+/g, '');  //remove white spaces
-	if (coord%2 ==0) {  // if RUBIN has even digits it should be because it 50 km north nubmer only have one digit so then add an 0 to the begining for the string;
+	if (coord.length % 2 == 0) {  // if RUBIN has even digits it should be because it 50 km north nubmer only have one digit so then add an 0 to the begining for the string;
 		coord = "0"+coord;
 	}
 	const N1 = coord.slice(0,2);
@@ -189,8 +189,8 @@ function isMGRSnew(coord) {
 	if (!isDigit(coord[1])) {
 		coord = '0'+coord;
 	} 
-	if (coord.lenght%2==0) return false; 
-	if (coord.length<5 || coord.length>15) return false;
+	if (coord.length % 2 == 0) return false; 
+	if (coord.length < 5 || coord.length>15) return false;
 	const GZD = coord.slice(0,3); 
 	if (!isGZD(GZD)) return false;
 	const sqId = coord.slice(3,5);
