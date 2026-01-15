@@ -32,7 +32,7 @@ function WGS84toRT90(WGS84) {
 		const rnorth =  k0xa*(xifjutt+beta1*Math.sin(2*xifjutt)*Math.cosh(2*etafjutt)+beta2*Math.sin(4*xifjutt)*Math.cosh(4*etafjutt)+beta3*Math.sin(6*xifjutt)*Math.cosh(6*etafjutt)+beta4*Math.sin(8*xifjutt)*Math.cosh(8*etafjutt))-667.711;
 		const reast = k0xa*(etafjutt+beta1*Math.cos(2*xifjutt)*Math.sinh(2*etafjutt)+beta2*Math.cos(4*xifjutt)*Math.sinh(4*etafjutt)+beta3*Math.cos(6*xifjutt)*Math.sinh(6*etafjutt)+beta4*Math.cos(8*xifjutt)*Math.sinh(8*etafjutt))+1.500064274e6;
 		//return [Math.round(rnorth), Math.round(reast)];
-		return {"north":Math.round(rnorth), "east":Math.round(reast)}
+		return {"north":Math.round(rnorth), "east":Math.round(reast)};
 	} else {
 		// RT90 is only defined for Sweden so if outside bounding box
 		return "outside defined area";
@@ -129,7 +129,7 @@ function WGS84toSweref99TM(WGS84) {
                 beta3 * Math.cos(6.0 * xi_prim) * Math.sinh(6.0 * eta_prim) +
                 beta4 * Math.cos(8.0 * xi_prim) * Math.sinh(8.0 * eta_prim)) +
         		sweref99TM_false_easting;
-	return {"north":Math.round(x), "east":Math.round(y)}
+	return {"north":Math.round(x), "east":Math.round(y)};
 	} else {
 		// Sweref99 is only defined for Sweden, so if outside an bouding box 
 		return "outside defined area";
@@ -145,7 +145,7 @@ function RUBINtoRT90(interpreted) {
 		e1 = interpreted.charCodeAt(2)-65;
 		north = 6075000+n1*50000;
 		east = 1225000+e1*50000;
-		return {"north":north,"east":east}
+		return {"north":north,"east":east};
 	}
 	else if (interpreted.length==5){
 		// 5x5 km
@@ -155,7 +155,7 @@ function RUBINtoRT90(interpreted) {
 		e2 = interpreted.charCodeAt(4)-97;
 		north = 6052500+n1*50000+n2*5000.0;
 		east = 1202500+e1*50000+e2*5000.0;
-		return {"north":north,"east":east}
+		return {"north":north,"east":east};
 	}
 	else if (interpreted.length==10 && interpreted.substring(7,8) == "-") {  // && interpreted.substring(7,8) == "-")
 		// 1x1 km
@@ -167,7 +167,7 @@ function RUBINtoRT90(interpreted) {
 		e3 = interpreted.substring(8,9);
 		north = 6050500+n1*50000+n2*5000.0+n3*1000;
 		east = 1200500+e1*50000+e2*5000.0+e3*1000;
-		return {"north":north,"east":east}
+		return {"north":north,"east":east};
 	}
 	else if (interpreted.length==10) {
 		// 100 x 100 m
@@ -179,7 +179,7 @@ function RUBINtoRT90(interpreted) {
 		e3 = interpreted.substring(8,10);
 		north = 6050050+n1*50000+n2*5000.0+n3*100;
 		east = 1200050+e1*50000+e2*5000.0+e3*100;
-		return {"north":north,"east":east}
+		return {"north":north,"east":east};
 	}
 	else {
 		// error
@@ -326,7 +326,7 @@ function GZDcorners(GZD) {
 	if (GZDNorth =='X') {
 		GZDNStop = 84;
 	} else {
-		GZDNStop = (GZDNorthNumb+1)*8 -80 
+		GZDNStop = (GZDNorthNumb+1)*8 -80;
 	}
 	// east start at -180 grader talet 01; varje band är 6 grader. OBS undantag för bergen och Svalbard
 	// Bergen = 31V och 32V   zone 32 is extended 3° further west
@@ -353,17 +353,17 @@ function GZDcorners(GZD) {
 		GZDEStart = -180 + (GZDEast-1) *6;
 		GZDEStop = -180 + GZDEast * 6;
 	}
-	return {"east1":GZDEStart,"east2":GZDEStop,"north1":GZDNStart,"north2":GZDNStop}
+	return {"east1":GZDEStart,"east2":GZDEStop,"north1":GZDNStart,"north2":GZDNStop};
 }
 
-// returns the corners of the 100 000 meter square identification for MGRS-new AA scheme
+// returns the corners of the 100 000 meter square identification for MGRS-new AA scheme, coord should be without anything after the MGRS square identifier
 function sqIDnewCorners(coord) {
 	const UTMmitt = MGRSnewtoUTM(coord);
 	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-50000,"east":UTMmitt.east-50000}; // substract an half sqId to get start coordinates
 	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+50000,"east":UTMmitt.east+50000}; // add an half sqId to get the end coordinates
 	const WGS84start = UTMtoWGS84(UTMstart);
 	const WGS84stop = UTMtoWGS84(UTMstop);
-	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east}
+	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
 }
 
 // returns the corners of the 100 000 meter square identification for MGRS-old AL scheme
@@ -373,8 +373,34 @@ function sqIDoldCorners(coord) {
 	const UTMstop = {"GZD":UTMmitt.GZD,"north":UTMmitt.north+50000,"east":UTMmitt.east+50000};  // add an half sqId to get the end coordinates
 	const WGS84start = UTMtoWGS84(UTMstart);
 	const WGS84stop = UTMtoWGS84(UTMstop);
-	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east}
+	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
 }
+
+// returns the corners of the MGRS squre can be differently sized so not only the square identifier
+function MGRSnewCorners(coord) {
+    MGRS = parseMGRS(coord);
+    const sqSize = 10**(5-MGRS.coordlength); // square size in meter
+    //console.log("sqSize: "+sqSize);
+	const UTMmitt = MGRSnewtoUTM(coord);
+	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-sqSize/2,"east":UTMmitt.east-sqSize/2}; // substract an half sq to get start coordinates
+	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+sqSize/2,"east":UTMmitt.east+sqSize/2}; // add an half sq to get the end coordinates
+	const WGS84start = UTMtoWGS84(UTMstart);
+	const WGS84stop = UTMtoWGS84(UTMstop);
+	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
+}
+
+function MGRSoldCorners(coord) {
+    MGRS = parseMGRS(coord);
+    const sqSize = 10**(5-MGRS.coordlength); // square size in meter
+    //console.log("sqSize: "+sqSize);
+	const UTMmitt = MGRSoldtoUTM(coord);
+	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-sqSize/2,"east":UTMmitt.east-sqSize/2}; // substract an half sq to get start coordinates
+	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+sqSize/2,"east":UTMmitt.east+sqSize/2}; // add an half sq to get the end coordinates
+	const WGS84start = UTMtoWGS84(UTMstart);
+	const WGS84stop = UTMtoWGS84(UTMstop);
+	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
+}
+
 
 // UTM central Meridian from GridZone
 function centralMedianFromGridZone(gridZone) {
@@ -525,7 +551,7 @@ function SQIdNumtoAlpha(num) {
 
 // convert UTM coordinates to MGRS AA scheme - new
 function UTMtoMGRSnew(UTM) {
-	console.log("UTM: "+UTM.GZD+"");
+	//console.log("UTM: "+UTM.GZD+"");
 
 	const GZDNorth = UTM.GZD.slice(-1);  // The northing part of the GZD
 	if (UTM.GZD.length == 3) {
@@ -606,11 +632,7 @@ function MGRSnewtoUTM (str) {
 	//console.log("MGRSnew: "+str);
 	// AA scheme, MGRS-new
 	const MGRS = parseMGRS(str);
-	//console.clear();
-	//console.log("coordlength: "+MGRS.coordlength);
 	const sqSize = 10**(5-MGRS.coordlength); // square size in meter
-	//console.log("sqSize: "+sqSize);
-
 
 	//divide the GZD string into northing and the easting part
 	const GZDNorth = MGRS.GZD.slice(-1);  // The northing part of the GZD
@@ -623,10 +645,6 @@ function MGRSnewtoUTM (str) {
 	// divide the 100 000-meter square identifier, sqID into east and north part
 	const sqIdEast = MGRS.sqId.slice(0,1);
 	const sqIdNorth = MGRS.sqId.slice(1,2);
-	
-	//console.log("sqIdEast: "+sqIdEast);
-	//console.log("sqIdNorth: "+sqIdNorth);
-
 
 	//calculate the UTM Esting 
 
@@ -696,12 +714,12 @@ function MGRSnewtoUTM (str) {
 		const sqIdnorthing = sqIdNorthNumP*100000;  // sqId northing in m from the equator in odd bands should be 0 for A and even bands 0 for F
 		const falsnorthing = 10000000; // northing at the equator for the southern hemisphere
 		northAU = falsnorthing - sqIdnorthing + MGRS.north;  //+4000000;
-		GZDSouthStartM = falsnorthing + GZDNorthStartM + 888888.888888888// start of the latitude bands in meter for the southern hemisphere
+		GZDSouthStartM = falsnorthing + GZDNorthStartM + 888888.888888888; // start of the latitude bands in meter for the southern hemisphere
 		while(northAU > GZDSouthStartM) {
 			northAU = northAU - 2000000; // substract one sqId A-U band until smaller than the GZD band
 		}
 	}
-	return {"GZD":MGRS.GZD,"north":northAU+sqSize/2,"east":UTMEast+sqSize/2}
+	return {"GZD":MGRS.GZD,"north":northAU+sqSize/2,"east":UTMEast+sqSize/2};
 }
 
 // convert from UTM to MGRS AL shcene - old
@@ -758,11 +776,7 @@ function UTMtoMGRSold(UTM) {
 function MGRSoldtoUTM (str) {
 	// AL scheme, MGRS-old
 	const MGRS = parseMGRS(str);
-	//console.clear();
-	//console.log("coordlength: "+MGRS.coordlength);
 	const sqSize = 10**(5-MGRS.coordlength); // square size in meter
-	//console.log("sqSize: "+sqSize);
-
 
 	//divide the GZD string into northing and the easting part
 	const GZDNorth = MGRS.GZD.slice(-1);  // The northing part of the GZD
@@ -775,11 +789,7 @@ function MGRSoldtoUTM (str) {
 	// divide the 100 000-meter square identifier, sqID into east and north part
 	const sqIdEast = MGRS.sqId.slice(0,1);
 	const sqIdNorth = MGRS.sqId.slice(1,2);
-	
-	//console.log("sqIdEast: "+sqIdEast);
-	//console.log("sqIdNorth: "+sqIdNorth);
-
-
+    
 	//calculate the UTM Esting 
 
 	//what SqID east alpha the GZD start with.
@@ -802,7 +812,6 @@ function MGRSoldtoUTM (str) {
 	const UTMEast = sqIdNumEast*100000 - (SqIDEnumstart-1)*100000 + MGRS.east;
 
 	//calculate the UTM northing part
-
 	const sqIdNumNorth = SQIdAlphatoNum(sqIdNorth);
 
 	// padd with 0 to get right amount of numbers
@@ -813,11 +822,7 @@ function MGRSoldtoUTM (str) {
 	// latitude band = 8 grader 90 grader = 10 000 000 meter så ett latitude band = 888888.888888888 meter
 
 	const oneLatbandM = 10000000/90*8;  // the length of 1 degree on earth surface in meter
-
-	//console.log("Northen hemsisphere");
-	//console.log(" GZD latitude band: "+GZDNorth);
 	const GZDNorthNum = SQIdAlphatoNum(GZDNorth)-12;  // latutude band 8 degree, first north of ekvator = 0; negative south of equator
-	//console.log(" GZD latitude band num: "+GZDNorthNum);
 
 	// start of the GZD latitude band in meter from the equator Northen hemisphere OBS only approximately, for exat numbers Gaus Kruger formula is needed;
 	const GZDNorthStartM = GZDNorthNum * 888888.888888888;  	
@@ -853,5 +858,134 @@ function MGRSoldtoUTM (str) {
 			northAU = northAU - 2000000; // substract one sqId A-U band until smaller than the GZD band
 		}
 	}
-	return {"GZD":MGRS.GZD,"north":northAU+sqSize/2,"east":UTMEast+sqSize/2}
+	return {"GZD":MGRS.GZD,"north":northAU+sqSize/2,"east":UTMEast+sqSize/2};
+}
+
+// asumes WGS84 but is simmilar enough to work like EU89 for modern Norwegian maps. UTM33 is used for most Norwegian maps.
+function WGS84toUTM33(WGS84) {
+    // easting range 167000 meters to 833000
+	// northing range 0 to 9300000
+	if (WGS84.north < -80 || WGS84.north > 84 ) {  // 
+		// polar areas uses the Universal polar stereographic coordinate system
+		return "outside defined area";
+	}
+	const UTM_centralMeridian = 15;
+	var UTM_false_northing = 0;   //N0  
+	if (WGS84.north<=0) {
+		UTM_false_northing = 10000000;       
+	} 
+	const UTM_false_easting = 500000.0; //E0
+	const atscale = 6364902.166165086;
+	const beta1 = 0.0008377318206303529;
+	const beta2 = 7.608527714248998e-7;
+	const beta3 = 1.1976380015605234e-9;
+	const beta4 = 2.443376194522064e-12;	
+	const phi = WGS84.north * Math.PI/180;
+    const lambda = WGS84.east * Math.PI/180;
+    const lambda_zero = UTM_centralMeridian * Math.PI/180;
+    const phi_star = phi - Math.sin(phi) * Math.cos(phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * Math.pow(Math.sin(phi), 2) +
+                2.592527480950674e-7 * Math.pow(Math.sin(phi), 4) +
+                1.971698908689572e-9 * Math.pow(Math.sin(phi), 6));
+    const delta_lambda = lambda - lambda_zero;
+    const xi_prim = Math.atan(Math.tan(phi_star) / Math.cos(delta_lambda));
+    const eta_prim = Math.atanh(Math.cos(phi_star) * Math.sin(delta_lambda));
+    const x = atscale * (xi_prim +
+                beta1 * Math.sin(2.0 * xi_prim) * Math.cosh(2.0 * eta_prim) +
+                beta2 * Math.sin(4.0 * xi_prim) * Math.cosh(4.0 * eta_prim) +
+                beta3 * Math.sin(6.0 * xi_prim) * Math.cosh(6.0 * eta_prim) +
+                beta4 * Math.sin(8.0 * xi_prim) * Math.cosh(8.0 * eta_prim)) +
+				+ UTM_false_northing;
+    const y = atscale * (eta_prim +
+                beta1 * Math.cos(2.0 * xi_prim) * Math.sinh(2.0 * eta_prim) +
+                beta2 * Math.cos(4.0 * xi_prim) * Math.sinh(4.0 * eta_prim) +
+                beta3 * Math.cos(6.0 * xi_prim) * Math.sinh(6.0 * eta_prim) +
+                beta4 * Math.cos(8.0 * xi_prim) * Math.sinh(8.0 * eta_prim)) +
+        		UTM_false_easting;
+	return {"east":Math.round(y), "north":Math.round(x)};
+}
+
+// används för moderna finska kartor. Antar att WGS84 är tillräkligt likt EGS84 EUREF-FIN för att inte behöva ändra geodetiskt datum.
+// använder samma transvers mercator projection som UTM zon 35
+function WGS84toETRSTM35FIN(WGS84) {
+    if (WGS84.north < -80 || WGS84.north > 84 ) {  // 
+		// polar areas uses the Universal polar stereographic coordinate system
+		return "outside defined area";
+	}
+	const UTM_centralMeridian = 27;
+	var UTM_false_northing = 0;   //N0  
+	if (WGS84.north<=0) {
+		UTM_false_northing = 10000000;       
+	} 
+	const UTM_false_easting = 500000.0; //E0
+	const atscale = 6364902.166165086;
+	const beta1 = 0.0008377318206303529;
+	const beta2 = 7.608527714248998e-7;
+	const beta3 = 1.1976380015605234e-9;
+	const beta4 = 2.443376194522064e-12;	
+	const phi = WGS84.north * Math.PI/180;
+    const lambda = WGS84.east * Math.PI/180;
+    const lambda_zero = UTM_centralMeridian * Math.PI/180;
+    const phi_star = phi - Math.sin(phi) * Math.cos(phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * Math.pow(Math.sin(phi), 2) +
+                2.592527480950674e-7 * Math.pow(Math.sin(phi), 4) +
+                1.971698908689572e-9 * Math.pow(Math.sin(phi), 6));
+    const delta_lambda = lambda - lambda_zero;
+    const xi_prim = Math.atan(Math.tan(phi_star) / Math.cos(delta_lambda));
+    const eta_prim = Math.atanh(Math.cos(phi_star) * Math.sin(delta_lambda));
+    const x = atscale * (xi_prim +
+                beta1 * Math.sin(2.0 * xi_prim) * Math.cosh(2.0 * eta_prim) +
+                beta2 * Math.sin(4.0 * xi_prim) * Math.cosh(4.0 * eta_prim) +
+                beta3 * Math.sin(6.0 * xi_prim) * Math.cosh(6.0 * eta_prim) +
+                beta4 * Math.sin(8.0 * xi_prim) * Math.cosh(8.0 * eta_prim)) +
+				+ UTM_false_northing;
+    const y = atscale * (eta_prim +
+                beta1 * Math.cos(2.0 * xi_prim) * Math.sinh(2.0 * eta_prim) +
+                beta2 * Math.cos(4.0 * xi_prim) * Math.sinh(4.0 * eta_prim) +
+                beta3 * Math.cos(6.0 * xi_prim) * Math.sinh(6.0 * eta_prim) +
+                beta4 * Math.cos(8.0 * xi_prim) * Math.sinh(8.0 * eta_prim)) +
+        		UTM_false_easting;
+	return {"east":Math.round(y), "north":Math.round(x)};
+}
+
+// EPSG:25832 is used in Denmark its UTM zone 32 with ETRS89 it should be similar enough as WGS84
+function WGS84toUTM32(WGS84) {
+    if (WGS84.north < -80 || WGS84.north > 84 ) {  // 
+		// polar areas uses the Universal polar stereographic coordinate system
+		return "outside defined area";
+	}
+	const UTM_centralMeridian = 9;
+	var UTM_false_northing = 0;   //N0  
+	if (WGS84.north<=0) {
+		UTM_false_northing = 10000000;       
+	} 
+	const UTM_false_easting = 500000.0; //E0
+	const atscale = 6364902.166165086;
+	const beta1 = 0.0008377318206303529;
+	const beta2 = 7.608527714248998e-7;
+	const beta3 = 1.1976380015605234e-9;
+	const beta4 = 2.443376194522064e-12;	
+	const phi = WGS84.north * Math.PI/180;
+    const lambda = WGS84.east * Math.PI/180;
+    const lambda_zero = UTM_centralMeridian * Math.PI/180;
+    const phi_star = phi - Math.sin(phi) * Math.cos(phi) * (0.0066943799901413165 +
+                0.000037295601745679795 * Math.pow(Math.sin(phi), 2) +
+                2.592527480950674e-7 * Math.pow(Math.sin(phi), 4) +
+                1.971698908689572e-9 * Math.pow(Math.sin(phi), 6));
+    const delta_lambda = lambda - lambda_zero;
+    const xi_prim = Math.atan(Math.tan(phi_star) / Math.cos(delta_lambda));
+    const eta_prim = Math.atanh(Math.cos(phi_star) * Math.sin(delta_lambda));
+    const x = atscale * (xi_prim +
+                beta1 * Math.sin(2.0 * xi_prim) * Math.cosh(2.0 * eta_prim) +
+                beta2 * Math.sin(4.0 * xi_prim) * Math.cosh(4.0 * eta_prim) +
+                beta3 * Math.sin(6.0 * xi_prim) * Math.cosh(6.0 * eta_prim) +
+                beta4 * Math.sin(8.0 * xi_prim) * Math.cosh(8.0 * eta_prim)) +
+				+ UTM_false_northing;
+    const y = atscale * (eta_prim +
+                beta1 * Math.cos(2.0 * xi_prim) * Math.sinh(2.0 * eta_prim) +
+                beta2 * Math.cos(4.0 * xi_prim) * Math.sinh(4.0 * eta_prim) +
+                beta3 * Math.cos(6.0 * xi_prim) * Math.sinh(6.0 * eta_prim) +
+                beta4 * Math.cos(8.0 * xi_prim) * Math.sinh(8.0 * eta_prim)) +
+        		UTM_false_easting;
+	return {"east":Math.round(y), "north":Math.round(x)};
 }

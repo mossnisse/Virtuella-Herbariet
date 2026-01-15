@@ -11,8 +11,8 @@ function parseUnknowCoord(coord) {
 	var Sweref99TM = false;
 	var RT90 = false;
 	var UTM = false;
-	var MGRSnew = false;
-	var MGRSold = false;
+	MGRSnew = false;
+	MGRSold = false;
 	var RUBIN = false;
 	var coordOBJ = false;
 	if      (R = isRT90(coord)) {
@@ -224,14 +224,13 @@ function isMGRSold(coord) {
 	const coordlength = (coord.length-5)/2;
 	const mult = 10**(5-coordlength);
 	// everything with a value is true, so returns both true and the cleaned up MGRS can't be 0 or null;
+   
 	return {"sys":"MGRS-old "+mult+" m square", "interpreted":coord};
 }
 
 function isUTM(coord) {
 	//coord = coord.replace(/\s/g, "");
 	//checking if GZD easting number is two or one digit, if only one add 0;
-	//console.clear();
-	//console.log("Coord: "+coord);
 	if (!isDigit(coord[1])) {
 		coord = '0'+coord;
 	} 
@@ -282,7 +281,7 @@ function isUTM(coord) {
 
 	// check if north and east values is valid, doing it withchecking if WGS84 is in gridzone
 	WGS84 = UTMtoWGS84({"GZD":GZD,"east":east,"north":north});
-	console.log("north: "+WGS84.north+ " east: "+WGS84.east);
+	//console.log("north: "+WGS84.north+ " east: "+WGS84.east);
 	GZDsquare = GZDcorners(GZD);
 	if (WGS84.north <= GZDsquare.north1 || WGS84.north >= GZDsquare.north2 || WGS84.east <= GZDsquare.east1 || WGS84.east >= GZDsquare.east2) {
 		return false;
