@@ -1,72 +1,115 @@
 // javascript functions so that convertcoordinates.html works, converts and list of coordinates in various formats
 // written by Nils Ericson 2025-03-07
 
+const OPTIONS = {
+    "Interpreted": "Coordinate interpreted as",
+    "Country": "Country",
+    "Province": "Province",
+    "District": "District",
+    "Locality": "Nearest locality in the db",
+    "WGS84": "WGS84",
+    "Sweref99TM": "Sweref99TM",
+    "RT90": "RT90",
+    "RUBIN": "RUBIN",
+    "UTM": "UTM (gridzone, WGS84)",
+    "MGRS-new": "MGRS-new",
+    "MGRS-old": "MGRS-old",
+    "DMS": "WGS84 DMS",
+    "DM": "WGS84 DM",
+    "Distance": "Nearest place, selected localities",
+    "City": "Nearest city, >500 pop in geonames.org",
+    "wname": "Waypoint name (ony if you use GPX file)",
+    "wtime": "Waypoint time (ony if you use GPX file)",
+};
+
+function createSelectHTML(selectedValue) {
+    let html = `<td><select onchange="addField(this)">`;
+    html += `<option value="Remove">--</option>`;
+    for (const [val, label] of Object.entries(OPTIONS)) {
+        const selected = val === selectedValue ? "selected" : "";
+        html += `<option value="${val}" ${selected}>${label}</option>`;
+    }
+    html += `</select></td>`;
+    return html;
+}
+
 function convertC() {
-	var coordinates = document.getElementById("coordinates").value;
-	coordinates = coordinates.trim();
-	const coordArray = coordinates.split("\n");
-	const outtable = document.getElementById("output_table");
-	outtable.textContent = "";
+    let coordinates = document.getElementById("coordinates").value.trim();
+    if (!coordinates) return;
+
+    const coordArray = coordinates.split("\n");
+    const outtable = document.getElementById("output_table");
+    outtable.textContent = "";
     
-    // create output table field names
-	var header = outtable.createTHead();
-	var row = header.insertRow(0); 
+    // Setup headers
+    const header = outtable.createTHead();
+    let hRow = header.insertRow(0); 
     const selectTable = document.getElementById("select_table");
-    const convTo = [];  // an list of coord systems / things to convert to.
-    var waypoints = false;
-    if (coordArray[0] == "gpx waypoints") {
-       	//console.log("qpx waipoints");
+    const convTo = []; 
+
+    let waypoints = false;
+    if (coordArray[0] === "gpx waypoints") {
         waypoints = true;
-        coordArray.shift();
-        coordArray.shift();
+        coordArray.shift(); // remove header line
+        coordArray.shift(); // remove column names line
     }
-    for (var i = 0, srow; srow = selectTable.rows[i]; i++) {
-        const fieldName = srow.cells[0].firstChild.value;
-        //console.log("field: "+fieldName);
-        if (fieldName != "Remove") {
-            var cell1 = row.insertCell(-1);
-            cell1.textContent = fieldName;
-            convTo[i]=fieldName;
+
+    // Identify which columns the user wants
+    for (let i = 0; i < selectTable.rows.length; i++) {
+        const selectEl = selectTable.rows[i].querySelector("select");
+        const fieldName = selectEl.value;
+        if (fieldName !== "Remove") {
+            let cell = hRow.insertCell(-1);
+            cell.textContent = selectEl.options[selectEl.selectedIndex].text;
+            convTo.push(fieldName);
         }
     }
-	//console.log("convert to: "+convTo);
-	for (var i=0;i<coordArray.length;i++){
-        row = outtable.insertRow(-1);
-        for (var j=0;j<convTo.length;j++) {
-            var coord = coordArray[i];
-            //console.log("conv coord: "+coord);
-            var name;
-            if(waypoints) {
-                arr = coord.split('\t');
-                name = arr[0];
-                coord = arr[1]+', '+arr[2];
-                time = arr[3];
-            }
-            //console.log("conv coord: "+coord);
-            var icoord = parseUnknowCoord(coord);
-            //console.log("iconv coord: "+icoord.interpreted);
-            var converted = convertInterpretedCoord(icoord, convTo[j], i, j);
-            //console.log("converted: "+converted);
-            var cell = row.insertCell(-1);
-            if (typeof converted === "string") {
-                cell.textContent = converted;
+
+    // Process Rows
+    for (let i = 0; i < coordArray.length; i++) {
+        let rawLine = coordArray[i].trim();
+        if (!rawLine) continue;
+        
+        let row = outtable.insertRow(-1);
+        let coordToParse = rawLine; // Default for non-GPX
+        let wptData = { name: "", time: "" };
+        
+        if (waypoints) {
+            const arr = rawLine.split('\t'); // FIXED: was 'coord'
+            wptData.name = arr[0] || "";
+            coordToParse = (arr[1] || "") + ', ' + (arr[2] || ""); // FIXED: was 'coordTParse'
+            wptData.time = arr[3] || "";
+        }
+        
+        const icoord = parseUnknowCoord(coordToParse);
+        
+        for (let j = 0; j < convTo.length; j++) {
+            let cell = row.insertCell(-1);
+            let targetSystem = convTo[j];
+            
+            if (targetSystem === "wname") {
+                cell.textContent = wptData.name;
+            } else if (targetSystem === "wtime") {
+                cell.textContent = wptData.time;
             } else {
-                var convText = "";
-                for (var k=0;k<converted.length;k++) {
-                    if (k==0) {
-                        convText = converted[k];
-                    } else {
-                        convText = convText + ', ' + converted[k];
-                    }
+                // The 'i' here correctly identifies the current row being built
+                let converted = convertInterpretedCoord(icoord, targetSystem, i, j);
+                
+                if (Array.isArray(converted)) {
+                    cell.textContent = converted.join(', ');
+                } else {
+                    cell.textContent = converted;
                 }
-                cell.textContent = convText;
-            }
+            }        
         }
-	}
+    }
 }
 
 function convertInterpretedCoord(icoor, toSystem, i, j) {
-	var coord;
+    if (!icoor || icoor.sys === "unknown" || !icoor.WGS84) {
+        return "N/A"; 
+    }
+	let coord = "";
 	const fromSystem = icoor.sys;
 	const interpreted = icoor.interpreted;
 	const wgs84 = icoor.WGS84;
@@ -100,185 +143,178 @@ function convertInterpretedCoord(icoor, toSystem, i, j) {
 			coord = printWGS84(wgs84);
 		break;
 		case "RT90":
-			RT90 = WGS84toRT90(wgs84);
+			const RT90 = WGS84toRT90(wgs84);
 			coord = printRT90(RT90);
 		break;
 		case "Sweref99TM":
-			Sweref99TM = WGS84toSweref99TM(wgs84);
+			const Sweref99TM = WGS84toSweref99TM(wgs84);
 			coord = printSweref99TM(Sweref99TM);
 		break;
 		case "UTM":
-			UTM = WGS84toUTM(wgs84);
+			const UTM = WGS84toUTM(wgs84);
 			coord = printUTM(UTM);
 		break;
 		case "RUBIN":
-			var rt90 = WGS84toRT90(wgs84);
+			const rt90 = WGS84toRT90(wgs84);
 			coord = RT90toRUBIN(rt90);
 		break;
 		case "MGRS-new":
-			UTM = WGS84toUTM(wgs84);
-            if (UTM != "outside defined area") {
-                coord = UTMtoMGRSnew(UTM);
+			const UTM2 = WGS84toUTM(wgs84);
+            if (UTM2 != "outside defined area") {
+                coord = UTMtoMGRSnew(UTM2);
             } else {
                 coord = "outside defined area";
             }
-			
         break;
 		case "MGRS-old":
-			UTM = WGS84toUTM(wgs84);
-            if (UTM != "outside defined area") {
-			     coord = UTMtoMGRSold(UTM);
+			const UTM3 = WGS84toUTM(wgs84);
+            if (UTM3 != "outside defined area") {
+			     coord = UTMtoMGRSold(UTM3);
             } else {
                 coord = "outside defined area";
             }
 		break;
+        case "City":
+            coord = getNearestCity(wgs84, i, j);
+        break;
 	}
 	return coord;
 }
 
-function ajax(url, doit)
-{
-	var xmlhttp;
-	if (window.XMLHttpRequest)
-	{
-	    xmlhttp=new XMLHttpRequest();
-	}
-	else
-	{
-	    alert("Your browser does not support XMLHTTP!");
-	}
-	xmlhttp.onreadystatechange=function()
-	{
-	    if (xmlhttp.readyState==4)
-	    {
-            doit(xmlhttp.responseText);
-	    }
-	};
-	xmlhttp.open("GET", url ,true);
-	xmlhttp.send(null);
+async function getData(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (e) {
+        console.error("Fetch error: " + e.message);
+        return null;
+    }
 }
 
 function getDistrictName(WGS84, i, j) {
-	var url = "districtFromC.php?North="+WGS84.north+"&East="+WGS84.east;
-	ajax(url, function(json) {
-		var distr = JSON.parse(json);
-		row = document.getElementById("output_table").rows[i+1];
-		row.cells[j].textContent = distr.name;
-	});
-	return "wait"+i;
+	const url = `districtFromC.php?North=${WGS84.north}&East=${WGS84.east}`;
+    const targetTable = document.getElementById("output_table");
+	// We trigger the fetch but don't 'await' it here so the table builds fast
+    getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+        if (data && data.name) {
+            cell.textContent = data.name;
+        } else {
+            cell.textContent = "error District not found";
+        }
+    });
+    return "loading...";
 }
 
 function getProvinceName(WGS84, i, j) {
-	var url = "provinceFromC.php?North="+WGS84.north+"&East="+WGS84.east;
-	ajax(url, function(json) {
-		var prov = JSON.parse(json);
-		row = document.getElementById("output_table").rows[i+1];
-		row.cells[j].textContent = prov.name;
-	});
-	return "wait"+i;
+	const url = `provinceFromC.php?North=${WGS84.north}&East=${WGS84.east}`;
+    const targetTable = document.getElementById("output_table");
+	getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+        if (data && data.name) {
+            cell.textContent = data.name;
+        } else {
+            cell.textContent = "error Province not found";
+        }
+    });
+    return "loading...";
 }
 
 function getCountryName(WGS84, i, j) {
 	var url = "countryFromC.php?North="+WGS84.north+"&East="+WGS84.east;
-	ajax(url, function(json) {
-		var count = JSON.parse(json);
-		row = document.getElementById("output_table").rows[i+1];
-		row.cells[j].textContent = count.name;
-	});
-	return "wait<"+i+"><"+j+">";
+	const targetTable = document.getElementById("output_table");
+	getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+        if (data && data.name) {
+            cell.textContent = data.name;
+        } else {
+            cell.textContent = "error Country not found";
+        }
+    });
+    return "loading...";
 }
 
-function getNearestLocalityName(WGS84, i, j){
-	var url = "nearestLocality.php?north="+WGS84.north+"&east="+WGS84.east;
-	ajax(url, function(json) {
-		row = document.getElementById("output_table").rows[i+1];
-		var loc = JSON.parse(json);
-        var dist = Math.round(loc.distance/100)/10;
-        var dirtext = dist+ "km " +loc.direction + " " + loc.name;
-		row.cells[j].textContent = dirtext;
-	});
-	return "wait"+i;
+function getNearestLocalityName(WGS84, i, j) {
+    const url = `nearestLocality.php?north=${WGS84.north}&east=${WGS84.east}`;
+    const targetTable = document.getElementById("output_table");
+
+    getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+
+        if (data && data.name) {
+            // Rounding to 1 decimal place (e.g., 5.2 km)
+            const dist = Math.round(data.distance / 100) / 10;
+            const dirtext = `${dist} km ${data.direction} ${data.name}`;
+            cell.textContent = dirtext;
+        } else {
+            cell.textContent = "No locality found within 10km";
+        }
+    });
+    return "loading...";
 }
 
-function getNearestPlace(WGS84, i, j){
-	var url = "nearestPlace.php?north="+WGS84.north+"&east="+WGS84.east;
-	ajax(url, function(json) {
-		row = document.getElementById("output_table").rows[i+1];
-		var loc = JSON.parse(json);
-        var dist = Math.round(loc.distance/100)/10;
-        var placeText = dist + "km " + loc.direction + " "+ loc.name;
-        row.cells[j].textContent = placeText;
-	});
-	return "wait"+i;
+function getNearestPlace(WGS84, i, j) {
+    const url = `nearestPlace.php?north=${WGS84.north}&east=${WGS84.east}`;
+    const targetTable = document.getElementById("output_table");
+
+    getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+
+        if (data && data.name) {
+            const dist = Math.round(data.distance / 100) / 10;
+            const placeText = `${dist} km ${data.direction} ${data.name}`;
+            cell.textContent = placeText;
+        } else {
+            cell.textContent = "No place found within 50km";
+        }
+    });
+    return "loading...";
+}
+
+function getNearestCity(WGS84, i, j) {
+    const url = `nearestGeoname500.php?north=${WGS84.north}&east=${WGS84.east}`;
+    const targetTable = document.getElementById("output_table");
+
+    getData(url).then(data => {
+        const row = targetTable?.rows[i + 1];
+        const cell = row?.cells[j];
+        if (!cell) return;
+
+        if (data && data.name) {
+            const dist = Math.round(data.distance / 100) / 10;
+            const placeText = `${dist} km ${data.direction} ${data.name}`;
+            cell.textContent = placeText;
+        } else {
+            cell.textContent = "No city found within 50km";
+        }
+    });
+    return "loading...";
 }
 
 function initFieldTable() {
     const selectTable = document.getElementById("select_table");
-    select_row_html =
-            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
-                <option value=\"Remove\" selected>--</option>\
-                <option value=\"Country\">Country</option>\
-                <option value=\"Province\">Province</option>\
-                <option value=\"District\" >District</option>\
-                <option value=\"Locality\">Nearest locality</option>\
-                <option value=\"WGS84\" selected>WGS84</option>\
-                <option value=\"Sweref99TM\">Sweref99TM</option>\
-                <option value=\"RT90\">RT90</option>\
-                <option value=\"RUBIN\">RUBIN</option>\
-                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
-                <option value=\"MGRS-new\">MGRS-new</option>\
-                <option value=\"MGRS-old\">MGRS-old</option>\
-                <option value=\"DMS\">WGS84 DMS</option>\
-                <option value=\"DM\">WGS84 DM</option>\
-                <option value=\"Interpreted\">Interpreted as</option>\
-                <option value=\"Distance\">Distance and direction to nearest place</option>\
-                <option value=\"wname\">Waypoint name (ony if you use GPX file)</option>\
-                <option value=\"wname\">Waypoint time (ony if you use GPX file)</option>\
-            </select></td>";
+    const select_row_html = createSelectHTML("District");
     var row =  selectTable.insertRow(-1);
     row.innerHTML = select_row_html;
-    select_row_html =
-            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
-                <option value=\"Remove\" selected>--</option>\
-                <option value=\"Country\">Country</option>\
-                <option value=\"Province\">Province</option>\
-                <option value=\"District\" >District</option>\
-                <option value=\"Locality\">Nearest locality</option>\
-                <option value=\"WGS84\" selected>WGS84</option>\
-                <option value=\"Sweref99TM\">Sweref99TM</option>\
-                <option value=\"RT90\">RT90</option>\
-                <option value=\"RUBIN\">RUBIN</option>\
-                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
-               	<option value=\"MGRS-new\">MGRS-new</option>\
-                <option value=\"MGRS-old\">MGRS-old</option>\
-                <option value=\"DMS\">WGS84 DMS</option>\
-                <option value=\"DM\">WGS84 DM</option>\
-                <option value=\"Interpreted\" selected>Interpreted as</option>\
-                <option value=\"Distance\">Distance and direction to nearest place</option>\
-            </select></td>";
-    row =  selectTable.insertRow(-1);
-    row.innerHTML = select_row_html;
-    select_row_html =
-            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
-                <option value=\"Remove\" selected>--</option>\
-                <option value=\"Country\">Country</option>\
-                <option value=\"Province\">Province</option>\
-                <option value=\"District\" >District</option>\
-                <option value=\"Locality\">Nearest locality</option>\
-                <option value=\"WGS84\">WGS84</option>\
-                <option value=\"Sweref99TM\">Sweref99TM</option>\
-                <option value=\"RT90\">RT90</option>\
-                <option value=\"RUBIN\">RUBIN</option>\
-                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
-                <option value=\"MGRS-new\">MGRS-new</option>\
-                <option value=\"MGRS-old\">MGRS-old</option>\
-                <option value=\"DMS\">WGS84 DMS</option>\
-                <option value=\"DM\">WGS84 DM</option>\
-                <option value=\"Interpreted\">Interpreted as</option>\
-                <option value=\"Distance\">Distance and direction to nearest place</option>\
-            </select></td>";
-    row =  selectTable.insertRow(-1);
-    row.innerHTML = select_row_html;
+    const select_row_html2 = createSelectHTML("Interpreted");
+    var row =  selectTable.insertRow(-1);
+    row.innerHTML = select_row_html2;
+    const select_row_html3 = createSelectHTML("Remove");
+    var row =  selectTable.insertRow(-1);
+    row.innerHTML = select_row_html3;
 }
 
 function addField(field) {
@@ -293,25 +329,7 @@ function addField(field) {
     }
     if (rowNumber+1 == selectTable.rows.length && field.value != "Remove") {
         //window.alert("insert row");
-          select_row_html =
-            "<td><select name=\"ouptput1\" id=\"ouptput1\" onchange=\"addField(this)\">\
-                <option value=\"Remove\" selected>--</option>\
-                <option value=\"Country\">Country</option>\
-                <option value=\"Province\">Province</option>\
-                <option value=\"District\" >District</option>\
-                <option value=\"Locality\">Nearest locality</option>\
-                <option value=\"WGS84\">WGS84</option>\
-                <option value=\"Sweref99TM\">Sweref99TM</option>\
-                <option value=\"RT90\">RT90</option>\
-                <option value=\"RUBIN\">RUBIN</option>\
-                <option value=\"UTM\">UTM(gridzone,WGS84)</option>\
-                <option value=\"MGRS-new\">MGRS-new</option>\
-                <option value=\"MGRS-old\">MGRS-old</option>\
-                <option value=\"DMS\">WGS84 DMS</option>\
-                <option value=\"DM\">WGS84 DM</option>\
-                <option value=\"Interpreted\">Interpreted as</option>\
-                <option value=\"Distance\">Distance and direction to nearest place</option>\
-            </select></td>";
+        select_row_html = createSelectHTML("Remove");
         let row =  selectTable.insertRow(-1);
         row.innerHTML = select_row_html;
     }
@@ -335,7 +353,7 @@ function displayContents(contents) {
     var parser, xmlDoc;
 	parser = new DOMParser();
 	xmlDoc = parser.parseFromString(contents,"text/xml");
-	wpts = xmlDoc.getElementsByTagName("wpt");
+	const wpts = xmlDoc.getElementsByTagName("wpt");
     
     var element = document.getElementById('coordinates');
     //element.textContent = wpts;
@@ -351,78 +369,63 @@ function displayContents(contents) {
 }
 
 var map = false;
-var markers = L.layerGroup();
+var markers = L.featureGroup();
 
 function showMap() {
     const showButton = document.getElementById("showMap");
     showButton.value = "Update map";
-    
+
     if (!map) {
-        map = L.map('map').setView([0, 0], 0);
+        map = L.map('leaf_map').setView([0, 0], 0);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-    }  else {
-        markers.clearLayers();
+        markers.addTo(map);
     }
+    markers.clearLayers();
 
     const coordinates = document.getElementById("coordinates").value.trim();
+    if (!coordinates) return;
+    
     const coordArray = coordinates.split("\n");
     var waypoints = false;
     if (coordArray[0] == "gpx waypoints") {
        	//console.log("qpx waipoints");
         waypoints = true;
-        coordArray.shift();
-        coordArray.shift();
+        coordArray.shift(); // remove header
+        coordArray.shift(); // remove column names
     }
     
-    Nmax = -1000;
-    Emax = -1000;
-    Nmin = +1000;
-    Emin = +1000;
-    
-    for (var i=0;i<coordArray.length;i++) {
-        
-        var coord = coordArray[i];
+    for (var i = 0; i < coordArray.length; i++) {
+        var coord = coordArray[i].trim();
+        if (!coord) continue;
             //console.log("conv coord: "+coord);
+        let displayName = "";
         if(waypoints) {
-            arr = coord.split('\t');
-            name = arr[0];
-            coord = arr[1]+', '+arr[2];
-            time = arr[3];
+            const arr = coord.split('\t');
+            displayName = arr[0];
+            coord = arr[1]+', '+arr[2]; // Lat, Lon
+            //const time = arr[3];   // future feuture
         }
         //console.log("coord: "+coord);
         var icoord = parseUnknowCoord(coord);
         
         if (icoord.sys != "unknown") {
             //console.log("north: "+icoord.WGS84.north+" east: "+icoord.WGS84.east);
-            var marker = L.marker([icoord.WGS84.north,icoord.WGS84.east]);
+            const marker = L.marker([icoord.WGS84.north,icoord.WGS84.east]);
             var popup
             if (waypoints) {
-                popup = L.popup().setContent(name);
+                popup = L.popup().setContent(displayName);
             } else {
                 popup = L.popup().setContent(icoord.interpreted);
             }
             marker.bindPopup(popup).openPopup();
             markers.addLayer(marker);
-            if (Nmax < icoord.WGS84.north) Nmax = icoord.WGS84.north;
-            if (Emax < icoord.WGS84.east) Emax = icoord.WGS84.east;
-            if (Nmin > icoord.WGS84.north) Nmin = icoord.WGS84.north;
-            if (Emin > icoord.WGS84.east) Emin = icoord.WGS84.east; 
         }
     }
-    
     // Zoom level lower number = big area, 0 = whole world 360 grader 
     // calculate some neat zoom level for the map
-    if (Nmax!=-1000) {  // checking if any valid coordinates
-        map.addLayer(markers);
-    
-        Ncenter = (Number(Nmax)+Number(Nmin))/2;
-        Ecenter = (Number(Emax)+Number(Emin))/2;
-        Ewith = Emax-Emin;
-        ratio = 360/(Ewith+0.5);
-        ezoom = Math.log(ratio)/Math.log(2);
-        zoom = Math.floor(ezoom);
-        map.setView([Ncenter, Ecenter],zoom);
+    if (markers.getLayers().length > 0) {
+        map.fitBounds(markers.getBounds(), { padding: [20, 20], maxZoom: 16 });
     }
 }
