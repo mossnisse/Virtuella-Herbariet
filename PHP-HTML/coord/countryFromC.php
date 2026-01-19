@@ -30,12 +30,12 @@ try {
     exit;
 }
 
-$query = "SELECT ID, geojson, english, native, maxX, maxY FROM countries where maxX>:east and minX<:east and maxY>:north and minY <:north;";
+$query = "SELECT ID, geojson, english, native, maxX, maxY FROM countries where maxX >= :east and minX <= :east and maxY >= :north and minY <= :north;";
 //echo "$query <p>";
 $Stm = $con->prepare($query);
 $Stm->execute([':east' => $east, ':north' => $north]);
 $response = [
-    "ID" => "0",
+    "ID" => "-1",
     "name" => "outside borders",
     "nativeName" => "NaN"
 ];

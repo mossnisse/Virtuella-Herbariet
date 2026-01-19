@@ -32,14 +32,14 @@ try {
     // 3. Query using the specific column names for districts (xmax, xmin, etc.)
     $query = "SELECT ID, geojson, district, xmax, ymax, typeNative, typeEng 
               FROM district 
-              WHERE xmax > :east AND xmin < :east 
-              AND ymax > :north AND ymin < :north";
+              WHERE xmax >= :east AND xmin <= :east 
+              AND ymax >= :north AND ymin <= :north";
 
     $Stm = $con->prepare($query);
     $Stm->execute([':east' => $east, ':north' => $north]);
 
     $response = [
-        "ID" => "0",
+        "ID" => "-1",
         "name" => "outside borders",
         "typeNative" => "NaN",
         "typeEng" => "NaN"

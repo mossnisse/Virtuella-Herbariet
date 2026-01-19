@@ -29,8 +29,8 @@ try {
 
     $query = "SELECT ID, geojson, province, maxX, maxY, type_native, type_eng 
               FROM provinces 
-              WHERE maxX > :east AND minX < :east 
-              AND maxY > :north AND minY < :north";
+              WHERE maxX >= :east AND minX <= :east 
+              AND maxY >= :north AND minY <= :north";
 
     $Stm = $con->prepare($query);
     $Stm->execute([':east' => $east, ':north' => $north]);

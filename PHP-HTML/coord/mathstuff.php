@@ -34,14 +34,14 @@ function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, f
 			return false;
 	    }
 	}
-	 if ($commonDenominator == 0){
+	 if (abs($commonDenominator) < 0.0000001) {
 	    // This code wasn't in Franklin Antonio's method. It was added by Keith Woodward.
 	    // The lines are parallel.
 	    // Check if they're collinear.
 	    $y3LessY1 = $y3-$y1;
-	    $ollinearityTestForP3 = $x1*($y2-$y3) + $x2*($y3LessY1) + $x3*($y1-$y2);   // see http://mathworld.wolfram.com/Collinear.html
+	    $collinearityTestForP3 = $x1*($y2-$y3) + $x2*($y3LessY1) + $x3*($y1-$y2);   // see http://mathworld.wolfram.com/Collinear.html
 	    // If p3 is collinear with p1 and p2 then p4 will also be collinear, since p1-p2 is parallel with p3-p4
-	    if ($collinearityTestForP3 == 0){
+	    if (abs($collinearityTestForP3) < 0.0000001) {
 	        // The lines are collinear. Now check if they overlap.
 	        if ($x1 >= $x3 && $x1 <= $x4 || $x1 <= $x3 && $x1 >= $x4 ||
 	                  $x2 >= $x3 && $x2 <= $x4 || $x2 <= $x3 && $x2 >= $x4 ||
@@ -58,30 +58,41 @@ function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, f
 	return true;
 }
 
-function isPointInsidePolly(float $east, float $north, float $xmax, float $ymax, String $geojson): bool {
+function isPointInsidePolly(float $east, float $north, float $xmax, float $ymax, string $geojson): bool {
     $decoded = json_decode($geojson);
-	$multiPolygon = $decoded->features[0]->geometry->coordinates;
-	$nr_intersections = 0;
-	$xout = $xmax + 0.1;  // point outside the region
-	$yout = $ymax + 0.1;
-    foreach($multiPolygon as $polygon) {
-		foreach($polygon as $ring) {
-			$xold = -2000000;
-			$yold = -2000000;
-			foreach($ring as $coord) {
-				//echo $coord[1].", ".$coord[0]."<br>\n";
-				if ($xold != -2000000) {
-					if (linesIntersect($xout, $yout, $east, $north, $xold, $yold, $coord[0], $coord[1])) {
-						$nr_intersections++;
-						//echo "intersects<br>\n";
-					}
-				}
-				$xold = $coord[0];
-				$yold = $coord[1];
-			}
-		}
-	}
-    return $nr_intersections%2==1;
+    if (!$decoded) return false;
+
+    $geometry = $decoded->features[0]->geometry;
+    
+    // Normalize: Ensure we always have an array of Polygons
+    // A Polygon is an array of Rings. A MultiPolygon is an array of Polygons.
+    $polygons = ($geometry->type === 'Polygon') ? [$geometry->coordinates] : $geometry->coordinates;
+    
+    $nr_intersections = 0;
+    $xout = $xmax + 1; 
+    $yout = $ymax + 1;
+
+    // 1. Loop through each Polygon in the MultiPolygon (or the single normalized Polygon)
+    foreach($polygons as $polygon) {
+        // 2. Loop through each Ring (Exterior ring is index 0, Holes are index 1+)
+        foreach($polygon as $ring) {
+            $xold = null;
+            $yold = null;
+            // 3. Loop through each Coordinate pair in the ring
+            foreach($ring as $coord) {
+                if ($xold !== null) {
+                    if (linesIntersect($xout, $yout, $east, $north, $xold, $yold, $coord[0], $coord[1])) {
+                        $nr_intersections++;
+                    }
+                }
+                $xold = $coord[0];
+                $yold = $coord[1];
+            }
+        }
+    }
+    
+    // If intersections are odd, the point is inside
+    return $nr_intersections % 2 == 1;
 }
 
 function isPointInsidePollyandBox(float $east, float $north, float $xmax, float $ymax, float $xmin, float $ymin, String $geojson): bool {
