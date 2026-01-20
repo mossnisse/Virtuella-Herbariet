@@ -1,98 +1,63 @@
 <?php
-function linesIntersect(float $x1, float $y1, float $x2, float $y2, float $x3, float $y3, float $x4, float $y4): bool {
-	// Return false if either of the lines have zero length
-	//echo "L1 = x1:$x1 y1:$y1 x2: $x2 y2:$y2 L2= x3:$x3 y3:$y3 x4:$x4 y4:$y4<br>\n";
-	if ($x1 == $x2 && $y1 == $y2 ||
-	    $x3 == $x4 && $y3 == $y4){
-	    return false;
-	}
-	// Fastest method, based on Franklin Antonio's "Faster Line Segment Intersection" topic "in Graphics Gems III" book (http://www.graphicsgems.org/)
-	$ax = $x2-$x1;
-	$ay = $y2-$y1;
-	$bx = $x3-$x4;
-	$by = $y3-$y4;
-	$cx = $x1-$x3;
-	$cy = $y1-$y3;
-	$alphaNumerator = $by*$cx - $bx*$cy;
-	$commonDenominator = $ay*$bx - $ax*$by;
-	if ($commonDenominator > 0){
-	    if ($alphaNumerator < 0 || $alphaNumerator > $commonDenominator){
-	        return false;
-	    }
-	} elseif ($commonDenominator < 0){
-	    if ($alphaNumerator > 0 || $alphaNumerator < $commonDenominator){
-	        return false;
-	    }
-	}
-	$betaNumerator = $ax*$cy - $ay*$cx;
-	if ($commonDenominator > 0){
-	    if ($betaNumerator < 0 || $betaNumerator > $commonDenominator){
-	        return false;
-	    }
-	} elseif ($commonDenominator < 0){
-	    if ($betaNumerator > 0 || $betaNumerator < $commonDenominator){
-			return false;
-	    }
-	}
-	 if (abs($commonDenominator) < 0.0000001) {
-	    // This code wasn't in Franklin Antonio's method. It was added by Keith Woodward.
-	    // The lines are parallel.
-	    // Check if they're collinear.
-	    $y3LessY1 = $y3-$y1;
-	    $collinearityTestForP3 = $x1*($y2-$y3) + $x2*($y3LessY1) + $x3*($y1-$y2);   // see http://mathworld.wolfram.com/Collinear.html
-	    // If p3 is collinear with p1 and p2 then p4 will also be collinear, since p1-p2 is parallel with p3-p4
-	    if (abs($collinearityTestForP3) < 0.0000001) {
-	        // The lines are collinear. Now check if they overlap.
-	        if ($x1 >= $x3 && $x1 <= $x4 || $x1 <= $x3 && $x1 >= $x4 ||
-	                  $x2 >= $x3 && $x2 <= $x4 || $x2 <= $x3 && $x2 >= $x4 ||
-	                  $x3 >= $x1 && $x3 <= $x2 || $x3 <= $x1 && $x3 >= $x2) {
-				if ($y1 >= $y3 && $y1 <= $y4 || $y1 <= $y3 && $y1 >= $y4 ||
-	                     $y2 >= $y3 && $y2 <= $y4 || $y2 <= $y3 && $y2 >= $y4 ||
-	                     $y3 >= $y1 && $y3 <= $y2 || $y3 <= $y1 && $y3 >= $y2){
-					return true;
-	            }
-	        }
-	    }
-	    return false;
-	}
-	return true;
-}
+
+/*
+ * function for checking if an geographical coordinate in latitude, longitude format is inside an geojson shape.
+ * great circle's are not handled, but they should also be drawn wrong, so if segments isn't to long it should be good enough
+ * polygons crossing the date line -180/180 longitude will probably also be handled incorrectly.
+ */
 
 function isPointInsidePolly(float $east, float $north, float $xmax, float $ymax, string $geojson): bool {
     $decoded = json_decode($geojson);
     if (!$decoded) return false;
 
-    $geometry = $decoded->features[0]->geometry;
-    
+    // Robustly find the geometry object
+    if (isset($decoded->features[0]->geometry)) {
+        $geometry = $decoded->features[0]->geometry;
+    } elseif (isset($decoded->geometry)) {
+        $geometry = $decoded->geometry;
+    } else {
+        $geometry = $decoded; // Assume the root is the geometry
+    }
+
+    if (!isset($geometry->type) || !isset($geometry->coordinates)) return false;
+
     // Normalize: Ensure we always have an array of Polygons
-    // A Polygon is an array of Rings. A MultiPolygon is an array of Polygons.
     $polygons = ($geometry->type === 'Polygon') ? [$geometry->coordinates] : $geometry->coordinates;
     
-    $nr_intersections = 0;
-    $xout = $xmax + 1; 
-    $yout = $ymax + 1;
+    $intersections = 0;
+    
+    // Safety for the North Pole: Latitude cannot exceed 90
+    $yout = min(90.0, $ymax + 0.1); 
+    
+    // Small epsilon to prevent perfect vertex alignment issues
+    $testLon = $east + 0.000000001; 
 
-    // 1. Loop through each Polygon in the MultiPolygon (or the single normalized Polygon)
     foreach($polygons as $polygon) {
-        // 2. Loop through each Ring (Exterior ring is index 0, Holes are index 1+)
         foreach($polygon as $ring) {
-            $xold = null;
-            $yold = null;
-            // 3. Loop through each Coordinate pair in the ring
-            foreach($ring as $coord) {
-                if ($xold !== null) {
-                    if (linesIntersect($xout, $yout, $east, $north, $xold, $yold, $coord[0], $coord[1])) {
-                        $nr_intersections++;
+            $count = count($ring);
+            foreach($ring as $i => $p1) {
+                // Get the next point (p2), closing the loop
+                $p2 = $ring[($i + 1) % count($ring)];
+            
+                $lon1 = $p1[0]; $lat1 = $p1[1];
+                $lon2 = $p2[0]; $lat2 = $p2[1];
+            
+                // Check if the point is within the latitude range of the segment
+                // Using (lat1 > north) != (lat2 > north) automatically handles:
+                // - Horizontal segments (ignored)
+                // - Ray passing exactly through a vertex (only counts once)
+                if (($lat1 > $north) != ($lat2 > $north)) {
+                    // Calculate the longitude where the segment crosses the point's latitude
+                    $intersectLon = ($lon2 - $lon1) * ($north - $lat1) / ($lat2 - $lat1) + $lon1;
+                    // If the intersection is to the "east" of our point, count it
+                    if ($east < $intersectLon) {
+                        $intersections++;
                     }
                 }
-                $xold = $coord[0];
-                $yold = $coord[1];
             }
         }
     }
-    
-    // If intersections are odd, the point is inside
-    return $nr_intersections % 2 == 1;
+    return $intersections % 2 == 1;
 }
 
 function isPointInsidePollyandBox(float $east, float $north, float $xmax, float $ymax, float $xmin, float $ymin, String $geojson): bool {
