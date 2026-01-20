@@ -92,6 +92,8 @@ function checkC() {
 
         if (coord.sys != "Sweref99TM") {
             Sweref99TM = WGS84toSweref99TM(WGS84);
+        } else {
+            Sweref99TM = coord.coordOBJ;
         }
         if (Sweref99TM != "outside defined area") {
             document.getElementById("Sweref99TM").textContent = Sweref99TM.north + ", " + Sweref99TM.east;
