@@ -8,15 +8,15 @@
         <meta name="keywords" content="Virtuella herbariet" />
         <link rel="shortcut icon" href="favicon.ico" />
         <script>
-            function star(field)
-            {
-                var e = document.getElementsByName(field);
-                if (e[0].value=="*") e[0].select();
+            function handleFocus(event) {
+            if (event.target.value === "*") {
+                event.target.select();
             }
+        }
         </script>
 	</head>
 	<body id = "locality_search">
-		<div class = "menu1">
+		<div class="menu1" aria-label="Main Navigation">
                 <ul>
                     <li class = "start_page"><a href="index.html">Start page</a></li>
                     <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
@@ -27,16 +27,27 @@
 		<div class = "subMenu">
 			<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality search</h2>
 			<h3>Search for localities, districts, provinces and countries in the locality database</h3>
-			You can use * as none or more unkown characters.
+			You can use * as none or more unknown characters.
 			<table class = "outerBox">
 			<tr> <td> 
 			<form method="get" action="locality_list.php" accept-charset="utf-8">
 			<table class="SBox">
-				<tr> <td>Country/Land</td> <td><input type="text" name="country" value="*" size="20" onclick="star('country');"/> </td></tr>
-				<tr> <td>Province/Landskap</td> <td><input type="text" name="province" value="*" size="20" onclick="star('province');"/></td></tr>
-				<tr> <td>District/Socken</td> <td><input type="text" name="district" value="*" size="20" onclick="star('district');"/></td> </tr>
-				<tr> <td>Locality/Lokal</td> <td><input type="text" name="locality" value="*" size="20" onclick="star('locality');"/></td></tr>
-				<tr> <td> <input type="submit" name= "search" value="Search" /> </td ><td></td></tr>
+				<tr>
+                    <td><label for="country">Country/Land</label></td>
+                    <td><input type="text" name="country" id="country" value="*" size="20" onfocus="handleFocus(event);"/> </td></tr>
+				<tr>
+                    <td><label for="province">Province/Landskap</label></td>
+                    <td><input type="text" name="province" id="province" value="*" size="20" onfocus="handleFocus(event);"/></td>
+                </tr>
+				<tr>
+                    <td><label for="district">District/Socken</label></td>
+                    <td><input type="text" name="district" id="district" value="*" size="20" onfocus="handleFocus(event);"/></td>
+                </tr>
+				<tr>
+                    <td><label for="locality">Locality/Lokal</label></td>
+                    <td><input type="text" name="locality" id="locality" value="*" size="20" onfocus="handleFocus(event);"/></td>
+                </tr>
+				<tr><td> <input type="submit" name= "search" value="Search" /> </td ><td></td></tr>
 			</table>
 			</form>
 			</td> </tr>

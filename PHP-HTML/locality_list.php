@@ -1,3 +1,34 @@
+<?php
+header("X-Content-Type-Options: nosniff"); 
+header("X-Frame-Options: DENY"); 
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+
+include "ini.php";
+include "locality_sengine.php";
+
+$con = getConS();
+
+// Get and validate parameters
+$country = isset($_GET['country']) ? $_GET['country'] : '';
+$province = isset($_GET['province']) ? $_GET['province'] : '';
+$district = isset($_GET['district']) ? $_GET['district'] : '';
+$locality = isset($_GET['locality']) ? $_GET['locality'] : '';
+$orderby = isset($_GET['orderby']) ? $_GET['orderby'] : '';
+
+$urlParams = [
+    'country' => $country,
+    'province' => $province,
+    'district' => $district,
+    'locality' => $locality
+];
+
+// Get lists
+$cstmt = getCountryList($con);
+$pstmt = getProvinceList($con);
+$dstmt = getDistrictList($con);
+$lstmt = getLocalityList($con);
+$lstmt->execute();
+?>
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 <head>
@@ -9,92 +40,102 @@
     <meta name="keywords" content="Virtuella herbariet" />
     <link rel="shortcut icon" href="favicon.ico" />
 </head>
-<body id = "locality_list">
-    <div class = "menu1">
+<body id="locality_list">
+    <div class="menu1">
         <ul>
-            <li class = "start_page"><a href="index.html">Start page</a></li>
-            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
-            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
-            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+            <li class="start_page"><a href="index.html">Start page</a></li>
+            <li class="standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class="cross_browser"><a href="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class="locality_search"><a href="locality_search.php">Search localities</a></li>
         </ul>
     </div>
-    <div class = "subMenu">
-	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality list</h2>
-<?php
-//error_reporting(E_ALL);
-//ini_set('display_errors', '1');
-include "ini.php";
-include "locality_sengine.php";
-$con = getConS();
-
-// how correctly encode url links in webpages should stop Cross Site Scripting
-$urlCountry =  htmlentities(urlencode($_GET['country']));
-$urlProvince = htmlentities(urlencode($_GET['province']));
-$urlDistrict = htmlentities(urlencode($_GET['district']));
-$urlLocality = htmlentities(urlencode($_GET['locality']));
+    <div class="subMenu">
+        <h2><span class="first">S</span>weden's <span class="first">V</span>irtual <span class="first">H</span>erbarium: Locality list</h2>
+        
+        <div class="menu2">
+            <ul>
+                <li class="list"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&orderby=locality">List</a></li>
+                <li class="map"><a href="locality_map.php?<?php echo http_build_query($urlParams); ?>&orderby=locality">Map</a></li>
+            </ul>
+        </div>
+        
+        <table class="outerBox">
+            <tr><td>
+                <table class="SBox">
+                    <?php
+                    // Display Country List
+                    if (isset($cstmt)) {
+                        $cstmt->execute();
+                        $countries = $cstmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($countries) > 0) {
+                            echo "<tr><th>Country</th></tr>\n";
+                            foreach ($countries as $row) {
+                                $htmlEnglish = htmlspecialchars($row['english'], ENT_QUOTES, 'UTF-8');
+                                $countryID = (int)$row['ID'];
+                                echo "<tr><td><a href=\"maps/country.php?ID=$countryID\">$htmlEnglish</a></td></tr>\n";
+                            }
+                        }
+                    }
                     
-echo "
-    <div class = \"menu2\">
-        <ul>
-            <li class = \"list\"><a href=\"locality_list.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">List</a></li>
-            <li class = \"map\"><a href=\"locality_map.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">Map</a></li>
-        </ul>
-    </div>
-	<table class = \"outerBox\"><tr><td>
-		<table class=\"SBox\">";
+                    // Display Province List
+                    if (isset($pstmt)) {
+                        $pstmt->execute();
+                        $provinces = $pstmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($provinces) > 0) {
+                            echo "<tr><th>Province</th><th>Country</th></tr>\n";
+                            foreach ($provinces as $row) {
+                                $htmlProvince = htmlspecialchars($row['province'], ENT_QUOTES, 'UTF-8');
+                                $htmlTypeEng = htmlspecialchars($row['type_eng'], ENT_QUOTES, 'UTF-8');
+                                $htmlTypeNative = htmlspecialchars($row['type_native'], ENT_QUOTES, 'UTF-8');
+                                $htmlCountry = htmlspecialchars($row['country'], ENT_QUOTES, 'UTF-8');
+                                $provinceID = (int)$row['ID'];
+                                echo "<tr><td><a href=\"maps/province.php?ID=$provinceID\">$htmlProvince</a> $htmlTypeEng/$htmlTypeNative</td><td>$htmlCountry</td></tr>\n";
+                            }
+                        }
+                    }
                     
-$cstmt = getCountryList($con);
-if (isset($cstmt)) {
-    $cstmt->execute();
-    $cstmt->setFetchMode(PDO::FETCH_ASSOC);
-    echo "<tr><th>Country</th></tr>";
-    while ($row = $cstmt->fetch())
-    {
-        echo "<tr><td><a href=\"maps/country.php?ID=$row[ID]\">$row[english]</a></td></tr>
-            ";
-    }
-}
+                    // Display District List
+                    if (isset($dstmt)) {
+                        $dstmt->execute();
+                        $districts = $dstmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($districts) > 0) {
+                            echo "<tr><th>District</th><th>Country</th><th>Province</th></tr>\n";
+                            foreach ($districts as $row) {
+                                $htmlDistrict = htmlspecialchars($row['district'], ENT_QUOTES, 'UTF-8');
+                                $htmlTypeEng = htmlspecialchars($row['typeEng'], ENT_QUOTES, 'UTF-8');
+                                $htmlTypeNative = htmlspecialchars($row['typeNative'], ENT_QUOTES, 'UTF-8');
+                                $htmlCountry = htmlspecialchars($row['country'], ENT_QUOTES, 'UTF-8');
+                                $htmlProvince = htmlspecialchars($row['province'], ENT_QUOTES, 'UTF-8');
+                                $districtID = (int)$row['ID'];
+                                echo "<tr><td><a href=\"maps/district.php?ID=$districtID\">$htmlDistrict</a> $htmlTypeEng/$htmlTypeNative</td><td>$htmlCountry</td><td>$htmlProvince</td></tr>\n";
+                            }
+                        }
+                    }
                     
-$pstmt = getProvinceList($con);
-if (isset($pstmt)) {
-    $pstmt->execute();
-    $pstmt->setFetchMode(PDO::FETCH_ASSOC);
-    echo "<tr><th>Province</th><th>Country</th></tr>";
-    while ($row = $pstmt->fetch())
-    {
-        echo "<tr><td><a href=\"maps/province.php?ID=$row[ID]\">$row[province]</a> $row[type_eng]/$row[type_native]</td><td>$row[country]</td></tr>
-            ";
-    }
-}
-                    
-$dstmt = getDistrictList($con);
-if (isset($dstmt)) {
-    $dstmt->execute();
-    $dstmt->setFetchMode(PDO::FETCH_ASSOC);
-    echo "<tr><th>District</th><th>Country</th><th>Province</th></tr>";
-    while ($row = $dstmt->fetch())
-    {
-        echo "<tr><td><a href=\"maps/district.php?ID=$row[ID]\">$row[district]</a> $row[typeEng]/$row[typeNative]</td><td>$row[country]</td><td>$row[province]</td></tr>
-                ";
-    }
-}
-                           
-$lstmt = getLocalityList($con);
-$lstmt->execute();
-$lstmt->setFetchMode(PDO::FETCH_ASSOC);
-echo "<tr>
-    <th class = \"sortr\"><a href=\"locality_list.php?country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict&amp;locality=$urlLocality&amp;orderby=locality\">Locality</a></th>
-    <th class = \"sortr\"><a href=\"locality_list.php?country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict&amp;locality=$urlLocality&amp;orderby=country\">Country</a></th>
-    <th class = \"sortr\"><a href=\"locality_list.php?country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict&amp;locality=$urlLocality&amp;orderby=province\">Province</a></th>
-    <th class = \"sortr\"><a href=\"locality_list.php?country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict&amp;locality=$urlLocality&amp;orderby=district\">District</a></th>
-</tr>";
-while ($row = $lstmt->fetch())
-{
-	echo "<tr><td><a href=\"locality.php?ID=$row[ID]\">$row[locality]</a></td><td>$row[country]</td><td>$row[province]</td><td>$row[district]</td></tr>\n";
-}				
-?>
-		</table>
-	</td></tr></table>
+                    // Display Locality List
+                    $localities = $lstmt->fetchAll(PDO::FETCH_ASSOC);
+                    if (count($localities) > 0) {
+                        ?>
+                        <tr>
+                            <th class="sortr"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&amp;orderby=locality">Locality</a></th>
+                            <th class="sortr"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&amp;orderby=country">Country</a></th>
+                            <th class="sortr"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&amp;orderby=province">Province</a></th>
+                            <th class="sortr"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&amp;orderby=district">District</a></th>
+                        </tr>
+                        <?php
+                        foreach ($localities as $row) {
+                            $htmlLocality = htmlspecialchars($row['locality'], ENT_QUOTES, 'UTF-8');
+                            $htmlCountry = htmlspecialchars($row['country'], ENT_QUOTES, 'UTF-8');
+                            $htmlProvince = htmlspecialchars($row['province'], ENT_QUOTES, 'UTF-8');
+                            $htmlDistrict = htmlspecialchars($row['district'], ENT_QUOTES, 'UTF-8');
+                            $localityID = (int)$row['ID'];
+                            echo "<tr><td><a href=\"locality.php?ID=$localityID\">$htmlLocality</a></td><td>$htmlCountry</td><td>$htmlProvince</td><td>$htmlDistrict</td></tr>\n";
+                        }
+                    }
+                    ?>
+                </table>
+            </td></tr>
+        </table>
     </div>
 </body>
 </html>

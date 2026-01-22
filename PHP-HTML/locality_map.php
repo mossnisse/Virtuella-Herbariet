@@ -1,99 +1,135 @@
+<?php
+header("X-Content-Type-Options: nosniff"); 
+header("X-Frame-Options: DENY"); 
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.openstreetmap.org https://tile.openstreetmap.org; connect-src 'self' https://*.openstreetmap.org https://tile.openstreetmap.org;");
+
+include "ini.php";
+include "locality_sengine.php";
+
+$con = getConS();
+
+// Get and validate parameters
+$country = isset($_GET['country']) ? $_GET['country'] : '';
+$province = isset($_GET['province']) ? $_GET['province'] : '';
+$district = isset($_GET['district']) ? $_GET['district'] : '';
+$locality = isset($_GET['locality']) ? $_GET['locality'] : '';
+
+$urlParams = [
+    'country' => $country,
+    'province' => $province,
+    'district' => $district,
+    'locality' => $locality
+];
+
+// Get locality list
+$lstmt = getLocalityList($con);
+$lstmt->execute();
+$localities = $lstmt->fetchAll(PDO::FETCH_ASSOC);
+
+// prepare marker data
+
+$markers = array();
+
+foreach ($localities as $loc) {
+    if (!empty($loc['lat']) && !empty($loc['long'])) {
+        $lat = (float)$loc['lat'];
+        $lng = (float)$loc['long'];
+        // Prepare marker data
+        $markers[] = array(
+            'id' => (int)$loc['ID'],
+            'lat' => $lat,
+            'lng' => $lng,
+            'name' => $loc['locality']
+        );
+    }
+}
+
+// Prepare map data for JSON
+$mapData = json_encode(array(
+    'markers' => $markers
+));
+?>
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Sweden's Virtual Herbarium: Locality map</title>
+    <title>Sweden's Virtual Herbarium: Locality search map</title>
     <link rel="stylesheet" href="herbes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/leaflet/leaflet.css" />
     <meta name="author" content="Nils Ericson" />
     <meta name="robots" content="noindex" />
     <meta name="keywords" content="Virtuella herbariet" />
     <link rel="shortcut icon" href="favicon.ico" />
+    <style>
+        #map {
+            width: 800px;
+            height: 800px;
+        }
+    </style>
 </head>
-<body id = "locality_map">
-    <div class = "menu1">
+<body id="locality_map">
+    <div class="menu1">
         <ul>
-            <li class = "start_page"><a href="index.html">Start page</a></li>
-            <li class = "standard_search"><a href="standard_search.html">Search specimens</a></li>
-            <li class = "cross_browser"><a href ="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
-            <li class = "locality_search"><a href="locality_search.php">Search localities</a></li>
+            <li class="start_page"><a href="index.html">Start page</a></li>
+            <li class="standard_search"><a href="standard_search.html">Search specimens</a></li>
+            <li class="cross_browser"><a href="cross_browser.php?SpatLevel=0&amp;SysLevel=0&amp;Sys=Life&amp;Spat=World&amp;Herb=All">Cross browser</a></li>
+            <li class="locality_search"><a href="locality_search.php">Search localities</a></li>
         </ul>
     </div>
-    <div class = "subMenu">
-	<h2><span class = "first">S</span>weden's <span class = "first">V</span>irtual <span class = "first">H</span>erbarium: Locality map</h2>
-<?php
-    include "ini.php";
-    include "locality_sengine.php";
-    $con = getConS();
-    
-    $urlCountry =  htmlentities(urlencode($_GET['country']));
-    $urlProvince = htmlentities(urlencode($_GET['province']));
-    $urlDistrict = htmlentities(urlencode($_GET['district']));
-    $urlLocality = htmlentities(urlencode($_GET['locality']));
-
-    echo "
-    <div class = \"menu2\">
-        <ul>
-            <li class = \"list\"><a href=\"locality_list.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">List</a></li>
-            <li class = \"map\"><a href=\"locality_map.php?locality=$urlLocality&amp;country=$urlCountry&amp;province=$urlProvince&amp;district=$urlDistrict\">Map</a></li>
-        </ul>
+    <div class="subMenu">
+        <h2><span class="first">S</span>weden's <span class="first">V</span>irtual <span class="first">H</span>erbarium: Locality search map</h2>
+        
+        <div class="menu2">
+            <ul>
+                <li class="list"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>">List</a></li>
+                <li class="map"><a href="locality_map.php?<?php echo http_build_query($urlParams); ?>">Map</a></li>
+            </ul>
+        </div>
+        
+        <table class="outerBox">
+            <tr><td>
+                <table class="SBox">
+                    <tr><td>
+                        <div id="map"></div>
+                    </td></tr>
+                </table>
+            </td></tr>
+        </table>
     </div>
-	<table class = \"outerBox\"> <tr> <td>
-		<table class=\"SBox\"> <tr> <td>";
-    
-    $lstmt = getLocalityList($con);
-    $lstmt->execute();
 
-    echo "
-					<div id=\"googleMap\" style=\"width:800px;height:800px;\"></div>
-
-					<script>
-						function myMap() {
-							var mapProp= { center:new google.maps.LatLng(51.508742,-0.120850), zoom:5, };
-							var map=new google.maps.Map(document.getElementById(\"googleMap\"),mapProp);
-                            var marker";
-					$i=1;
-                    $LatMin = +360;
-                    $LatMax = -360;
-                    $LongMax = -360;
-                    $LongMin = +360;
-					while ($row = $lstmt->fetch())
-					{
-                        $locality = str_replace('"', '\"', $row["locality"]);
-                        echo "
-						marker$i = new google.maps.Marker({position: new google.maps.LatLng($row[lat],$row[long])});
-						marker$i.setMap(map);
-						google.maps.event.addListener(marker$i, 'click', function() { new google.maps.InfoWindow({ content:\"<a href=\\\"locality.php?ID=$row[ID]\\\">$locality</a>\"}).open(map,marker$i);});";
-                        ++$i;
-                        if ($LatMin > $row['lat']) $LatMin = $row['lat'];
-                        if ($LatMax < $row['lat']) $LatMax = $row['lat'];
-                        if ($LongMin > $row['long']) $LongMin = $row['long'];
-                        if ($LongMax < $row['long']) $LongMax = $row['long'];
-                       
-					}
-                    // max start zoom in on map
-                    $CenterLong = ($LongMin + $LongMax)/2.0;
-                    $CenterLat = ($LatMin  + $LatMax)/2.0;
-                    
-                    $maxZoom = 0.04;
-                    if ($LongMax-$LongMin<$maxZoom) {
-                        $LongMax = $CenterLong + $maxZoom/2.0;
-                        $LongMin = $CenterLong - $maxZoom/2.0;
-                    }
-                    if ($LatMax-$LatMin<$maxZoom) {
-                        $LatMax = $CenterLat + $maxZoom/2.0;
-                        $LatMin = $CenterLat - $maxZoom/2.0;
-                    }
-                    echo "
-                        var bounds = new google.maps.LatLngBounds ();
-                        bounds.extend(new google.maps.LatLng($LatMin, $LongMin));
-                        bounds.extend(new google.maps.LatLng($LatMax, $LongMax));
-                        map.fitBounds(bounds);
-						}
-					</script>
-					<script src=\"https://maps.googleapis.com/maps/api/js?key=$GoogleMapsKey&callback=myMap\"></script>";
-?>
-		</td></tr></table>
-	</td></tr> </table>
-    </div>
+    <script src="assets/leaflet/leaflet.js"></script>
+    <script>
+        var mapData = <?php echo $mapData; ?>;
+        
+        document.addEventListener("DOMContentLoaded", function() {
+           var map = L.map('map');
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+        
+            // Helper function to escape HTML
+            function escapeHtml(text) {
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        
+            var markerGroup = new L.featureGroup();
+        
+            mapData.markers.forEach(function(marker) {
+                var m = L.marker([marker.lat, marker.lng])
+                         .bindPopup('<a href="locality.php?ID=' + marker.id + '">' + escapeHtml(marker.name) + '</a>');
+                markerGroup.addLayer(m);
+            });
+        
+            markerGroup.addTo(map);
+        
+            if (mapData.markers.length > 0) {
+                map.fitBounds(markerGroup.getBounds(), { padding: [20, 20] });
+            } else {
+                map.setView([60.12, 18.64], 5); // Fallback
+            }
+        });
+    </script>
 </body>
 </html>

@@ -18,9 +18,7 @@ function bindListSearch(PDOStatement $stmt, array $binds) : void {
 
 function likeEscape(string $string) : string {
     $string = str_replace(array('\\', '_', '%'), array('\\\\', '\\_', '\\%'), $string);
-    $text = str_replace("*","%", $string);
-    //$string = str_replace("\\*","*", $string);  // fix search on escaped characters as \*
-    return $text;
+    return str_replace("*","%", $string);
 }
 
 function getLocalityList(PDO $con) : ?PDOStatement {
@@ -111,7 +109,6 @@ function getProvinceList(PDO $con) : ?PDOStatement {
 }
 
 function getCountryList(PDO $con) : ?PDOStatement {
-    $con = getConS();
     $Country  = likeEscape($_GET['country']);
     $Locality = likeEscape($_GET['locality']);
     if ($Country != '%' && $Locality == '%') {
