@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <form id="uploadForm" enctype="multipart/form-data" action="script" method="post"> 
+        <input type="hidden" name="MAX_FILE_SIZE" value="1000000000" /> 
+        <p>Choose a file to upload:
+        <input id="fileInput" name="uploadedfile" type="file" onchange="runAnalysis()" /> </p>
+        
+        <div id="errorMessage" style="color: red;"></div>
+        
+        <p>
+        Template:
+        <select id="template" onchange="runAnalysis()">
+            <option value="LD">LD, Lund</option>
+            <option value="SCrypto">S, Cryptogams</option>
+            <option value="SVas">S, Vascular plants</option>
+            <option value="GB">GB, Göteborg</option>
+            <option value="UPS">UPS, Uppsala</option>
+            <option value="OHN">OHN, Oskarshamn</option>
+            <option value="UME">UME, Umeå</option>
+        </select>
+        </p>
+        <p> 
+        Character Set:
+        <select id="encodingInput" onchange="runAnalysis()">
+            <option value="UTF-8">UTF-8</option>
+            <option value="ISO-8859-1">Western (ISO-8859-1)</option>
+            <option value="Windows-1252">Windows-1252</option>
+            <option value="UTF-16">UTF-16</option>
+        </select>
+        </p>
+        <p>
+        <label>
+            <input type="checkbox" id="hasHeader" onchange="runAnalysis()"> 
+            First line contains column names
+        </label>
+        </p>
+        <hr>
+        <p><strong>File Analysis:</strong></p>
+        <div>Line Endings: <span id="d_line_endings" style="font-weight:bold;">-</span></div>
+        <div>Field Separator: <span id="d_field_sep" style="font-weight:bold;">-</span></div>
+        <div>Columns: <span id="n_columns" style="font-weight:bold;">-</span></div>
+
+        <p><strong>Data Preview (First 10 lines):</strong></p>
+        <div id="previewContainer" style="overflow-x: auto; max-width: 100%; border: 1px solid #ccc; margin-top: 10px;">
+            <table id="previewTable" style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 12px;"></table>
+        </div>
+        <hr>
+        <div id="verificationArea" style="margin: 20px 0; padding: 15px; border: 2px solid #ffc107; background: #fffde7; display: none;">
+            <p style="margin-top: 0;"><strong>Final Human Visual Check:</strong></p>
+            <label style="display: block; cursor: pointer;">
+                <input type="checkbox" id="humanVerified" onchange="toggleUploadButton()"> 
+                I have verified that the column content matches the template headers and Swedish characters (å, ä, ö) are displayed correctly. If characters are not correctly shown, the character code is not matching the csv file. If no template is good for the data send a mejl.
+            </label>
+        </div>
+
+        <input type="submit" id="submitBtn" value="Upload File" disabled 
+            style="padding: 10px 20px; cursor: not-allowed; opacity: 0.5; background: #ccc;" />
+       </form>
+    <script>
+/*
+Todo: 
+check BOM mark
+if first UTF8 and OK then change to utf16 it still looks OK?
+*/
+const form = document.getElementById('uploadForm');
+const fileInput = document.getElementById('fileInput');
+const errorDiv = document.getElementById('errorMessage');
+const submitBtn = document.getElementById('submitBtn');
+const verificationArea = document.getElementById('verificationArea');
+const humanCheckbox = document.getElementById('humanVerified');
+
+const TEMPLATES = {
+    "UME": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'SspVarForm', 'HybridName', 'collector', 'Collectornumber', 'Comments', 'Continent', 'Country', 'Province', 'District', 'Locality', 'Cultivated', 'Altitude_meter', 'Original_name', 'Original_text', 'Notes', 'Exsiccata', 'Exs_no', 'RUBIN', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'Matrix', 'LastModified'],
+    "GB": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'SspVarForm', 'HybridName', 'collector', 'Collectornumber', 'Comments', 'Continent', 'Country', 'Province', 'District', 'Locality', 'Cultivated', 'AltitudeLow', 'AltitudeHigh', 'Original_name', 'Original_text', 'Notes', 'Exsiccata', 'Exs_no', 'RUBIN', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'LastModified', 'linereg', 'Sweref99N', 'Sweref99E', 'UTM', 'Type_status', 'Basionym', 'TAuctor', 'image1', 'image2', 'image3', 'image4'],
+    "OHN": ['AccessionNo', 'scientific_name', 'datum', 'North', 'East', 'Presicion', 'Koordsys', 'Continent', 'Country', 'Province', 'District', 'OriginalLokal', 'Collector', 'Original_name', 'Original_text', 'Que', 'Notes'],
+    "UPS": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'SspVarForm', 'HybridName', 'collector', 'Collectornumber', 'Comments', 'Continent', 'Country', 'Province', 'District', 'Locality', 'Cultivated', 'Altitude_meter', 'Original_name', 'Original_text', 'Notes', 'Exsiccata', 'Exs_no', 'RUBIN', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'Matrix', 'LastModified'],
+    "SCrypto": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'collector', 'Collectornumber', 'notes', 'continent', 'country', 'province', 'district', 'Original_text', 'Exsiccata', 'Exs_no', 'RUBIN1', 'RUBIN2', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'LasModifiedFM', 'Basionym', 'Type_status', 'habitat', 'image1', 'image2', 'image3', 'image4', 'dummy'],
+    "SVas": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'collector', 'Collectornumber', 'notes', 'continent', 'country', 'provinc', 'district', 'Original_text', 'Exsiccata', 'Exs_no', 'RUBIN1', 'RUBIN2', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'LasModifiedFM', 'Basionym', 'Type_status', 'habitat', 'image1', 'image2', 'image3', 'image4'],
+    "LD": ['AccessionNo', 'Day', 'Month', 'Year', 'Genus', 'Species', 'SspVarForm', 'HybridName', 'collector', 'Collectornumber', 'Comments', 'Continent', 'Country', 'Province', 'District', 'Locality', 'Cultivated', 'Altitude_meter', 'Original_name', 'Original_text', 'Notes', 'Exsiccata', 'Exs_no', 'RUBIN', 'RiketsN', 'RiketsO', 'Lat_deg', 'Lat_min', 'Lat_sec', 'Lat_dir', 'Long_deg', 'Long_min', 'Long_sec', 'long_dir', 'LastModified', 'linereg', 'Type_status', 'Basionym', 'TAuctor', 'image1', 'image2', 'image3']
+};
+
+let isFileValidated = false;
+
+// 1. New function to handle the final button state
+function toggleUploadButton() {
+    if (humanCheckbox.checked && isFileValidated) {
+        submitBtn.disabled = false;
+        submitBtn.style.cssText = "padding: 10px 20px; cursor: pointer; background: #28a745; color: white; opacity: 1;";
+    } else {
+        submitBtn.disabled = true;
+        submitBtn.style.cssText = "padding: 10px 20px; cursor: not-allowed; opacity: 0.5; background: #ccc;";
+    }
+}
+
+form.onsubmit = function(e) {
+    if (!isFileValidated || !humanCheckbox.checked) {
+        e.preventDefault();
+        alert("Please verify the data and check the confirmation box before uploading.");
+    }
+};
+
+function runAnalysis() {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    // Reset verification state when a change occurs
+    humanCheckbox.checked = false;
+    toggleUploadButton();
+
+    const encoding = document.getElementById('encodingInput').value;
+    const reader = new FileReader();
+    const blob = file.slice(0, 64 * 1024);
+
+    reader.onload = function(e) {
+        const text = e.target.result;
+        
+        function parseLines(rawText, separator, lineEnding, useQuotes) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = "";
+            let inQuotes = false;
+            for (let i = 0; i < rawText.length; i++) {
+                const char = rawText[i];
+                const nextChar = rawText[i + 1];
+                if (useQuotes && char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"'; i++;
+                    } else { inQuotes = !inQuotes; }
+                    continue;
+                }
+                if (!inQuotes && char === separator) {
+                    currentRow.push(currentField.trim()); currentField = ""; continue;
+                }
+                if (!inQuotes && rawText.substring(i, i + lineEnding.length) === lineEnding) {
+                    currentRow.push(currentField.trim()); rows.push(currentRow);
+                    currentRow = []; currentField = ""; i += (lineEnding.length - 1);
+                    if (rows.length >= 11) break; continue;
+                }
+                currentField += char;
+            }
+            if (currentRow.length > 0 || currentField !== "") {
+                currentRow.push(currentField.trim());
+                if (rows.length < 11) rows.push(currentRow);
+            }
+            return rows;
+        }
+
+        const seps = [',', ';', '\t', '|'];
+        const lineEndings = ['\r\n', '\n', '\r'];
+        const quoteStyles = [true, false];
+        let best = { strategy: "", sep: "", leName: "", fields: 0, rows: [] };
+
+        quoteStyles.forEach(qStyle => {
+            lineEndings.forEach(le => {
+                seps.forEach(s => {
+                    const resultRows = parseLines(text, s, le, qStyle);
+                    if (resultRows.length < 2) return;
+                    const counts = resultRows.map(r => r.length);
+                    const isConsistent = counts.every(c => c === counts[0] && c > 1);
+                    if (isConsistent && counts[0] > best.fields) {
+                        best = { strategy: qStyle ? "Quoted" : "Escaped", sep: s, leName: le === '\r\n' ? "CRLF" : (le === '\r' ? "CR" : "LF"), fields: counts[0], rows: resultRows };
+                    }
+                });
+            });
+        });
+
+        if (best.fields > 0) {
+            const selectedKey = document.getElementById('template').value;
+            const targetTemplate = TEMPLATES[selectedKey];
+            const useHeader = document.getElementById('hasHeader').checked;
+            
+            // Update UI Stats
+            document.getElementById('d_line_endings').textContent = best.leName;
+            document.getElementById('d_field_sep').textContent = `${best.strategy} ${best.sep === '\t' ? '[Tab]' : `"${best.sep}"`}`;
+            document.getElementById('n_columns').textContent = `${best.fields} (Expected ${targetTemplate.length})`;
+
+            const table = document.getElementById('previewTable');
+            table.innerHTML = "";
+
+            // Render headers and data (your existing table code works great here)
+            const tHead = table.insertRow();
+            targetTemplate.forEach(name => {
+                const th = document.createElement('th');
+                th.innerHTML = `<small style="color:#666">Template:</small><br>${name}`;
+                th.style.cssText = "border:1px solid #ccc; padding:6px; background:#e0f0ff; text-align:left;";
+                tHead.appendChild(th);
+            });
+
+            if (useHeader) {
+                const fileHeaderRow = table.insertRow();
+                best.rows[0].forEach((h, i) => {
+                    const td = fileHeaderRow.insertCell();
+                    td.innerHTML = `<small style="color:#666">File Header:</small><br><strong>${h || ""}</strong>`;
+                    td.style.cssText = "border:1px solid #ccc; padding:6px; background:#fff9c4;";
+                    if (i >= targetTemplate.length) td.style.backgroundColor = "#ffcdd2";
+                });
+            }
+
+            const dataRows = useHeader ? best.rows.slice(1, 11) : best.rows.slice(0, 10);
+            dataRows.forEach(rowData => {
+                const row = table.insertRow();
+                for (let i = 0; i < Math.max(rowData.length, targetTemplate.length); i++) {
+                    const cell = row.insertCell();
+                    cell.textContent = rowData[i] || ""; 
+                    cell.style.cssText = "border:1px solid #ccc; padding:6px; white-space:nowrap;";
+                    if (i >= targetTemplate.length) cell.style.backgroundColor = "#fff0f0";
+                }
+            });
+
+            // 2. Final logic check for the Verification Area
+            if (best.fields === targetTemplate.length) {
+                isFileValidated = true;
+                verificationArea.style.display = "block"; // Show the yellow box
+                errorDiv.innerHTML = "<span style='color:green;'>✔️ Column count matches. Check Swedish characters below.</span>";
+            } else {
+                isFileValidated = false;
+                verificationArea.style.display = "none"; // Hide if it doesn't match
+                errorDiv.innerHTML = `<strong>Warning:</strong> Column mismatch. Template expects ${targetTemplate.length}, found ${best.fields}.`;
+            }
+        }
+    };
+    reader.readAsText(blob, encoding);
+}
+    </script>
+</body>
