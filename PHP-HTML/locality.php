@@ -144,10 +144,12 @@ $mapData = json_encode(array(
                                         <?php
                                         $url = "https://minkarta.lantmateriet.se/plats/3006/v2.0/?e=" . urlencode($row['SWTME']) . "&n=" . urlencode($row['SWTMN']) . "&z=8&mapprofile=karta&layers=%5B%5B%223%22%5D%2C%5B%221%22%5D%5D";
                                         $url2 = "https://kartbild.com/?marker=" . urlencode($row['lat']) . "," . urlencode($row['long']) . "#14/" . urlencode($row['lat']) . "/" . urlencode($row['long']) . "+/0x20";
+                                        $url3 = "https://historiskakartor.lantmateriet.se/hk/positionsearch?e=". urlencode($row['SWTME']) ."&n=". urlencode($row['SWTMN']);
                                         ?>
                                         <tr>
                                             <td><a href="<?php echo htmlspecialchars($url, ENT_QUOTES, 'UTF-8'); ?>" target="_blank">open Min karta</a></td>
                                             <td><a href="<?php echo htmlspecialchars($url2, ENT_QUOTES, 'UTF-8'); ?>" target="_blank">open kartbild.com</a></td>
+                                            <td><a href="<?php echo htmlspecialchars($url3, ENT_QUOTES, 'UTF-8'); ?>" target="_blank">search 'Historiska kartor' at coordinate</a></td>
                                         </tr>
                                     <?php elseif ($row['country'] == "Denmark"): ?>
                                         <?php
