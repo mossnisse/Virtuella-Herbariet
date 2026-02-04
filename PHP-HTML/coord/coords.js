@@ -49,6 +49,7 @@ function checkC() {
     document.getElementById("toggleRUBIN").style.display = "none";
     document.getElementById("MinKarta").style.display = "none";
     document.getElementById("Kartbild").style.display = "none";
+    document.getElementById("History").style.display = "none";
     document.getElementById("Norgeskart").style.display = "none";
     document.getElementById("Kartplatsen").style.display = "none";
     document.getElementById("toggleMGRSAA").style.display = "none";
@@ -228,6 +229,7 @@ function getCountry(WGS84) {
                 document.getElementById("toggleRUBIN").style.display = "initial";
                 document.getElementById("MinKarta").style.display = "initial";
                 document.getElementById("Kartbild").style.display = "initial";
+                document.getElementById("History").style.display = "initial";
             } else if (count.ID == 2) {  // = Norway
                 document.getElementById("Norgeskart").style.display = "initial";
             } else if (count.ID == 4) {  // = Finland
@@ -605,6 +607,11 @@ function showMinKartaf() {
 function showKartbildf() {
     url = "https://kartbild.com/?marker=" + WGS84.north + "," + WGS84.east + "#14/" + WGS84.north + "/" + WGS84.east + "/0x20";
     window.open(url, '_blank').focus();
+}
+
+function searchHistory() {
+     url = "https://historiskakartor.lantmateriet.se/hk/positionsearch?e=" + Sweref99TM.east + "&n="+ Sweref99TM.north;
+     window.open(url, '_blank').focus();
 }
 
 function showKartplatsenf() {
