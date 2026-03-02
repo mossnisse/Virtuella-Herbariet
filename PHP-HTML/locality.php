@@ -71,6 +71,8 @@ $htmlProvince = htmlspecialchars($row['province'], ENT_QUOTES, 'UTF-8');
 $htmlDistrict = htmlspecialchars($row['district'], ENT_QUOTES, 'UTF-8');
 $htmlLat = htmlspecialchars($row['lat'], ENT_QUOTES, 'UTF-8');
 $htmlLong = htmlspecialchars($row['long'], ENT_QUOTES, 'UTF-8');
+$htmlLat1m = htmlspecialchars(number_format((float)$row['lat'], 5, '.', ''), ENT_QUOTES, 'UTF-8');
+$htmlLong1m = htmlspecialchars(number_format((float)$row['long'], 5, '.', ''), ENT_QUOTES, 'UTF-8');
 $htmlRT90N = htmlspecialchars($row['RT90N'], ENT_QUOTES, 'UTF-8');
 $htmlRT90E = htmlspecialchars($row['RT90E'], ENT_QUOTES, 'UTF-8');
 $htmlSWTMN = htmlspecialchars($row['SWTMN'], ENT_QUOTES, 'UTF-8');
@@ -131,7 +133,7 @@ $mapData = json_encode(array(
                                     <tr><td>Country:</td><td><a href="maps/country.php?Country=<?php echo $urlCountry; ?>"><?php echo $htmlCountry; ?></a></td></tr>
                                     <tr><td>Province:</td><td><a href="maps/province.php?Province=<?php echo $urlProvince; ?>&amp;Country=<?php echo $urlCountry; ?>"><?php echo $htmlProvince; ?></a></td></tr>
                                     <tr><td>District:</td><td><a href="maps/district.php?District=<?php echo $urlDistrict; ?>&amp;Province=<?php echo $urlProvince; ?>&amp;Country=<?php echo $urlCountry; ?>"><?php echo $htmlDistrict; ?></a></td></tr>
-                                    <tr><td>WGS84:</td><td><?php echo $htmlLat; ?>, <?php echo $htmlLong; ?></td></tr>
+                                    <tr><td>WGS84:</td><td><?php echo $htmlLat1m; ?>, <?php echo $htmlLong1m; ?></td></tr>
                                     <tr><td>RT90:</td><td><?php echo $htmlRT90N; ?>, <?php echo $htmlRT90E; ?></td></tr>
                                     <tr><td>Sweref99TM:</td><td><?php echo $htmlSWTMN; ?>, <?php echo $htmlSWTME; ?></td></tr>
                                     <tr><td>Source:</td><td><?php echo $htmlSource; ?></td></tr>
