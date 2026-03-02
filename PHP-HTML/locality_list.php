@@ -63,11 +63,13 @@ $lstmt->execute();
             <tr><td>
                 <table class="SBox">
                     <?php
+                    $hasResults = false;
                     // Display Country List
                     if (isset($cstmt)) {
                         $cstmt->execute();
                         $countries = $cstmt->fetchAll(PDO::FETCH_ASSOC);
                         if (count($countries) > 0) {
+                            $hasResults = true;
                             echo "<tr><th>Country</th></tr>\n";
                             foreach ($countries as $row) {
                                 $htmlEnglish = htmlspecialchars($row['english'], ENT_QUOTES, 'UTF-8');
@@ -82,6 +84,7 @@ $lstmt->execute();
                         $pstmt->execute();
                         $provinces = $pstmt->fetchAll(PDO::FETCH_ASSOC);
                         if (count($provinces) > 0) {
+                            $hasResults = true;
                             echo "<tr><th>Province</th><th>Country</th></tr>\n";
                             foreach ($provinces as $row) {
                                 $htmlProvince = htmlspecialchars($row['province'], ENT_QUOTES, 'UTF-8');
@@ -99,6 +102,7 @@ $lstmt->execute();
                         $dstmt->execute();
                         $districts = $dstmt->fetchAll(PDO::FETCH_ASSOC);
                         if (count($districts) > 0) {
+                            $hasResults = true;
                             echo "<tr><th>District</th><th>Country</th><th>Province</th></tr>\n";
                             foreach ($districts as $row) {
                                 $htmlDistrict = htmlspecialchars($row['district'], ENT_QUOTES, 'UTF-8');
@@ -115,6 +119,7 @@ $lstmt->execute();
                     // Display Locality List
                     $localities = $lstmt->fetchAll(PDO::FETCH_ASSOC);
                     if (count($localities) > 0) {
+                        $hasResults = true;
                         ?>
                         <tr>
                             <th class="sortr"><a href="locality_list.php?<?php echo http_build_query($urlParams); ?>&amp;orderby=locality">Locality</a></th>
@@ -131,6 +136,9 @@ $lstmt->execute();
                             $localityID = (int)$row['ID'];
                             echo "<tr><td><a href=\"locality.php?ID=$localityID\">$htmlLocality</a></td><td>$htmlCountry</td><td>$htmlProvince</td><td>$htmlDistrict</td></tr>\n";
                         }
+                    }
+                    if (!$hasResults) {
+                        echo "<tr><td colspan='4' style='padding: 20px; text-align: center;'>No localities or regions found matching your criteria.</td></tr>";
                     }
                     ?>
                 </table>
