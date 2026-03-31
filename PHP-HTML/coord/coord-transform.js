@@ -318,19 +318,24 @@ function GZDcorners(GZD) {
 	if (!isDigit(GZD[1])) {
 		GZD = '0'+GZD;
 	}
-	const GZDNorth = GZD.slice(-1);  // The northing part of the GZD
-	const GZDEast  = Number(GZD.slice(0,2));  // The easting part of the GZD
-	const GZDNorthNumb = SQIdAlphatoNum(GZDNorth)-2;
+	const GZDNorth = GZD.slice(-1).toUpperCase();  // The easting part of the GZD
+	const GZDEast  = Number(GZD.slice(0, 2));
+    
+    const alphabet = "CDEFGHJKLMNPQRSTUVWXX";
+    const GZDNorthNumb = alphabet.indexOf(GZDNorth);
+    if (GZDNorthNumb === -1) return null;  // is not an letter used in a gridzone
 	// north börjar med bokstaben C på -80 grader, varje band är 8 grader förutom nordligaste (X) som är 12 grader
 	const GZDNStart = GZDNorthNumb*8 -80;
 	if (GZDNorth =='X') {
 		GZDNStop = 84;
 	} else {
-		GZDNStop = (GZDNorthNumb+1)*8 -80;
+		GZDNStop = GZDNStart + 8;
 	}
 	// east start at -180 grader talet 01; varje band är 6 grader. OBS undantag för bergen och Svalbard
 	// Bergen = 31V och 32V   zone 32 is extended 3° further west
 	// Svalbard = 31X, 33X, 37X  32X och 34X och 36X existerar ej.
+    let GZDEStart, GZDEStop;
+    
 	if (GZD == "31V" ) {
 		GZDEStart = 0;
 		GZDEStop = 3;
@@ -358,29 +363,59 @@ function GZDcorners(GZD) {
 
 // returns the corners of the 100 000 meter square identification for MGRS-new AA scheme, coord should be without anything after the MGRS square identifier
 function sqIDnewCorners(coord) {
-	const UTMmitt = MGRSnewtoUTM(coord);
-	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-50000,"east":UTMmitt.east-50000}; // substract an half sqId to get start coordinates
-	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+50000,"east":UTMmitt.east+50000}; // add an half sqId to get the end coordinates
-	const WGS84start = UTMtoWGS84(UTMstart);
-	const WGS84stop = UTMtoWGS84(UTMstop);
-	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
+    const UTMmitt = MGRSnewtoUTM(coord);
+    
+    // Define the 4 corners in UTM meters (relative to the center)
+    const cornersUTM = [
+        { east: UTMmitt.east - 50000, north: UTMmitt.north - 50000 }, // SW
+        { east: UTMmitt.east + 50000, north: UTMmitt.north - 50000 }, // SE
+        { east: UTMmitt.east - 50000, north: UTMmitt.north + 50000 }, // NW
+        { east: UTMmitt.east + 50000, north: UTMmitt.north + 50000 }  // NE
+    ];
+
+    // Convert all 4 corners to WGS84
+    const pointsWGS = cornersUTM.map(p => UTMtoWGS84({ GZD: UTMmitt.GZD, ...p }));
+
+    // Find the absolute bounding box in Lat/Long
+    // This ensures your overlap check covers the entire slanted square
+    const norths = pointsWGS.map(p => p.north);
+    const easts = pointsWGS.map(p => p.east);
+
+    return {
+        "north1": Math.min(...norths),
+        "east1":  Math.min(...easts),
+        "north2": Math.max(...norths),
+        "east2":  Math.max(...easts)
+    };
 }
 
 // returns the corners of the 100 000 meter square identification for MGRS-old AL scheme
 function sqIDoldCorners(coord) {
-	const UTMmitt = MGRSoldtoUTM(coord);
-	const UTMstart =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north-50000,"east":UTMmitt.east-50000};  // substract an half sqId to get start coordinates
-	const UTMstop = {"GZD":UTMmitt.GZD,"north":UTMmitt.north+50000,"east":UTMmitt.east+50000};  // add an half sqId to get the end coordinates
-	const WGS84start = UTMtoWGS84(UTMstart);
-	const WGS84stop = UTMtoWGS84(UTMstop);
-	return {"north1":WGS84start.north,"east1":WGS84start.east,"north2":WGS84stop.north,"east2":WGS84stop.east};
+    const UTMmitt = MGRSoldtoUTM(coord);
+    
+    const cornersUTM = [
+        { east: UTMmitt.east - 50000, north: UTMmitt.north - 50000 }, // South-West
+        { east: UTMmitt.east + 50000, north: UTMmitt.north - 50000 }, // South-East
+        { east: UTMmitt.east - 50000, north: UTMmitt.north + 50000 }, // North-West
+        { east: UTMmitt.east + 50000, north: UTMmitt.north + 50000 }  // North-East
+    ];
+
+    const pointsWGS = cornersUTM.map(p => UTMtoWGS84({ GZD: UTMmitt.GZD, ...p }));
+    const norths = pointsWGS.map(p => p.north);
+    const easts = pointsWGS.map(p => p.east);
+
+    return {
+        "north1": Math.min(...norths),
+        "east1":  Math.min(...easts),
+        "north2": Math.max(...norths),
+        "east2":  Math.max(...easts)
+    };
 }
 
 // returns the corners of the MGRS squre can be differently sized so not only the square identifier
 function MGRSnewCorners(coord) {
     MGRS = parseMGRS(coord);
     const sqSize = 10**(5-MGRS.coordlength); // square size in meter
-    //console.log("sqSize: "+sqSize);
 	const UTMmitt = MGRSnewtoUTM(coord);
 	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-sqSize/2,"east":UTMmitt.east-sqSize/2}; // substract an half sq to get start coordinates
 	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+sqSize/2,"east":UTMmitt.east+sqSize/2}; // add an half sq to get the end coordinates
@@ -392,7 +427,6 @@ function MGRSnewCorners(coord) {
 function MGRSoldCorners(coord) {
     MGRS = parseMGRS(coord);
     const sqSize = 10**(5-MGRS.coordlength); // square size in meter
-    //console.log("sqSize: "+sqSize);
 	const UTMmitt = MGRSoldtoUTM(coord);
 	const UTMstart = {"GZD":UTMmitt.GZD,"north":UTMmitt.north-sqSize/2,"east":UTMmitt.east-sqSize/2}; // substract an half sq to get start coordinates
 	const UTMstop =  {"GZD":UTMmitt.GZD,"north":UTMmitt.north+sqSize/2,"east":UTMmitt.east+sqSize/2}; // add an half sq to get the end coordinates

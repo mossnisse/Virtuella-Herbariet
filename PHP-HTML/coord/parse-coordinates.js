@@ -7,13 +7,14 @@ function parseUnknowCoord(coord) {
 	coord = coord.trim();
 	var sys = "unknown";
 	var interpreted = "";
+    /*
 	var WGS84 = false;
 	var Sweref99TM = false;
 	var RT90 = false;
 	var UTM = false;
 	var MGRSnew = false;
 	var MGRSold = false;
-	var RUBIN = false;
+	var RUBIN = false;*/
 	var coordOBJ = false;
 	if (R = isRT90(coord)) {
 		sys = "RT90 2.5 gon V";
@@ -126,106 +127,120 @@ function isRUBIN(coord) {
 
 // checking if MGRS/UTM grid-zone disgnation is valid
 function isGZD(GZD) {
-	if (!isDigit(GZD[1])) {
-		GZD = '0'+GZD;
-	} 
-	if(GZD.length!=3) return false;
-	const GZDNorth = GZD.slice(-1);  // The northing part of the GZD
-	const GZDEast  = Number(GZD.slice(0,2));  // The easting part of the GZD
-	if (GZDEast>60 || GZDEast<1) return false;
-	if (GZDNorth == 'O' || GZDEast == 'I' || GZDEast < 'C' || GZDEast > 'X') return false;
+    if (!isDigit(GZD[1])) {
+        GZD = '0' + GZD;
+    } 
+    if(GZD.length != 3) return false;
+    
+    const GZDNorth = GZD.slice(-1);  // The northing part of the GZD (Letter)
+    const GZDEast  = Number(GZD.slice(0,2));  // The easting part of the GZD (Number)
+    
+    if (GZDEast > 60 || GZDEast < 1) return false;
+    
+    if (GZDNorth === 'O' || GZDNorth === 'I' || GZDNorth < 'C' || GZDNorth > 'X') return false;
 
-	// fixa : 32X och 34X och 36X existerar ej på grund av undantag runt Svalbard , borde de kunna gå att använda i alla fall?
-	return true;
+    // 32X, 34X, and 36X exceptions in Norway and Svalbard are accepted.
+    return true;
 }
 
 // checking if MGRS 100,000-meter square identification is valid in the AA sheme (new). Enligt Wikipedia så ska hela rutan kunna användas för en GZD även om den ligger delvis utanför
 function isSqIDnew(GZD, sqId) {
-	if (sqId.length!=2) return false;
-	const sqIdEast = sqId.slice(0,1);
-	if (sqIdEast == 'I' || sqIdEast == 'O' || sqIdEast <'A' || sqIdEast>'Z') return false;
-	const sqIdNorth = sqId.slice(1,2);
-	if (sqIdNorth == 'I' || sqIdNorth == 'O' || sqIdNorth <'A' || sqIdNorth>'V') return false;
-	// todo check if sqId exists in GZD must be done to differencate between the to sheemes
-	const GZDruta = GZDcorners(GZD);
-	const sqIdruta = sqIDnewCorners(GZD+sqId);
-	//console.log("idSq Start North: "+sqIdruta.north1+" idSq Start east: "+sqIdruta.east1+" idSq Start North: "+sqIdruta.north2+" idSq Start east: "+sqIdruta.east2);
-	// check if GZDruta och sqIdruta överlappar, c1... är en bool för om varje sQid hörn ligger inom GZD rutan.
-	c1 = (GZDruta.north1 < sqIdruta.north1 && GZDruta.north2 > sqIdruta.north1  && GZDruta.east1 < sqIdruta.east1 && GZDruta.east2 > sqIdruta.east1);
-	c2 = (GZDruta.north1 < sqIdruta.north1 && GZDruta.north2 > sqIdruta.north1  && GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east2);
-	c3 = (GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north2  && GZDruta.east1 < sqIdruta.east1 && GZDruta.east2 > sqIdruta.east1);
-	c4 = (GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north2  && GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east2);
-	//console.log("c1: "+c1+" c2: "+c2+" c3: "+c3+" c4: "+c4);
-	if (!(c1 && c2 && c3 && c4)) return false;
-	return true;
+    if (sqId.length != 2) return false;
+    
+    const sqIdEast = sqId.slice(0,1);
+    if (sqIdEast === 'I' || sqIdEast === 'O' || sqIdEast < 'A' || sqIdEast > 'Z') return false;
+    
+    const sqIdNorth = sqId.slice(1,2);
+    if (sqIdNorth === 'I' || sqIdNorth === 'O' || sqIdNorth < 'A' || sqIdNorth > 'V') return false;
+    
+    const GZDruta = GZDcorners(GZD);
+    const sqIdruta = sqIDnewCorners(GZD + sqId);
+    
+    const intersect = (GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east1 &&
+                   GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north1);
+
+    if (!intersect) return false;
+    return true;
 }
 
 // checking if MGRS 100,000-meter square identification is valid in the AL sheme (old)
 function isSqIDold(GZD, sqId) {
-	if (sqId.length!=2) return false;
-	const sqIdEast = sqId.slice(0,1);
-	if (sqIdEast == 'I' || sqIdEast == 'O' || sqIdEast <'A' || sqIdEast>'Z') return false;
-	const sqIdNorth = sqId.slice(1,2);
-	if (sqIdNorth == 'I' || sqIdNorth == 'O' || sqIdNorth <'A' || sqIdNorth>'V') return false;
-	// todo check if sqId exists in GZD must be done to differencate between the to sheemes
-	const GZDruta = GZDcorners(GZD);
-	const sqIdruta = sqIDoldCorners(GZD+sqId);
-	//console.log("idSq Start North: "+sqIdruta.north1+" idSq Start east: "+sqIdruta.east1+" idSq Start North: "+sqIdruta.north2+" idSq Start east: "+sqIdruta.east2);
-	// check if GZDruta och sqIdruta överlappar
-	c1 = (GZDruta.north1 < sqIdruta.north1 && GZDruta.north2 > sqIdruta.north1  && GZDruta.east1 < sqIdruta.east1 && GZDruta.east2 > sqIdruta.east1);
-	c2 = (GZDruta.north1 < sqIdruta.north1 && GZDruta.north2 > sqIdruta.north1  && GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east2);
-	c3 = (GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north2  && GZDruta.east1 < sqIdruta.east1 && GZDruta.east2 > sqIdruta.east1);
-	c4 = (GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north2  && GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east2);
-	//console.log("c1: "+c1+" c2: "+c2+" c3: "+c3+" c4: "+c4);
-	if (!(c1 && c2 && c3 && c4)) return false;
-	return true;
+    if (sqId.length !== 2) return false;
+    
+    const sqIdEast = sqId.slice(0,1);
+    if (sqIdEast === 'I' || sqIdEast === 'O' || sqIdEast < 'A' || sqIdEast > 'Z') return false;
+    
+    const sqIdNorth = sqId.slice(1,2);
+    if (sqIdNorth === 'I' || sqIdNorth === 'O' || sqIdNorth < 'A' || sqIdNorth > 'V') return false;
+    
+    const GZDruta = GZDcorners(GZD);
+    // Note: ensure sqIDoldCorners is defined to handle the AL lettering logic
+    const intersect = (GZDruta.east1 < sqIdruta.east2 && GZDruta.east2 > sqIdruta.east1 &&
+                   GZDruta.north1 < sqIdruta.north2 && GZDruta.north2 > sqIdruta.north1);
+
+    if (!intersect) return false;
+    return true;
 }
 
 // checks if coord is an valid MGRS AA sheme string if true returns cleaned up string else returns false
 function isMGRSnew(coord) {
-	if (typeof coord != "string") return false; 
-	coord = coord.replace(/\s/g, "");
-	//checking if GZD easting number is two or one digit, if only one add 0;
-	if (!isDigit(coord[1])) {
-		coord = '0'+coord;
-	} 
-	if (coord.length % 2 == 0) return false; 
-	if (coord.length < 5 || coord.length>15) return false;
-	const GZD = coord.slice(0,3); 
-	if (!isGZD(GZD)) return false;
-	const sqId = coord.slice(3,5);
-	if (!isSqIDnew(GZD, sqId)) return false;
-	// Numerical localtion can be 0 to 5 digits. 0 to 99999. // whole sqId on the border of GZD should be possible to use.
-	const numloc = coord.slice(5);
-	if (numloc.match(/^[0-9]+$/) == null && coord.length!=5) return false;  // check if Numerical location have something else than numbers
-	const coordlength = (coord.length-5)/2;
-	const mult = 10**(5-coordlength);
-	// everything with a value is true, so returns both true and the cleaned up MGRS, MGRS can't be 0 or null;
-	return {"sys":"MGRS-new "+mult+" m square", "interpreted":coord};
+    if (typeof coord !== "string") return false; 
+    coord = coord.replace(/\s/g, "");
+    
+    //checking if GZD easting number is two or one digit, if only one add 0;
+    if (!isDigit(coord[1])) {
+        coord = '0' + coord;
+    } 
+    
+    if (coord.length % 2 === 0) return false; 
+    if (coord.length < 5 || coord.length > 15) return false;
+    
+    const GZD = coord.slice(0,3); 
+    if (!isGZD(GZD)) return false;
+    
+    const sqId = coord.slice(3,5);
+    if (!isSqIDnew(GZD, sqId)) return false;
+    
+    // Numerical location can be 0 to 5 digits. 0 to 99999.
+    const numloc = coord.slice(5);
+    
+    // check if Numerical location have something else than numbers
+    if (numloc.match(/^[0-9]+$/) === null && coord.length !== 5) return false;  
+    
+    const coordlength = (coord.length - 5) / 2;
+    const mult = 10 ** (5 - coordlength);
+    
+    return {"sys":"MGRS-new " + mult + " m square", "interpreted": coord};
 }
 
 // checks if coord is an valid MGRS AL sheme string if true returns cleaned up string else returns false
 function isMGRSold(coord) {
-	if (typeof coord != "string") return false;
-	coord = coord.replace(/\s/g, "");
-	//checking if GZD easting number is two or one digit, if only one add 0;
-	if (!isDigit(coord[1])) {
-		coord = '0'+coord;
-	} 
-	if (coord.lenght%2==0) return false;
-	if (coord.length<5 || coord.length>15) return false;
-	var GZD = coord.slice(0,3); 
-	if (!isGZD(GZD)) return false;
-	var sqId = coord.slice(3,5);
-	if (!isSqIDold(GZD, sqId)) return false;
-	// Numerical localtion can be 0 to 5 digits. 0 to 99999. // whole sqId on the border of GZD should be possible to use.
-	const numloc = coord.slice(5);
-	if (numloc.match(/^[0-9]+$/) == null && coord.length!=5) return false;  // check if Numerical location have something else than numbers
-	const coordlength = (coord.length-5)/2;
-	const mult = 10**(5-coordlength);
-	// everything with a value is true, so returns both true and the cleaned up MGRS can't be 0 or null;
+    if (typeof coord !== "string") return false;
+    coord = coord.replace(/\s/g, "");
+    
+    // checking if GZD easting number is two or one digit, if only one add 0;
+    if (!isDigit(coord[1])) {
+        coord = '0' + coord;
+    } 
+    
+    // FIX: Corrected typo 'lenght' to 'length'
+    if (coord.length % 2 === 0) return false;
+    if (coord.length < 5 || coord.length > 15) return false;
+    
+    const GZD = coord.slice(0,3); 
+    if (!isGZD(GZD)) return false;
+    
+    const sqId = coord.slice(3,5);
+    // Uses the old scheme corner validation
+    if (!isSqIDold(GZD, sqId)) return false;
+    
+    const numloc = coord.slice(5);
+    if (numloc.match(/^[0-9]+$/) === null && coord.length !== 5) return false; 
+    
+    const coordlength = (coord.length - 5) / 2;
+    const mult = 10 ** (5 - coordlength);
    
-	return {"sys":"MGRS-old "+mult+" m square", "interpreted":coord};
+    return {"sys": "MGRS-old " + mult + " m square", "interpreted": coord};
 }
 
 function isUTM(coord) {
